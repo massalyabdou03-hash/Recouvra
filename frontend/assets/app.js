@@ -751,6 +751,7 @@ async function syncFieldUpdates() {
 }
 
 function initGlobalNavigation() {
+  document.title = "Gestion Stock & Recouvra";
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
   const links = [
     { key: "home", label: "Accueil", href: "index.html", pages: ["index.html"] },
@@ -769,7 +770,7 @@ function initGlobalNavigation() {
   const nav = document.createElement("nav");
   nav.className = "global-nav";
   nav.setAttribute("aria-label", "Navigation principale");
-  nav.innerHTML = `<div class="global-nav-brand"><img src="assets/img/logo-sylla-icon.png" alt="Entreprise"><span data-company-name>Gestion Stock & Recouvra</span></div><div class="global-nav-links">${links.map(link => `<a class="global-nav-link${link.pages.includes(currentPage) ? " active" : ""}" href="${link.href}" data-nav-key="${link.key}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${icons[link.key]}</svg><span>${link.label}</span></a>`).join("")}</div><div class="global-nav-footer"><span id="current-user-email" class="global-nav-user"></span><button type="button" class="btn-logout" onclick="logout()">Déconnexion</button></div>`;
+  nav.innerHTML = `<div class="global-nav-brand"><span class="global-nav-mark" aria-hidden="true">R</span><span data-company-name>Gestion Stock & Recouvra</span></div><div class="global-nav-links">${links.map(link => `<a class="global-nav-link${link.pages.includes(currentPage) ? " active" : ""}" href="${link.href}" data-nav-key="${link.key}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${icons[link.key]}</svg><span>${link.label}</span></a>`).join("")}</div><div class="global-nav-footer"><span id="current-user-email" class="global-nav-user"></span><button type="button" class="btn-logout" onclick="logout()">Déconnexion</button></div>`;
   document.querySelector(".sidebar, .topbar")?.replaceWith(nav);
   nav.querySelector('[data-nav-key="recouvra"]')?.addEventListener("click", handleRecouvraNavigation);
 }
@@ -781,7 +782,7 @@ async function handleRecouvraNavigation(event) {
   const { data: profile } = await supabaseClient.from("profiles").select("id,entreprise_id,has_recouvra").eq("id", userData.user.id).maybeSingle();
   if (profile?.has_recouvra) { window.location.href = "recouvra.html"; return; }
 
-  openSubscriptionModal(profile);
+  window.location.href = "abonnement.html";
 }
 
 function openSubscriptionModal(profile) {
@@ -831,7 +832,7 @@ async function requireRecouvra() {
 async function requestRecouvra() {
   const profile = await currentProfile();
   if (!profile) return;
-  openSubscriptionModal(profile);
+  window.location.href = "abonnement.html";
 }
 
 function money(value) { return `${Number(value || 0).toLocaleString("fr-FR")} F`; }
@@ -860,7 +861,7 @@ async function applyCompanySettings() {
   if (settings.primary_color) document.documentElement.style.setProperty("--accent", settings.primary_color);
   if (settings.secondary_color) document.documentElement.style.setProperty("--secondary", settings.secondary_color);
   document.querySelectorAll("[data-company-name]").forEach(el => { el.textContent = settings.nom_commercial || "Entreprise"; });
-  document.querySelectorAll(".global-nav-brand img").forEach(img => { img.src = settings.logo_url || "assets/img/logo-sylla-icon.png"; img.alt = settings.nom_commercial || "Entreprise"; });
+  document.querySelectorAll(".global-nav-mark").forEach(mark => { mark.textContent = (settings.nom_commercial || "Entreprise").trim().charAt(0).toUpperCase(); });
 }
 
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", applyCompanySettings);

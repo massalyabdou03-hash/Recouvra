@@ -8,6 +8,7 @@ create table if not exists demandes_abonnement (
     id uuid primary key default gen_random_uuid(),
     entreprise_id uuid not null references entreprises(id) on delete cascade,
     reference_wave varchar(120) not null,
+    preuve_paiement_path text,
     montant numeric(10,2) not null default 15000 check (montant = 15000),
     status varchar(15) not null default 'en_attente' check (status in ('en_attente', 'validee', 'refusee')),
     submitted_by uuid not null references auth.users(id) on delete cascade,
@@ -15,6 +16,7 @@ create table if not exists demandes_abonnement (
     reviewed_at timestamptz,
     created_at timestamptz not null default now()
 );
+alter table demandes_abonnement add column if not exists preuve_paiement_path text;
 
 create unique index if not exists one_pending_subscription
 on demandes_abonnement(entreprise_id) where status = 'en_attente';
@@ -60,3 +62,17 @@ create policy subscription_superadmin_update on demandes_abonnement for update t
 using (current_user_is_super_admin()) with check (current_user_is_super_admin());
 
 grant execute on function create_company_for_new_user() to service_role;
+
+insert into storage.buckets (id, name, public)
+values ('payment-proofs', 'payment-proofs', false)
+on conflict (id) do update set public = false;
+
+drop policy if exists payment_proof_insert on storage.objects;
+create policy payment_proof_insert on storage.objects for insert to authenticated
+with check (bucket_id = 'payment-proofs' and name like current_user_entreprise_id()::text || '/%');
+drop policy if exists payment_proof_read on storage.objects;
+create policy payment_proof_read on storage.objects for select to authenticated
+using (bucket_id = 'payment-proofs' and (name like current_user_entreprise_id()::text || '/%' or current_user_is_super_admin()));
+drop policy if exists payment_proof_delete on storage.objects;
+create policy payment_proof_delete on storage.objects for delete to authenticated
+using (bucket_id = 'payment-proofs' and (name like current_user_entreprise_id()::text || '/%' or current_user_is_super_admin()));

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Activation Recouvra</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/config.js"></script>
+<script src="assets/app.js" defer></script>
+<script src="assets/abonnement.js" defer></script>
+</head>
+<body>
+<main class="shell">
+  <section class="subscription-page">
+    <div class="subscription-heading"><span class="eyebrow">Module Premium</span><h1>Automatisez et Accélérez le Recouvrement de vos Impayés</h1><p>Fini les relances manuelles pénibles. Récupérez votre argent plus vite tout en préservant vos relations clients.</p></div>
+    <section class="subscription-card">
+      <div class="subscription-benefits-block"><h2>Tout ce qu'il vous faut pour être payé plus vite</h2><ul class="subscription-benefits"><li><strong>Relances WhatsApp en 1 clic</strong><span>Envoyez des messages personnalisés et professionnels directement depuis l'application.</span></li><li><strong>Suivi automatique des échéances</strong><span>Identifiez immédiatement les factures en retard et les montants dus.</span></li><li><strong>Gestion des promesses de paiement</strong><span>Planifiez et suivez les engagements de règlement de vos clients.</span></li><li><strong>Acomptes et paiements partiels</strong><span>Gardez un historique clair de tous les versements reçus.</span></li><li><strong>Réduction du retard de paiement</strong><span>Améliorez la trésorerie de votre entreprise dès le premier mois.</span></li></ul></div>
+      <div class="subscription-price"><strong>15 000 FCFA</strong><span>/ mois, sans engagement</span></div>
+      <ul class="subscription-benefits"><li>Relances WhatsApp en un clic</li><li>Suivi des créances et des soldes</li><li>Historique des promesses de paiement</li><li>Gestion des acomptes et paiements</li></ul>
+      <div class="wave-instructions"><span class="eyebrow">Paiement Wave Sénégal</span><p>Effectuez votre transfert Wave de <strong>15 000 FCFA au numéro : +221 77 033 80 30</strong></p></div>
+      <form id="subscription-form" class="subscription-form">
+        <label>Importer la capture d'écran du reçu de paiement Wave<input id="payment-proof" type="file" accept="image/jpeg,image/png,application/pdf" required><small>Formats acceptés : JPG, PNG, PDF. Taille maximale : 5 Mo.</small></label>
+        <label>Référence / ID Transaction Wave<input id="wave-reference" type="text" maxlength="120" required placeholder="Ex : TXN-123456"></label>
+        <label class="terms-check"><input id="terms" type="checkbox" required><span>J'accepte les <button type="button" class="text-button" id="terms-link">Conditions Générales d'Utilisation</button> du service Recouvra.</span></label>
+        <button class="button" type="submit" id="subscription-submit">Envoyer ma preuve de paiement</button>
+        <p id="subscription-message" class="subscription-message" aria-live="polite"></p>
+      </form>
+    </section>
+  </section>
+</main>
+<div id="terms-modal" class="terms-modal" hidden><section class="terms-dialog" role="dialog" aria-modal="true" aria-labelledby="terms-title"><button type="button" class="terms-close" aria-label="Fermer">×</button><span class="eyebrow">Recouvra</span><h2 id="terms-title">Conditions Générales d'Utilisation</h2><div class="terms-content"><p>Recouvra est un service d'aide au recouvrement et de gestion des créances.</p><p>L'abonnement mensuel est de 15 000 FCFA, payable d'avance par Wave au +221 77 033 80 30.</p><p>L'activation est réalisée après vérification de la preuve de paiement par l'administrateur.</p><p>L'utilisateur est responsable de l'exactitude des numéros de téléphone des clients et des montants réclamés via WhatsApp.</p><p>Les données clients doivent être utilisées de manière confidentielle et protégées conformément à la réglementation applicable.</p></div></section></div>
+</body>
+</html>
