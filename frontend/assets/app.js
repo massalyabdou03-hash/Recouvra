@@ -772,10 +772,17 @@ function initGlobalNavigation() {
     recouvra: '<path d="M13 2 3 14h7l-1 8 11-14h-7l1-6z"/>',
     settings: '<path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/><circle cx="12" cy="12" r="3"/>',
   };
+  // Dans le module Recouvra (paiements/promesses/detail/hub), on masque tout le menu
+  // de gestion de stock : ces pages ne concernent que le recouvrement des factures
+  // deja saisies dans Sylla, pas le catalogue/stock que Sylla gere deja par ailleurs.
+  const recouvraLink = links.find(l => l.key === "recouvra");
+  const isRecouvraContext = recouvraLink.pages.includes(currentPage);
+  const visibleLinks = isRecouvraContext ? [recouvraLink] : links;
+
   const nav = document.createElement("nav");
   nav.className = "global-nav";
   nav.setAttribute("aria-label", "Navigation principale");
-  nav.innerHTML = `<div class="global-nav-brand"><span class="global-nav-mark" aria-hidden="true">R</span><span data-company-name>Gestion Stock & Recouvra</span></div><div class="global-nav-links">${links.map(link => `${link.group ? `<div class="nav-group-label">${link.group}</div>` : ""}<a class="global-nav-link${link.power ? " nav-link-power" : ""}${link.pages.includes(currentPage) ? " active" : ""}" href="${link.href}" data-nav-key="${link.key}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${icons[link.key]}</svg><span>${link.label}</span>${link.power ? '<span class="power-badge" data-recouvra-badge>...</span>' : ""}</a>`).join("")}</div><div class="global-nav-footer"><span id="current-user-email" class="global-nav-user"></span><button type="button" class="btn-logout" onclick="logout()">Déconnexion</button></div>`;
+  nav.innerHTML = `<div class="global-nav-brand"><span class="global-nav-mark" aria-hidden="true">R</span><span data-company-name>Gestion Stock & Recouvra</span></div><div class="global-nav-links">${visibleLinks.map(link => `${link.group && !isRecouvraContext ? `<div class="nav-group-label">${link.group}</div>` : ""}<a class="global-nav-link${link.power ? " nav-link-power" : ""}${link.pages.includes(currentPage) ? " active" : ""}" href="${link.href}" data-nav-key="${link.key}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${icons[link.key]}</svg><span>${link.label}</span>${link.power ? '<span class="power-badge" data-recouvra-badge>...</span>' : ""}</a>`).join("")}</div><div class="global-nav-footer"><span id="current-user-email" class="global-nav-user"></span><button type="button" class="btn-logout" onclick="logout()">Déconnexion</button></div>`;
   document.querySelector(".sidebar, .topbar")?.replaceWith(nav);
   nav.querySelector('[data-nav-key="recouvra"]')?.addEventListener("click", handleRecouvraNavigation);
   currentProfile().then(profile => {
