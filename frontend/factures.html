@@ -507,7 +507,7 @@ let facturesList = [];
 async function loadFactures() {
   const { items, offline, savedAt } = await loadWithCache("factures", () =>
     supabaseClient
-      .from("factures").select("id, numero_facture, statut, montant_total, mode_paiement, created_at, clients(nom)")
+      .from("factures").select("id, numero_facture, statut, montant_total, mode_paiement, created_at, paye, date_echeance, client_id, clients(nom, telephone)")
       .neq("statut", "ANNULEE")
       .order("created_at", { ascending: false }).limit(100)
   );
@@ -542,20 +542,26 @@ function renderFacturesList() {
     groups[groups.length - 1].rows.push(f);
   }
 
+  const today = new Date();
   el.innerHTML = `
     <table>
-      <thead><tr><th>N° facture</th><th>Client</th><th>Statut</th><th>Paiement</th><th class="num">Montant</th></tr></thead>
+      <thead><tr><th>N° facture</th><th>Client</th><th>Statut</th><th>Paiement</th><th class="num">Montant</th><th></th></tr></thead>
       <tbody>
         ${groups.map(g => `
-          <tr class="table-group-row table-group-date"><td colspan="5">${g.key}</td></tr>
-          ${g.rows.map(f => `
+          <tr class="table-group-row table-group-date"><td colspan="6">${g.key}</td></tr>
+          ${g.rows.map(f => {
+            const impayee = f.statut === "VALIDEE" && f.mode_paiement === "CREDIT" && !f.paye;
+            const enRetard = impayee && f.date_echeance && new Date(f.date_echeance) < today;
+            return `
             <tr style="cursor:pointer;" onclick="window.location.href='facture-detail.html?id=${f.id}'">
               <td class="ref">${esc(f.numero_facture || "brouillon-" + f.id)}</td>
               <td>${esc(f.clients?.nom || "—")}</td>
-              <td><span class="badge ${badgeClass[f.statut]}">${f.statut}</span></td>
+              <td><span class="badge ${badgeClass[f.statut]}">${f.statut}</span>${enRetard ? ' <span class="badge badge-danger">En retard</span>' : impayee ? ' <span class="badge badge-warn">Impayée</span>' : ""}</td>
               <td class="hint">${f.mode_paiement ? esc(MODE_PAIEMENT_LABELS[f.mode_paiement] || f.mode_paiement) : "—"}</td>
               <td class="num">${fmtMoney(f.montant_total)}</td>
-            </tr>`).join("")}
+              <td class="actions-cell">${impayee ? `<button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); window.location.href='recouvra.html?facture=${f.id}'">💬 Relancer via Recouvra</button>` : ""}</td>
+            </tr>`;
+          }).join("")}
         `).join("")}
       </tbody>
     </table>`;

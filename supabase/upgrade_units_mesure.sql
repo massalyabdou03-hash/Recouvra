@@ -10,6 +10,11 @@ alter table pieces add constraint pieces_unite_mesure_check check (unite_mesure 
 alter table pieces drop constraint if exists pieces_unite_gros_facteur_check;
 alter table pieces add constraint pieces_unite_gros_facteur_check check (unite_gros_facteur is null or unite_gros_facteur > 0);
 
+-- vue_alertes_stock (schema.sql) depend de pieces.quantite_stock : impossible de changer
+-- son type tant que la vue existe (rule _RETURN). On la supprime et on la recree a
+-- l'identique juste apres.
+drop view if exists vue_alertes_stock;
+
 alter table pieces alter column quantite_stock type numeric(12,3) using quantite_stock::numeric;
 alter table mouvements_stock alter column quantite type numeric(12,3) using quantite::numeric;
 alter table mouvements_stock alter column quantite_avant type numeric(12,3) using quantite_avant::numeric;
@@ -19,6 +24,11 @@ alter table factures_lignes add column if not exists quantite_affichee numeric(1
 alter table factures_lignes add column if not exists unite_mesure varchar(20);
 alter table factures_lignes add column if not exists vente_par_lot boolean not null default false;
 alter table factures_lignes add column if not exists unite_gros varchar(20);
+
+create or replace view vue_alertes_stock as
+select id, reference_oem, reference_interne, designation, quantite_stock, seuil_alerte, marque, emplacement
+from pieces where actif = true and quantite_stock <= seuil_alerte
+order by (quantite_stock - seuil_alerte) asc;
 
 create or replace function enregistrer_mouvement_stock(p_piece_id bigint, p_type varchar, p_quantite numeric, p_motif varchar)
 returns void language plpgsql security definer set search_path = public as $$

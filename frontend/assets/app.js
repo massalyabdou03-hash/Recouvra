@@ -755,25 +755,35 @@ function initGlobalNavigation() {
   document.title = "Gestion Stock & Recouvra";
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
   const links = [
-    { key: "home", label: "Accueil", href: "index.html", pages: ["index.html"] },
-    { key: "stock", label: "Stock", href: "stock.html", pages: ["stock.html", "catalogue.html", "rupture-stock.html"] },
+    { key: "home", label: "Accueil", href: "index.html", pages: ["index.html"], group: "Gestion courante" },
+    { key: "stock", label: "Stock & Produits", href: "stock.html", pages: ["stock.html", "rupture-stock.html"] },
+    { key: "catalogue", label: "Catalogue", href: "catalogue.html", pages: ["catalogue.html"] },
     { key: "invoices", label: "Factures", href: "factures.html", pages: ["factures.html", "facture-detail.html", "credits.html"] },
-    { key: "recouvra", label: "Recouvra", href: "recouvra.html", pages: ["recouvra.html", "recouvra-detail.html", "paiements.html", "promesses.html"] },
+    { key: "clients", label: "Clients", href: "clients.html", pages: ["clients.html"] },
     { key: "settings", label: "Paramètres", href: "parametres.html", pages: ["parametres.html"] },
+    { key: "recouvra", label: "Recouvra", href: "recouvra.html", pages: ["recouvra.html", "recouvra-detail.html", "paiements.html", "promesses.html"], group: "Extension premium", power: true },
   ];
   const icons = {
     home: '<path d="m3 10 9-7 9 7v10H3z"/><path d="M9 21v-6h6v6"/>',
     stock: '<path d="m3 7 9-4 9 4-9 4z"/><path d="M3 7v10l9 4 9-4V7M12 11v10"/>',
+    catalogue: '<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>',
     invoices: '<path d="M6 2h12v19l-3-2-3 2-3-2-3 2V2z"/><path d="M9 8h6M9 12h6"/>',
-    recouvra: '<rect x="5" y="5" width="14" height="14" rx="2"/><path d="M8 12h8M12 8v8"/>',
+    clients: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    recouvra: '<path d="M13 2 3 14h7l-1 8 11-14h-7l1-6z"/>',
     settings: '<path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/><circle cx="12" cy="12" r="3"/>',
   };
   const nav = document.createElement("nav");
   nav.className = "global-nav";
   nav.setAttribute("aria-label", "Navigation principale");
-  nav.innerHTML = `<div class="global-nav-brand"><span class="global-nav-mark" aria-hidden="true">R</span><span data-company-name>Gestion Stock & Recouvra</span></div><div class="global-nav-links">${links.map(link => `<a class="global-nav-link${link.pages.includes(currentPage) ? " active" : ""}" href="${link.href}" data-nav-key="${link.key}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${icons[link.key]}</svg><span>${link.label}</span></a>`).join("")}</div><div class="global-nav-footer"><span id="current-user-email" class="global-nav-user"></span><button type="button" class="btn-logout" onclick="logout()">Déconnexion</button></div>`;
+  nav.innerHTML = `<div class="global-nav-brand"><span class="global-nav-mark" aria-hidden="true">R</span><span data-company-name>Gestion Stock & Recouvra</span></div><div class="global-nav-links">${links.map(link => `${link.group ? `<div class="nav-group-label">${link.group}</div>` : ""}<a class="global-nav-link${link.power ? " nav-link-power" : ""}${link.pages.includes(currentPage) ? " active" : ""}" href="${link.href}" data-nav-key="${link.key}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${icons[link.key]}</svg><span>${link.label}</span>${link.power ? '<span class="power-badge" data-recouvra-badge>...</span>' : ""}</a>`).join("")}</div><div class="global-nav-footer"><span id="current-user-email" class="global-nav-user"></span><button type="button" class="btn-logout" onclick="logout()">Déconnexion</button></div>`;
   document.querySelector(".sidebar, .topbar")?.replaceWith(nav);
   nav.querySelector('[data-nav-key="recouvra"]')?.addEventListener("click", handleRecouvraNavigation);
+  currentProfile().then(profile => {
+    const badge = nav.querySelector("[data-recouvra-badge]");
+    if (!badge) return;
+    const active = Boolean(profile?.has_recouvra || profile?.role === "super_admin");
+    badge.textContent = active ? "ACTIF" : "PREMIUM";
+  });
 }
 
 async function handleRecouvraNavigation(event) {

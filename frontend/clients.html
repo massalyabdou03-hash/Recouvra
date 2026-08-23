@@ -138,7 +138,7 @@ async function loadClientStats() {
   try {
     const { data, error } = await fetchAllRows(() =>
       supabaseClient.from("factures")
-        .select("client_id, montant_total, mode_paiement, paye")
+        .select("client_id, montant_total, montant_restant, mode_paiement, paye")
         .eq("statut", "VALIDEE")
     );
     if (error || !data) return;
@@ -147,7 +147,7 @@ async function loadClientStats() {
       const s = clientStats[f.client_id];
       s.nbFactures += 1;
       s.totalAchete += Number(f.montant_total);
-      if (f.mode_paiement === "CREDIT" && !f.paye) s.du += Number(f.montant_total);
+      if (f.mode_paiement === "CREDIT" && !f.paye) s.du += Number(f.montant_restant ?? f.montant_total);
     });
   } catch {
     // hors ligne : pas de connexion pour calculer les statistiques, elles resteront à 0.
@@ -261,6 +261,7 @@ function openDetailModal(id) {
       <div class="hint">Adresse</div>
       <div style="white-space:pre-wrap; margin-top:4px;">${c.adresse ? esc(c.adresse) : '<span class="hint">—</span>'}</div>
     </div>
+    ${s.du > 0 ? `<div style="margin-top:16px;"><button type="button" class="btn btn-secondary" onclick="window.location.href='recouvra.html?client=${c.id}'">💬 Relancer via Recouvra</button></div>` : ""}
   `;
   document.getElementById("detail-edit-btn").onclick = () => { closeDetailModal(); editClient(id); };
   document.getElementById("detail-backdrop").classList.add("open");
