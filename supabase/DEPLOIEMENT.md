@@ -3,11 +3,14 @@
 ## 1. Projet de test `recovra-dev`
 
 1. Creer ou ouvrir le projet Supabase de test `recovra-dev`.
-2. Dans **SQL Editor**, executer le schema MVP (`schema.sql`) si la base est vide.
-3. Executer ensuite `migration_recouvra.sql` en entier.
+2. Dans **SQL Editor**, executer `schema.sql` en entier. Cette etape cree notamment la table `pieces`.
+3. Verifier que les tables `pieces`, `clients` et `factures` existent.
+4. Executer ensuite `migration_recouvra.sql` en entier.
 4. Creer un utilisateur de test dans **Authentication > Users**.
 5. Renseigner l URL et la cle publishable/anon de `recovra-dev` dans `frontend/assets/config.js`.
-6. Servir le dossier `frontend` avec un serveur statique et tester connexion, activation, paiements, promesses, relances, branding et super-admin.
+7. Servir le dossier `frontend` avec un serveur statique et tester connexion, activation, paiements, promesses, relances, branding et super-admin.
+
+`migration_recouvra.sql` est une migration complementaire. Si elle est executee avant `schema.sql`, Supabase affiche `42P01: relation "pieces" does not exist`. Dans ce cas, executer `schema.sql`, puis relancer la migration depuis le debut.
 
 Ne jamais utiliser la cle `service_role` dans `config.js`.
 
