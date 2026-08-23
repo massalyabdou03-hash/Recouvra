@@ -15,9 +15,9 @@
 // postes déjà installés continueront de servir l'ancienne version en cache.
 // =============================================================================
 
-const CACHE_VERSION = "v17";
-const SHELL_CACHE = `sylla-shell-${CACHE_VERSION}`;
-const RUNTIME_CACHE = `sylla-runtime-${CACHE_VERSION}`;
+const CACHE_VERSION = "v18";
+const SHELL_CACHE = `recouvra-shell-${CACHE_VERSION}`;
+const RUNTIME_CACHE = `recouvra-runtime-${CACHE_VERSION}`;
 
 const SHELL_ASSETS = [
   "login.html",
@@ -29,11 +29,11 @@ const SHELL_ASSETS = [
   "facture-detail.html",
   "credits.html",
   "clients.html",
+  "manifest.json",
   "assets/style.css",
   "assets/app.js",
   "assets/config.js",
-  "assets/img/logo-sylla-icon.png",
-  "assets/img/logo-sylla.png",
+  "assets/img/icon.svg",
 ];
 
 self.addEventListener("install", (event) => {
