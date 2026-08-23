@@ -881,6 +881,10 @@ async function applyCompanySettings() {
   if (settings.secondary_color) document.documentElement.style.setProperty("--secondary", settings.secondary_color);
   document.querySelectorAll("[data-company-name]").forEach(el => { el.textContent = settings.nom_commercial || "Entreprise"; });
   document.querySelectorAll(".global-nav-mark").forEach(mark => { mark.textContent = (settings.nom_commercial || "Entreprise").trim().charAt(0).toUpperCase(); });
+  if (settings.logo_url) document.querySelectorAll("[data-company-logo]").forEach(img => { img.src = settings.logo_url; });
+  if (settings.nom_commercial && document.title.includes(" — ")) {
+    document.title = document.title.split(" — ")[0] + " — " + settings.nom_commercial;
+  }
 }
 
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", applyCompanySettings);
