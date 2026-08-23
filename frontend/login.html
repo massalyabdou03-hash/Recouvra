@@ -1,1 +1,61 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Connexion</title><link rel="stylesheet" href="assets/style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="assets/config.js"></script></head><body data-public><main class="shell"><section class="panel access-panel"><span class="eyebrow">Sylla Automobile</span><h1>Gestion Stock & Recouvra</h1><form id="login" class="cards"><label>Email<input type="email" id="email" required></label><label>Mot de passe<input type="password" id="password" required></label><button class="button">Se connecter</button></form><p id="error"></p></section></main><script>login.onsubmit=async e=>{e.preventDefault();const {error}=await supabaseClient.auth.signInWithPassword({email:email.value,password:password.value});if(error){document.querySelector('#error').textContent=error.message;return}location.href='index.html'}</script></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connexion — Sylla Automobile</title>
+<link rel="icon" href="assets/img/sylla.ico">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login-box">
+      <div class="brand"><img src="assets/img/logo-sylla-icon.png" class="brand-logo" alt="Sylla Automobile"> Sylla Automobile</div>
+      <p class="hint" style="margin-top:-10px; margin-bottom:18px;">Ziguinchor · Entre le code d'accès de la boutique.</p>
+      <form id="login-form">
+        <label for="code">Code d'accès</label>
+        <input id="code" type="password" required autocomplete="current-password" minlength="6" inputmode="text">
+        <button type="submit" class="btn" style="width:100%; margin-top:20px;" id="submit-btn">Se connecter</button>
+      </form>
+      <div id="msg"></div>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  (async () => {
+    const { data } = await supabaseClient.auth.getSession();
+    if (data.session) window.location.href = "index.html";
+  })();
+
+  const form = document.getElementById("login-form");
+  const msg = document.getElementById("msg");
+  const btn = document.getElementById("submit-btn");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearMsg(msg);
+    btn.disabled = true;
+    btn.textContent = "Connexion...";
+    const code = document.getElementById("code").value.trim();
+
+    // Le code d'accès sert à la fois d'identifiant et de mot de passe :
+    // on le transforme en email technique pour Supabase Auth (invisible pour l'utilisateur).
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email: codeToEmail(code),
+      password: code,
+    });
+
+    if (error) {
+      showMsg(msg, friendlyError(error));
+      btn.disabled = false;
+      btn.textContent = "Se connecter";
+    } else {
+      window.location.href = "index.html";
+    }
+  });
+</script>
+</body>
+</html>

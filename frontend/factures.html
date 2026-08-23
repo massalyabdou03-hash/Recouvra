@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Factures — Sylla Automobile — Ziguinchor</title>
+<link rel="icon" href="assets/img/sylla.ico">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="app">
+  <nav class="sidebar">
+    <div class="brand"><img src="assets/img/logo-sylla-icon.png" class="brand-logo" alt="Sylla Automobile"> Sylla Automobile <span class="brand-tag">Ziguinchor</span></div>
+    <a class="nav-link" href="index.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> Tableau de bord</a>
+    <a class="nav-link" href="catalogue.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg> Catalogue</a>
+    <a class="nav-link" href="stock.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v18"/><path d="M4 7l4-4 4 4"/><path d="M16 21V3"/><path d="M20 17l-4 4-4-4"/></svg> Mouvements stock</a>
+    <a class="nav-link" href="rupture-stock.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 17h.01"/></svg> Ruptures de stock</a>
+    <a class="nav-link active" href="factures.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v19l-3-2-3 2-3-2-3 2V2z"/><path d="M9 8h6M9 12h6"/></svg> Factures</a>
+    <a class="nav-link" href="credits.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg> Emprunts</a>
+    <a class="nav-link" href="clients.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Clients</a>
+    <div class="sidebar-footer">
+      <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
+      <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="topbar">
+      <div><h1>Factures</h1><div class="subtitle">Brouillons et factures validées</div></div>
+      <button class="btn" onclick="toggleNewForm()" id="toggle-new-btn">+ Nouvelle facture</button>
+    </div>
+
+    <div class="card" id="new-facture-card" style="display:none;">
+      <h3>Nouvelle facture (brouillon)</h3>
+      <label>Client *</label>
+      <div class="input-with-action" id="client-select-row">
+        <select id="client_id" required onchange="updateOfflineFieldsVisibility()"><option value="">Sélectionner un client...</option></select>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="openQuickClient()">+ Nouveau</button>
+      </div>
+      <label style="display:flex; align-items:center; gap:8px; margin-top:10px; cursor:pointer;">
+        <input type="checkbox" id="vente-comptoir-check" style="width:auto; margin:0;" onchange="toggleVenteComptoir()">
+        <span class="hint" style="margin:0;">Vente comptoir — client de passage, sans nom ni coordonnées</span>
+      </label>
+
+      <table style="margin-top:16px;">
+        <thead><tr><th>Pièce</th><th style="width:90px;">Qté</th><th style="width:120px;">Prix unit.</th><th style="width:110px;">Montant</th><th></th></tr></thead>
+        <tbody id="lignes-body"></tbody>
+      </table>
+      <button type="button" class="btn btn-secondary btn-sm" style="margin-top:10px;" onclick="addLigne()">+ Ajouter une ligne</button>
+
+      <div id="offline-payment-fields" style="display:none; margin-top:16px;">
+        <p class="hint" style="margin-top:0;">Hors connexion : choisis le mode de paiement maintenant — la facture sera validée automatiquement (numéro officiel + déstockage) dès le retour de la connexion.</p>
+        <div class="field-row">
+          <div>
+            <label>Mode de paiement *</label>
+            <select id="offline_mode_paiement" onchange="onOfflineModePaiementChange()">
+              <option value="ESPECES">Espèces</option>
+              <option value="CARTE">Carte</option>
+              <option value="VIREMENT">Virement</option>
+              <option value="WAVE">Wave</option>
+              <option value="OM">Orange Money</option>
+              <option value="CHEQUE">Chèque</option>
+              <option value="CREDIT">Crédit (bon — le client paie plus tard)</option>
+            </select>
+          </div>
+          <div id="offline-echeance-field" style="display:none;">
+            <label>Le client paie sous *</label>
+            <select id="offline_echeance_type">
+              <option value="SEMAINE">1 semaine</option>
+              <option value="MOIS">1 mois</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:right; margin-top:16px; font-family:var(--font-display); font-size:1.2rem;">
+        Total : <span id="total-facture" class="mono">0 F</span>
+      </div>
+
+      <div id="new-facture-msg"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="toggleNewForm()">Annuler</button>
+        <button type="button" class="btn" id="save-facture-btn" onclick="saveFacture()">Enregistrer en brouillon</button>
+      </div>
+    </div>
+
+    <div class="card" id="pending-sales-card" style="display:none;">
+      <div class="card-head">
+        <h3>Ventes en attente de synchronisation</h3>
+        <button class="btn btn-secondary btn-sm" onclick="syncPendingSales()">Synchroniser maintenant</button>
+      </div>
+      <div id="pending-sales-content"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>Historique</h3></div>
+      <div class="toolbar" style="margin-bottom:16px;">
+        <input class="search-input" id="historique-search" placeholder="Rechercher (client, n° facture)..." oninput="renderFacturesList()">
+      </div>
+      <div id="table-content">Chargement...</div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal création rapide de client -->
+<div class="modal-backdrop" id="quick-client-backdrop">
+  <div class="modal modal-sm">
+    <div class="modal-head"><h3>Nouveau client</h3><button class="close-x" onclick="closeQuickClient()">×</button></div>
+    <form id="quick-client-form">
+      <label>Nom / Raison sociale *</label>
+      <input id="qc-nom" required>
+      <div class="field-row">
+        <div><label>Téléphone</label><input id="qc-telephone"></div>
+        <div><label>Email</label><input id="qc-email" type="email"></div>
+      </div>
+      <div id="quick-client-msg"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeQuickClient()">Annuler</button>
+        <button type="submit" class="btn" id="qc-save-btn">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script>
+let piecesList = [];
+let ligneCounter = 0;
+let ligneWidgets = {}; // id de ligne -> instance du champ de recherche de pièce (initPieceSearch)
+let pendingNewClients = {}; // clients créés hors ligne, en attente d'un vrai id Supabase
+
+function toggleNewForm() {
+  const card = document.getElementById("new-facture-card");
+  const isOpen = card.style.display !== "none";
+  card.style.display = isOpen ? "none" : "block";
+  if (!isOpen) {
+    if (document.getElementById("lignes-body").children.length === 0) addLigne();
+    updateOfflineFieldsVisibility();
+  }
+}
+
+// Ouvre le formulaire de nouvelle facture avec une pièce déjà ajoutée en première ligne —
+// utilisé quand on arrive depuis le Catalogue via "Facturer cette pièce" (?piece_id=...).
+function openNewFormWithPiece(piece) {
+  document.getElementById("new-facture-card").style.display = "block";
+  resetClientSelection();
+  document.getElementById("lignes-body").innerHTML = "";
+  ligneWidgets = {};
+  addLigne();
+  const rowId = ligneCounter;
+  const tr = document.getElementById(`ligne-${rowId}`);
+  ligneWidgets[rowId].setSelected(piece);
+  tr.querySelector(".ligne-prix").value = piece.prix_vente;
+  recalcLigne(rowId);
+  updateOfflineFieldsVisibility();
+  tr.querySelector(".ligne-qte").focus();
+  tr.querySelector(".ligne-qte").select();
+}
+
+function updateOfflineFieldsVisibility() {
+  // Un client créé hors ligne doit passer par la file d'attente même si la connexion
+  // est revenue entre-temps (il n'a pas encore de vrai id Supabase).
+  const clientId = document.getElementById("client_id").value;
+  const isComptoir = document.getElementById("vente-comptoir-check").checked;
+  // Vente comptoir : paiement toujours espèces, jamais besoin de le demander.
+  const needsOfflineFields = !isComptoir && (!appIsOnline || clientId.startsWith("new-"));
+  document.getElementById("offline-payment-fields").style.display = needsOfflineFields ? "block" : "none";
+
+  let label = "Enregistrer en brouillon";
+  if (isComptoir) label = "Valider comme vente";
+  else if (needsOfflineFields) label = "Enregistrer la vente (hors ligne)";
+  document.getElementById("save-facture-btn").textContent = label;
+}
+
+function onOfflineModePaiementChange() {
+  const isCredit = document.getElementById("offline_mode_paiement").value === "CREDIT";
+  document.getElementById("offline-echeance-field").style.display = isCredit ? "block" : "none";
+}
+
+function addLigne() {
+  ligneCounter++;
+  const id = ligneCounter;
+  const tbody = document.getElementById("lignes-body");
+  const tr = document.createElement("tr");
+  tr.id = `ligne-${id}`;
+  tr.innerHTML = `
+    <td>
+      <div class="piece-search">
+        <input type="text" class="piece-search-input" placeholder="Rechercher une pièce..." autocomplete="off">
+        <div class="piece-search-results"></div>
+      </div>
+    </td>
+    <td><input type="number" class="ligne-qte" min="1" step="1" value="1" onchange="recalcLigne(${id})"></td>
+    <td><input type="number" class="ligne-prix" min="0" step="1" value="0" onchange="recalcLigne(${id})"></td>
+    <td class="num ligne-montant mono">0 F</td>
+    <td><button type="button" class="btn-icon" onclick="removeLigne(${id})"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></button></td>
+  `;
+  tbody.appendChild(tr);
+
+  ligneWidgets[id] = initPieceSearch(tr.querySelector(".piece-search"), piecesList, {
+    getStockLabel: (p) => computeEffectiveStock(p.id, p.quantite_stock),
+    onSelect: (p) => {
+      if (p) tr.querySelector(".ligne-prix").value = p.prix_vente;
+      recalcLigne(id);
+    },
+  });
+}
+
+function removeLigne(id) {
+  document.getElementById(`ligne-${id}`)?.remove();
+  delete ligneWidgets[id];
+  recalcTotal();
+}
+
+function recalcLigne(id) {
+  const tr = document.getElementById(`ligne-${id}`);
+  const qte = Number(tr.querySelector(".ligne-qte").value) || 0;
+  const prix = Number(tr.querySelector(".ligne-prix").value) || 0;
+  tr.querySelector(".ligne-montant").textContent = fmtMoney(qte * prix);
+  recalcTotal();
+}
+
+function recalcTotal() {
+  let total = 0;
+  document.querySelectorAll("#lignes-body tr").forEach(tr => {
+    const qte = Number(tr.querySelector(".ligne-qte")?.value) || 0;
+    const prix = Number(tr.querySelector(".ligne-prix")?.value) || 0;
+    total += qte * prix;
+  });
+  document.getElementById("total-facture").textContent = fmtMoney(total);
+}
+
+async function saveFacture() {
+  const msgEl = document.getElementById("new-facture-msg");
+  clearMsg(msgEl);
+
+  const clientIdRaw = document.getElementById("client_id").value;
+  if (!clientIdRaw) { showMsg(msgEl, "Sélectionne un client, ou coche \"Vente comptoir\"."); return; }
+
+  const lignes = [];
+  document.querySelectorAll("#lignes-body tr").forEach(tr => {
+    const rowId = Number(tr.id.replace("ligne-", ""));
+    const piece = ligneWidgets[rowId]?.getSelected();
+    const qte = Number(tr.querySelector(".ligne-qte").value) || 0;
+    const prix = Number(tr.querySelector(".ligne-prix").value) || 0;
+    if (piece && qte > 0) {
+      lignes.push({ piece_id: piece.id, designation: piece.designation, quantite: qte, prix_unitaire: prix, montant: qte * prix });
+    }
+  });
+
+  if (lignes.length === 0) { showMsg(msgEl, "Ajoute au moins une ligne valide."); return; }
+
+  const total = lignes.reduce((s, l) => s + l.montant, 0);
+  const isDraftClient = clientIdRaw.startsWith("new-");
+  const isComptoir = document.getElementById("vente-comptoir-check").checked;
+
+  // Vente comptoir : pas de choix de mode de paiement (toujours espèces) et pas de
+  // brouillon à valider séparément sur facture-detail.html — un seul geste : pièce(s),
+  // quantité(s), et c'est déstocké. En ligne comme hors ligne.
+  if (isComptoir) {
+    if (!appIsOnline) {
+      queuePendingSale({
+        client: { mode: "existing", id: Number(clientIdRaw), nom: "Client de passage" },
+        lignes, total, mode_paiement: "ESPECES", echeance_type: null,
+      });
+      showToast("Vente enregistrée hors ligne — elle sera synchronisée automatiquement au retour de la connexion.", "info");
+      resetFactureForm();
+      renderPendingSales();
+      return;
+    }
+
+    const btn = document.getElementById("save-facture-btn");
+    btn.disabled = true; btn.textContent = "Enregistrement...";
+
+    const { data: facture, error: errFacture } = await supabaseClient
+      .from("factures").insert({ client_id: Number(clientIdRaw), montant_total: total }).select().single();
+    if (errFacture) {
+      btn.disabled = false; btn.textContent = "Valider comme vente";
+      showMsg(msgEl, friendlyError(errFacture));
+      return;
+    }
+
+    const lignesPayload = lignes.map(l => ({ ...l, facture_id: facture.id }));
+    const { error: errLignes } = await supabaseClient.from("factures_lignes").insert(lignesPayload);
+    if (errLignes) {
+      btn.disabled = false; btn.textContent = "Valider comme vente";
+      showMsg(msgEl, friendlyError(errLignes));
+      return;
+    }
+
+    const { error: errValidation } = await supabaseClient.rpc("valider_facture", {
+      p_facture_id: facture.id, p_mode_paiement: "ESPECES", p_echeance_type: null,
+    });
+    btn.disabled = false; btn.textContent = "Valider comme vente";
+    if (errValidation) { showMsg(msgEl, friendlyError(errValidation)); return; }
+
+    showToast(`Vente enregistrée (${fmtMoney(total)}) — stock mis à jour.`, "success");
+    resetFactureForm();
+    loadFactures();
+    return;
+  }
+
+  // Un client créé hors ligne n'a pas de vrai id Supabase : on passe forcément par la
+  // file d'attente pour lui, même si la connexion est déjà revenue entre-temps.
+  if (!appIsOnline || isDraftClient) {
+    const modePaiement = document.getElementById("offline_mode_paiement").value;
+    const echeanceType = modePaiement === "CREDIT" ? document.getElementById("offline_echeance_type").value : null;
+    if (modePaiement === "CREDIT" && !echeanceType) { showMsg(msgEl, "Précise l'échéance du crédit."); return; }
+
+    const clientPayload = isDraftClient
+      ? { mode: "new", ...pendingNewClients[clientIdRaw] }
+      : { mode: "existing", id: Number(clientIdRaw), nom: document.getElementById("client_id").selectedOptions[0]?.textContent || "" };
+
+    queuePendingSale({ client: clientPayload, lignes, total, mode_paiement: modePaiement, echeance_type: echeanceType });
+    showToast("Vente enregistrée hors ligne — elle sera synchronisée automatiquement au retour de la connexion.", "info");
+    resetFactureForm();
+    renderPendingSales();
+    if (appIsOnline) syncPendingSales();
+    return;
+  }
+
+  const btn = document.getElementById("save-facture-btn");
+  btn.disabled = true; btn.textContent = "Enregistrement...";
+
+  const { data: facture, error: errFacture } = await supabaseClient
+    .from("factures").insert({ client_id: Number(clientIdRaw), montant_total: total }).select().single();
+
+  if (errFacture) {
+    btn.disabled = false; btn.textContent = "Enregistrer en brouillon";
+    showMsg(msgEl, friendlyError(errFacture));
+    return;
+  }
+
+  const lignesPayload = lignes.map(l => ({ ...l, facture_id: facture.id }));
+  const { error: errLignes } = await supabaseClient.from("factures_lignes").insert(lignesPayload);
+
+  btn.disabled = false; btn.textContent = "Enregistrer en brouillon";
+
+  if (errLignes) { showMsg(msgEl, friendlyError(errLignes)); return; }
+
+  window.location.href = `facture-detail.html?id=${facture.id}`;
+}
+
+async function loadPieces() {
+  const { items, offline, savedAt } = await loadWithCache("pieces", () =>
+    fetchAllRows(() => supabaseClient.from("pieces").select("*").eq("actif", true).order("designation").order("id"))
+  );
+  piecesList = items;
+  if (offline && savedAt) showToast(`Catalogue hors ligne : données du ${fmtDateTime(savedAt)}.`, "info");
+}
+
+async function loadClientsSelect() {
+  const { data, error } = await supabaseClient.from("clients").select("id, nom").order("nom");
+  let clients;
+  if (!error && data) {
+    clients = data;
+    cacheClientsLocally(data);
+  } else {
+    clients = getCachedClients().items;
+  }
+  const sel = document.getElementById("client_id");
+  clients.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c.id; opt.textContent = c.nom;
+    sel.appendChild(opt);
+  });
+  await ensureClientDePassage(clients);
+}
+
+// Certaines ventes se font sans relever l'identité du client (vente comptoir). Plutôt que
+// de rendre client_id optionnel en base (et de gérer un cas "sans client" partout), on
+// réutilise un client générique unique "Client de passage", créé une seule fois puis
+// retrouvé ensuite comme n'importe quel autre client — aucune autre règle à changer.
+let clientDePassageId = null;
+
+async function ensureClientDePassage(clients) {
+  const existing = clients.find(c => c.nom === "Client de passage");
+  if (existing) { clientDePassageId = existing.id; return; }
+  if (!appIsOnline) return; // sera créé à la prochaine visite en ligne
+
+  const { data, error } = await supabaseClient.from("clients").insert({ nom: "Client de passage" }).select().single();
+  if (!error && data) {
+    clientDePassageId = data.id;
+    const opt = document.createElement("option");
+    opt.value = data.id; opt.textContent = data.nom;
+    document.getElementById("client_id").appendChild(opt);
+    // Met aussi à jour le cache local tout de suite, sinon ce client resterait absent
+    // hors ligne tant que la page n'a pas été rechargée une fois en ligne.
+    cacheClientsLocally(clients.concat(data));
+  }
+}
+
+function resetClientSelection() {
+  document.getElementById("vente-comptoir-check").checked = false;
+  document.getElementById("client-select-row").style.display = "flex";
+  document.getElementById("client_id").value = "";
+}
+
+// Remet le formulaire "Nouvelle facture" à zéro et referme la carte — utilisé après
+// chaque vente enregistrée avec succès (comptoir ou normale, en ligne ou hors ligne).
+function resetFactureForm() {
+  document.getElementById("new-facture-card").style.display = "none";
+  document.getElementById("lignes-body").innerHTML = "";
+  ligneWidgets = {};
+  document.getElementById("total-facture").textContent = fmtMoney(0);
+  resetClientSelection();
+  updateOfflineFieldsVisibility();
+}
+
+function toggleVenteComptoir() {
+  const checked = document.getElementById("vente-comptoir-check").checked;
+  const row = document.getElementById("client-select-row");
+  const sel = document.getElementById("client_id");
+
+  if (checked && !clientDePassageId) {
+    showToast("Le client \"comptoir\" n'a pas pu être préparé (connexion requise la première fois). Réessaie une fois en ligne.", "error");
+    document.getElementById("vente-comptoir-check").checked = false;
+    return;
+  }
+
+  row.style.display = checked ? "none" : "flex";
+  sel.value = checked ? String(clientDePassageId) : "";
+  updateOfflineFieldsVisibility();
+}
+
+function openQuickClient() {
+  document.getElementById("quick-client-form").reset();
+  clearMsg(document.getElementById("quick-client-msg"));
+  document.getElementById("quick-client-backdrop").classList.add("open");
+  document.getElementById("qc-nom").focus();
+}
+
+function closeQuickClient() {
+  document.getElementById("quick-client-backdrop").classList.remove("open");
+}
+
+document.getElementById("quick-client-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msgEl = document.getElementById("quick-client-msg");
+  clearMsg(msgEl);
+
+  const payload = {
+    nom: document.getElementById("qc-nom").value.trim(),
+    telephone: document.getElementById("qc-telephone").value.trim() || null,
+    email: document.getElementById("qc-email").value.trim() || null,
+  };
+  if (!payload.nom) { showMsg(msgEl, "Le nom est obligatoire."); return; }
+
+  const sel = document.getElementById("client_id");
+
+  if (!appIsOnline) {
+    // Pas d'id Supabase possible hors ligne : le client réel sera créé à la synchronisation.
+    const tempId = `new-${Date.now()}`;
+    pendingNewClients[tempId] = payload;
+    const opt = document.createElement("option");
+    opt.value = tempId; opt.textContent = `${payload.nom} (hors ligne)`;
+    sel.appendChild(opt);
+    sel.value = tempId;
+    updateOfflineFieldsVisibility();
+    closeQuickClient();
+    return;
+  }
+
+  const btn = document.getElementById("qc-save-btn");
+  btn.disabled = true; btn.textContent = "Enregistrement...";
+
+  const { data, error } = await supabaseClient.from("clients").insert(payload).select().single();
+
+  btn.disabled = false; btn.textContent = "Enregistrer";
+  if (error) { showMsg(msgEl, friendlyError(error)); return; }
+
+  const opt = document.createElement("option");
+  opt.value = data.id; opt.textContent = data.nom;
+  sel.appendChild(opt);
+  sel.value = data.id;
+
+  closeQuickClient();
+});
+
+let facturesList = [];
+
+async function loadFactures() {
+  const { items, offline, savedAt } = await loadWithCache("factures", () =>
+    supabaseClient
+      .from("factures").select("id, numero_facture, statut, montant_total, mode_paiement, created_at, clients(nom)")
+      .neq("statut", "ANNULEE")
+      .order("created_at", { ascending: false }).limit(100)
+  );
+
+  if (offline && savedAt) showToast(`Historique hors ligne : données du ${fmtDateTime(savedAt)}.`, "info");
+  facturesList = items;
+  renderFacturesList();
+}
+
+function renderFacturesList() {
+  const el = document.getElementById("table-content");
+  if (facturesList.length === 0) { el.innerHTML = `<div class="empty-state">Aucune facture pour le moment.</div>`; return; }
+
+  const q = (document.getElementById("historique-search")?.value || "").trim().toLowerCase();
+  const items = q ? facturesList.filter(f =>
+    (f.clients?.nom || "").toLowerCase().includes(q) ||
+    (f.numero_facture || "").toLowerCase().includes(q)
+  ) : facturesList;
+
+  if (items.length === 0) { el.innerHTML = `<div class="empty-state">Aucun résultat pour cette recherche.</div>`; return; }
+
+  const badgeClass = { BROUILLON: "badge-muted", VALIDEE: "badge-success", ANNULEE: "badge-danger" };
+
+  // Regroupe par jour (les factures sont déjà triées du plus récent au plus ancien) :
+  // c'est ce qui sert le mieux la lecture au quotidien (caisse, clôture du jour), la
+  // recherche ci-dessus couvrant déjà le besoin de retrouver un client précis.
+  const groups = [];
+  let currentKey = null;
+  for (const f of items) {
+    const key = fmtDate(f.created_at);
+    if (key !== currentKey) { groups.push({ key, rows: [] }); currentKey = key; }
+    groups[groups.length - 1].rows.push(f);
+  }
+
+  el.innerHTML = `
+    <table>
+      <thead><tr><th>N° facture</th><th>Client</th><th>Statut</th><th>Paiement</th><th class="num">Montant</th></tr></thead>
+      <tbody>
+        ${groups.map(g => `
+          <tr class="table-group-row table-group-date"><td colspan="5">${g.key}</td></tr>
+          ${g.rows.map(f => `
+            <tr style="cursor:pointer;" onclick="window.location.href='facture-detail.html?id=${f.id}'">
+              <td class="ref">${esc(f.numero_facture || "brouillon-" + f.id)}</td>
+              <td>${esc(f.clients?.nom || "—")}</td>
+              <td><span class="badge ${badgeClass[f.statut]}">${f.statut}</span></td>
+              <td class="hint">${f.mode_paiement ? esc(MODE_PAIEMENT_LABELS[f.mode_paiement] || f.mode_paiement) : "—"}</td>
+              <td class="num">${fmtMoney(f.montant_total)}</td>
+            </tr>`).join("")}
+        `).join("")}
+      </tbody>
+    </table>`;
+}
+
+function renderPendingSales() {
+  const card = document.getElementById("pending-sales-card");
+  const el = document.getElementById("pending-sales-content");
+  const sales = getPendingSales();
+
+  if (sales.length === 0) { card.style.display = "none"; return; }
+  card.style.display = "block";
+
+  const statusBadge = {
+    pending: '<span class="badge badge-warn">En attente</span>',
+    syncing: '<span class="badge badge-info">Synchronisation...</span>',
+    error: '<span class="badge badge-danger">Erreur</span>',
+  };
+
+  el.innerHTML = `
+    <table>
+      <thead><tr><th>Client</th><th>Lignes</th><th class="num">Total</th><th>Statut</th><th></th></tr></thead>
+      <tbody>
+        ${sales.map(s => `
+          <tr>
+            <td>${esc(s.client.nom)}</td>
+            <td class="hint">${s.lignes.map(l => `${esc(l.designation)} ×${l.quantite}`).join(", ")}</td>
+            <td class="num">${fmtMoney(s.total)}</td>
+            <td>
+              ${statusBadge[s.status] || ""}
+              ${s.status === "error" ? `<div class="hint" style="color:var(--danger); margin-top:4px;">${esc(s.errorMsg || "")}</div>` : ""}
+            </td>
+            <td class="actions-cell">
+              ${s.status === "error" ? `<button type="button" class="btn btn-secondary btn-sm" onclick="syncPendingSales()">Réessayer</button>` : ""}
+              <button type="button" class="btn-icon" title="Annuler cette vente" onclick="cancelPendingSale('${s.id}')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+            </td>
+          </tr>`).join("")}
+      </tbody>
+    </table>`;
+}
+
+async function cancelPendingSale(id) {
+  const ok = await confirmDialog("Annuler cette vente en attente ? Elle ne sera jamais envoyée à Supabase.", {
+    title: "Annuler la vente",
+    confirmLabel: "Annuler la vente",
+    danger: true,
+  });
+  if (!ok) return;
+  removePendingSale(id);
+  showToast("Vente en attente annulée.", "info");
+}
+
+(async () => {
+  const session = await requireAuth();
+  if (!session) return;
+  await loadPieces();
+  await loadClientsSelect();
+  loadFactures();
+  renderPendingSales();
+
+  // Arrivée depuis le Catalogue via "Facturer cette pièce" : ouvre directement une
+  // facture avec la pièce déjà en première ligne, sans avoir à la rechercher deux fois.
+  const preselectPieceId = new URLSearchParams(window.location.search).get("piece_id");
+  if (preselectPieceId) {
+    const piece = piecesList.find(p => String(p.id) === preselectPieceId);
+    if (piece) {
+      openNewFormWithPiece(piece);
+    } else {
+      showToast("Cette pièce est introuvable dans le catalogue.", "error");
+    }
+    window.history.replaceState({}, "", "factures.html");
+  }
+
+  document.addEventListener("sylla:connectivity-changed", updateOfflineFieldsVisibility);
+  document.addEventListener("sylla:pending-sales-updated", () => {
+    renderPendingSales();
+    loadFactures();
+  });
+})();
+</script>
+</body>
+</html>

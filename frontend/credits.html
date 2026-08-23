@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emprunts clients — Sylla Automobile — Ziguinchor</title>
+<link rel="icon" href="assets/img/sylla.ico">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="app">
+  <nav class="sidebar">
+    <div class="brand"><img src="assets/img/logo-sylla-icon.png" class="brand-logo" alt="Sylla Automobile"> Sylla Automobile <span class="brand-tag">Ziguinchor</span></div>
+    <a class="nav-link" href="index.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> Tableau de bord</a>
+    <a class="nav-link" href="catalogue.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg> Catalogue</a>
+    <a class="nav-link" href="stock.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v18"/><path d="M4 7l4-4 4 4"/><path d="M16 21V3"/><path d="M20 17l-4 4-4-4"/></svg> Mouvements stock</a>
+    <a class="nav-link" href="rupture-stock.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 17h.01"/></svg> Ruptures de stock</a>
+    <a class="nav-link" href="factures.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v19l-3-2-3 2-3-2-3 2V2z"/><path d="M9 8h6M9 12h6"/></svg> Factures</a>
+    <a class="nav-link active" href="credits.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg> Emprunts</a>
+    <a class="nav-link" href="clients.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Clients</a>
+    <div class="sidebar-footer">
+      <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
+      <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1>Emprunts clients</h1>
+        <div class="subtitle">Clients ayant pris des pièces à crédit (bons) et leurs échéances de paiement</div>
+      </div>
+    </div>
+
+    <div class="grid-stats">
+      <div class="stat-card danger">
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <div class="stat-body"><div class="label">Total dû (non payé)</div><div class="value" id="stat-total">—</div></div>
+      </div>
+      <div class="stat-card danger">
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <div class="stat-body"><div class="label">Bons en retard</div><div class="value" id="stat-retard">—</div></div>
+      </div>
+      <div class="stat-card warn">
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+        <div class="stat-body"><div class="label">À payer cette semaine</div><div class="value" id="stat-semaine">—</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Bons en cours</h3>
+        <div class="toolbar">
+          <button type="button" class="btn btn-sm" id="tab-impayes" onclick="setFilter('impayes')">Non payés</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="tab-retard" onclick="setFilter('retard')">En retard</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="tab-tous" onclick="setFilter('tous')">Tous</button>
+        </div>
+      </div>
+      <div class="toolbar" id="bulk-toolbar" style="margin-bottom:16px; display:none;">
+        <button type="button" class="btn btn-sm" id="bulk-pay-btn" onclick="marquerSelectionPayee()">Marquer payé (<span id="bulk-count">0</span>)</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="clearSelection()">Annuler la sélection</button>
+      </div>
+      <div id="table-content">Chargement...</div>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script>
+let currentFilter = "impayes";
+let allCredits = [];
+
+let selectedIds = new Set();
+
+function setFilter(filter) {
+  currentFilter = filter;
+  ["impayes", "retard", "tous"].forEach(f => {
+    document.getElementById(`tab-${f}`).className = f === filter ? "btn btn-sm" : "btn btn-secondary btn-sm";
+  });
+  clearSelection();
+}
+
+function clearSelection() {
+  selectedIds.clear();
+  renderEmprunts();
+}
+
+function toggleSelect(id, checked) {
+  if (checked) selectedIds.add(id); else selectedIds.delete(id);
+  updateBulkToolbar();
+  // Coche/décoche aussi la case "tout sélectionner" du groupe client concerné, sans
+  // redessiner tout le tableau (perdrait le focus et re-scrollerait la page).
+  document.querySelectorAll(".group-select-all").forEach(cb => {
+    const groupIds = cb.dataset.ids.split(",").filter(Boolean).map(Number);
+    cb.checked = groupIds.length > 0 && groupIds.every(gid => selectedIds.has(gid));
+  });
+}
+
+function toggleSelectGroup(idsCsv, checked) {
+  const ids = idsCsv.split(",").filter(Boolean).map(Number);
+  ids.forEach(id => { if (checked) selectedIds.add(id); else selectedIds.delete(id); });
+  renderEmprunts();
+}
+
+function updateBulkToolbar() {
+  const count = selectedIds.size;
+  document.getElementById("bulk-toolbar").style.display = count > 0 ? "flex" : "none";
+  document.getElementById("bulk-count").textContent = count;
+}
+
+// Une seule requête large (tous les bons à crédit validés), mise en cache pour l'usage
+// hors ligne ; les onglets "Non payés"/"En retard"/"Tous" filtrent ensuite en local,
+// ce qui permet de changer d'onglet sans connexion.
+async function loadCreditsData() {
+  const { items, offline, savedAt } = await loadWithCache("credits", () =>
+    supabaseClient
+      .from("factures")
+      .select("id, client_id, numero_facture, montant_total, created_at, echeance_type, date_echeance, paye, paye_at, clients(nom, telephone)")
+      .eq("mode_paiement", "CREDIT").eq("statut", "VALIDEE")
+      .order("date_echeance", { ascending: true })
+  );
+  allCredits = applyPendingFieldUpdates("factures", items);
+  if (offline && savedAt) showToast(`Emprunts hors ligne : données du ${fmtDateTime(savedAt)}.`, "info");
+}
+
+function loadStats() {
+  const rows = allCredits.filter(f => !f.paye);
+  const total = rows.reduce((s, f) => s + Number(f.montant_total), 0);
+
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const dansUneSemaine = new Date(today); dansUneSemaine.setDate(today.getDate() + 7);
+
+  let retard = 0, semaine = 0;
+  rows.forEach(f => {
+    if (!f.date_echeance) return;
+    const d = new Date(f.date_echeance);
+    if (d < today) retard++;
+    else if (d <= dansUneSemaine) semaine++;
+  });
+
+  document.getElementById("stat-total").textContent = fmtMoney(total);
+  document.getElementById("stat-retard").textContent = retard;
+  document.getElementById("stat-semaine").textContent = semaine;
+}
+
+function renderEmprunts() {
+  const el = document.getElementById("table-content");
+  const todayStr = new Date().toISOString().slice(0, 10);
+
+  let data = allCredits;
+  if (currentFilter === "impayes") data = data.filter(f => !f.paye);
+  if (currentFilter === "retard") data = data.filter(f => !f.paye && f.date_echeance && f.date_echeance < todayStr);
+
+  updateBulkToolbar();
+
+  if (data.length === 0) { el.innerHTML = `<div class="empty-state">Aucun bon à afficher pour ce filtre.</div>`; return; }
+
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const dansUneSemaine = new Date(today); dansUneSemaine.setDate(today.getDate() + 7);
+
+  // Regroupe par client (les bons sont déjà triés par échéance croissante, donc les
+  // groupes apparaissent dans l'ordre du client ayant le bon le plus urgent en premier).
+  const groups = new Map();
+  data.forEach(f => {
+    const key = f.client_id ?? f.clients?.nom ?? "—";
+    if (!groups.has(key)) groups.set(key, { nom: f.clients?.nom || "—", telephone: f.clients?.telephone || "", rows: [] });
+    groups.get(key).rows.push(f);
+  });
+
+  el.innerHTML = `
+    <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th></th><th>Client</th><th>Téléphone</th><th>N° bon</th><th class="num">Montant</th>
+          <th>Vendu le</th><th>Échéance</th><th>Date limite</th><th>Statut</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${[...groups.values()].map(g => {
+          const totalDu = g.rows.filter(f => !f.paye).reduce((s, f) => s + Number(f.montant_total), 0);
+          const unpaidIds = g.rows.filter(f => !f.paye).map(f => f.id);
+          const idsCsv = unpaidIds.join(",");
+          const allSelected = unpaidIds.length > 0 && unpaidIds.every(id => selectedIds.has(id));
+
+          return `
+          <tr class="table-group-row">
+            <td>${unpaidIds.length > 0 ? `<input type="checkbox" class="group-select-all" data-ids="${idsCsv}" ${allSelected ? "checked" : ""} onchange="toggleSelectGroup('${idsCsv}', this.checked)">` : ""}</td>
+            <td colspan="8">${esc(g.nom)}${g.telephone ? ` <span style="text-transform:none; font-weight:400;">— ${esc(g.telephone)}</span>` : ""}</td>
+            <td class="num">${totalDu > 0 ? fmtMoney(totalDu) + " dû" : ""}</td>
+          </tr>
+          ${g.rows.map(f => {
+            const echDate = f.date_echeance ? new Date(f.date_echeance) : null;
+            let statutLabel = "À venir", statutClass = "badge-info";
+            if (f.paye) { statutLabel = "Payé"; statutClass = "badge-success"; }
+            else if (echDate && echDate < today) { statutLabel = "En retard"; statutClass = "badge-danger"; }
+            else if (echDate && echDate <= dansUneSemaine) { statutLabel = "Cette semaine"; statutClass = "badge-warn"; }
+
+            return `
+            <tr style="cursor:pointer;" onclick="window.location.href='facture-detail.html?id=${f.id}'">
+              <td onclick="event.stopPropagation();">${f.paye ? "" : `<input type="checkbox" ${selectedIds.has(f.id) ? "checked" : ""} onchange="toggleSelect(${f.id}, this.checked)">`}</td>
+              <td></td>
+              <td class="hint"></td>
+              <td class="ref">${esc(f.numero_facture || "—")}</td>
+              <td class="num">${fmtMoney(f.montant_total)}</td>
+              <td class="hint">${fmtDate(f.created_at)}</td>
+              <td><span class="badge badge-muted">${f.echeance_type === "SEMAINE" ? "Sous 1 semaine" : "Sous 1 mois"}</span></td>
+              <td class="hint">${fmtDate(f.date_echeance)}</td>
+              <td><span class="badge ${statutClass}">${statutLabel}</span> ${f._pendingSync ? '<span class="badge badge-info">Sync en attente</span>' : ""}</td>
+              <td>${f.paye ? "" : `<button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); marquerPaye(${f.id})">Marquer payé</button>`}</td>
+            </tr>`;
+          }).join("")}
+          `;
+        }).join("")}
+      </tbody>
+    </table>
+    </div>`;
+}
+
+async function marquerPaye(id) {
+  const ok = await confirmDialog("Marquer ce bon comme payé ?", { confirmLabel: "Marquer payé", danger: false });
+  if (!ok) return;
+
+  if (!appIsOnline) {
+    const patch = { paye: true, paye_at: new Date().toISOString() };
+    queueFieldUpdate("factures", id, patch, `Bon #${id} marqué payé`);
+    const item = allCredits.find(f => f.id === id);
+    if (item) Object.assign(item, patch, { _pendingSync: true });
+    showToast("Marqué payé hors ligne — synchronisé automatiquement au retour de la connexion.", "info");
+    loadStats();
+    renderEmprunts();
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("factures").update({ paye: true, paye_at: new Date().toISOString() }).eq("id", id);
+
+  if (error) { showToast(friendlyError(error), "error"); return; }
+  showToast("Bon marqué comme payé.", "success");
+  await loadCreditsData();
+  loadStats();
+  renderEmprunts();
+}
+
+async function marquerSelectionPayee() {
+  const ids = [...selectedIds];
+  if (ids.length === 0) return;
+
+  const ok = await confirmDialog(`Marquer ${ids.length} bon(s) comme payé(s) ?`, { confirmLabel: "Marquer payés", danger: false });
+  if (!ok) return;
+
+  const patch = { paye: true, paye_at: new Date().toISOString() };
+
+  if (!appIsOnline) {
+    ids.forEach(id => {
+      queueFieldUpdate("factures", id, patch, `Bon #${id} marqué payé`);
+      const item = allCredits.find(f => f.id === id);
+      if (item) Object.assign(item, patch, { _pendingSync: true });
+    });
+    showToast("Marqués payés hors ligne — synchronisés automatiquement au retour de la connexion.", "info");
+    selectedIds.clear();
+    loadStats();
+    renderEmprunts();
+    return;
+  }
+
+  const { error } = await supabaseClient.from("factures").update(patch).in("id", ids);
+
+  if (error) { showToast(friendlyError(error), "error"); return; }
+  showToast(`${ids.length} bon(s) marqué(s) comme payé(s).`, "success");
+  selectedIds.clear();
+  await loadCreditsData();
+  loadStats();
+  renderEmprunts();
+}
+
+(async () => {
+  const session = await requireAuth();
+  if (!session) return;
+  await loadCreditsData();
+  loadStats();
+  renderEmprunts();
+  document.addEventListener("sylla:pending-updates-updated", async () => { await loadCreditsData(); loadStats(); renderEmprunts(); });
+})();
+</script>
+</body>
+</html>
