@@ -1,18 +1,15 @@
 -- Upgrade Sylla Automobile uniquement.
 -- A executer APRES migration_recouvra.sql sur l'instance Sylla.
 -- Ce script ne modifie pas clients, pieces ni factures.
--- Remplacer la valeur ci-dessous par l'email reel du gerant avant execution.
+-- Email du gerant renseigne : proprietaire@sylla.local (compte cree via
+-- setup_sylla_code_access.sql, code d'acces "1234").
 
 do $$
 declare
-    v_email constant text := 'email_du_gerant_sylla';
+    v_email constant text := 'proprietaire@sylla.local';
     v_user_id uuid;
     v_entreprise_id uuid;
 begin
-    if v_email = 'email_du_gerant_sylla' then
-        raise exception 'Remplacez email_du_gerant_sylla par l email reel du gerant Sylla Automobile';
-    end if;
-
     select id into v_user_id
     from auth.users
     where lower(email) = lower(v_email);
@@ -81,4 +78,4 @@ select p.id, u.email, p.role, p.has_recouvra, p.entreprise_id, e.nom
 from profiles p
 join auth.users u on u.id = p.id
 join entreprises e on e.id = p.entreprise_id
-where lower(u.email) = lower('email_du_gerant_sylla');
+where lower(u.email) = lower('proprietaire@sylla.local');
