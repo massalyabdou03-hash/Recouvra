@@ -55,7 +55,7 @@
         <div class="field-row">
           <div>
             <label id="qty-label">Quantité *</label>
-            <input id="quantite" type="number" min="1" step="1" required>
+            <div class="quantity-control"><input id="quantite" type="number" min="1" step="1" required><span class="ligne-unite" id="qty-unite"></span></div>
           </div>
           <div>
             <label>Motif</label>
@@ -101,15 +101,23 @@ function updateHint() {
   const type = document.getElementById("type_mouvement").value;
   const qtyLabel = document.getElementById("qty-label");
   const hint = document.getElementById("stock-actuel-hint");
+  const qtyInput = document.getElementById("quantite");
+  const qtyUnite = document.getElementById("qty-unite");
 
   qtyLabel.textContent = type === "AJUSTEMENT" ? "Nouvelle quantité réelle (comptée) *" : "Quantité *";
 
   if (piece) {
+    qtyInput.step = piece.permettre_fractionnement ? "0.01" : "1";
+    qtyInput.min = piece.permettre_fractionnement ? "0.01" : "1";
+    qtyUnite.textContent = MEASURE_UNIT_LABELS[piece.unite_mesure] || piece.unite_mesure || "pcs";
     const effectif = computeEffectiveStock(piece.id, piece.quantite_stock);
     hint.textContent = appIsOnline
-      ? `Stock actuel enregistré : ${piece.quantite_stock}`
-      : `Stock estimé (avec mouvements en attente) : ${effectif}`;
+      ? `Stock actuel enregistré : ${piece.quantite_stock} ${qtyUnite.textContent}`
+      : `Stock estimé (avec mouvements en attente) : ${effectif} ${qtyUnite.textContent}`;
   } else {
+    qtyInput.step = "1";
+    qtyInput.min = "1";
+    qtyUnite.textContent = "";
     hint.textContent = "";
   }
 }
@@ -144,7 +152,7 @@ async function loadHistorique() {
   const { items, offline, savedAt } = await loadWithCache("mouvements", () =>
     supabaseClient
       .from("mouvements_stock")
-      .select("id, type_mouvement, quantite, quantite_avant, quantite_apres, motif, facture_id, created_at, pieces(designation, reference_interne)")
+      .select("id, type_mouvement, quantite, quantite_avant, quantite_apres, motif, facture_id, created_at, pieces(designation, reference_interne, unite_mesure)")
       .order("created_at", { ascending: false })
       .limit(40)
   );
@@ -174,8 +182,8 @@ async function loadHistorique() {
             <td class="hint">${fmtDateTime(m.created_at)}</td>
             <td>${esc(m.pieces?.designation || "—")}</td>
             <td><span class="badge ${badgeClass[m.type_mouvement]}">${label[m.type_mouvement]}</span></td>
-            <td class="num">${m.quantite_avant}</td>
-            <td class="num">${m.quantite_apres}</td>
+            <td class="num">${m.quantite_avant} ${MEASURE_UNIT_LABELS[m.pieces?.unite_mesure] || ""}</td>
+            <td class="num">${m.quantite_apres} ${MEASURE_UNIT_LABELS[m.pieces?.unite_mesure] || ""}</td>
             <td class="hint">${esc(m.motif || "—")}</td>
             <td class="actions-cell">
               ${m.facture_id

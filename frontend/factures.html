@@ -152,11 +152,25 @@ function openNewFormWithPiece(piece) {
   const rowId = ligneCounter;
   const tr = document.getElementById(`ligne-${rowId}`);
   ligneWidgets[rowId].setSelected(piece);
-  tr.querySelector(".ligne-prix").value = piece.prix_vente;
+  applyPieceToRow(tr, piece);
   recalcLigne(rowId);
   updateOfflineFieldsVisibility();
   tr.querySelector(".ligne-qte").focus();
   tr.querySelector(".ligne-qte").select();
+}
+
+// Met à jour le prix, l'unité affichée, le pas décimal et la case "Lot/rouleau" d'une
+// ligne pour la pièce choisie — utilisé à la fois par la recherche manuelle et par
+// l'arrivée depuis "Facturer cette pièce" (qui pré-sélectionne sans passer par onSelect).
+function applyPieceToRow(tr, p) {
+  tr.querySelector(".ligne-prix").value = p.prix_vente;
+  tr.querySelector(".ligne-unite").textContent = MEASURE_UNIT_LABELS[p.unite_mesure] || p.unite_mesure || "pcs";
+  const quantity = tr.querySelector(".ligne-qte");
+  quantity.step = p.permettre_fractionnement ? "0.01" : "1";
+  quantity.min = p.permettre_fractionnement ? "0.01" : "1";
+  const lot = tr.querySelector(".ligne-lot");
+  lot.disabled = !p.unite_gros_facteur;
+  if (!p.unite_gros_facteur) lot.checked = false;
 }
 
 function updateOfflineFieldsVisibility() {
@@ -192,7 +206,7 @@ function addLigne() {
         <div class="piece-search-results"></div>
       </div>
     </td>
-    <td><input type="number" class="ligne-qte" min="1" step="1" value="1" onchange="recalcLigne(${id})"></td>
+    <td><div class="quantity-control"><input type="number" class="ligne-qte" min="0.001" step="1" value="1" onchange="recalcLigne(${id})"><span class="ligne-unite">pcs</span></div><label class="lot-check"><input type="checkbox" class="ligne-lot" onchange="recalcLigne(${id})"> Lot/rouleau</label></td>
     <td><input type="number" class="ligne-prix" min="0" step="1" value="0" onchange="recalcLigne(${id})"></td>
     <td class="num ligne-montant mono">0 F</td>
     <td><button type="button" class="btn-icon" onclick="removeLigne(${id})"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></button></td>
@@ -202,7 +216,7 @@ function addLigne() {
   ligneWidgets[id] = initPieceSearch(tr.querySelector(".piece-search"), piecesList, {
     getStockLabel: (p) => computeEffectiveStock(p.id, p.quantite_stock),
     onSelect: (p) => {
-      if (p) tr.querySelector(".ligne-prix").value = p.prix_vente;
+      if (p) applyPieceToRow(tr, p);
       recalcLigne(id);
     },
   });
@@ -217,17 +231,23 @@ function removeLigne(id) {
 function recalcLigne(id) {
   const tr = document.getElementById(`ligne-${id}`);
   const qte = Number(tr.querySelector(".ligne-qte").value) || 0;
+  const piece = ligneWidgets[id]?.getSelected();
+  const lot = Boolean(tr.querySelector(".ligne-lot")?.checked);
+  const stockQuantity = qte * (lot && piece?.unite_gros_facteur ? Number(piece.unite_gros_facteur) : 1);
   const prix = Number(tr.querySelector(".ligne-prix").value) || 0;
-  tr.querySelector(".ligne-montant").textContent = fmtMoney(qte * prix);
+  tr.querySelector(".ligne-montant").textContent = fmtMoney(stockQuantity * prix);
   recalcTotal();
 }
 
 function recalcTotal() {
   let total = 0;
   document.querySelectorAll("#lignes-body tr").forEach(tr => {
-    const qte = Number(tr.querySelector(".ligne-qte")?.value) || 0;
+    const qte = Number(tr.querySelector(".ligne-qte").value) || 0;
+    const piece = ligneWidgets[Number(tr.id.replace("ligne-", ""))]?.getSelected();
+    const lot = Boolean(tr.querySelector(".ligne-lot")?.checked);
+    const stockQuantity = qte * (lot && piece?.unite_gros_facteur ? Number(piece.unite_gros_facteur) : 1);
     const prix = Number(tr.querySelector(".ligne-prix")?.value) || 0;
-    total += qte * prix;
+    total += stockQuantity * prix;
   });
   document.getElementById("total-facture").textContent = fmtMoney(total);
 }
@@ -245,8 +265,11 @@ async function saveFacture() {
     const piece = ligneWidgets[rowId]?.getSelected();
     const qte = Number(tr.querySelector(".ligne-qte").value) || 0;
     const prix = Number(tr.querySelector(".ligne-prix").value) || 0;
+    const lot = Boolean(tr.querySelector(".ligne-lot")?.checked);
+    const factor = lot && piece?.unite_gros_facteur ? Number(piece.unite_gros_facteur) : 1;
+    const stockQuantity = qte * factor;
     if (piece && qte > 0) {
-      lignes.push({ piece_id: piece.id, designation: piece.designation, quantite: qte, prix_unitaire: prix, montant: qte * prix });
+      lignes.push({ piece_id: piece.id, designation: piece.designation, quantite: stockQuantity, quantite_affichee: qte, unite_mesure: piece.unite_mesure || "PCS", unite_gros: lot ? (piece.unite_gros || "LOT") : null, vente_par_lot: lot, prix_unitaire: prix, montant: stockQuantity * prix });
     }
   });
 

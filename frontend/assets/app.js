@@ -87,6 +87,7 @@ const MODE_PAIEMENT_LABELS = {
   ESPECES: "Espèces", CARTE: "Carte", VIREMENT: "Virement",
   WAVE: "Wave", OM: "Orange Money", CHEQUE: "Chèque", CREDIT: "Crédit (bon)",
 };
+window.MEASURE_UNIT_LABELS = { PCS: "pcs", M: "m", M2: "m²", KG: "kg", L: "L", ROULEAU: "rouleau", CARTON: "carton", PAQUET: "paquet" };
 
 function fmtMoney(n) {
   const v = Number(n || 0);
@@ -822,6 +823,7 @@ async function currentProfile() {
 
 async function requireRecouvra() {
   const profile = await currentProfile();
+  if (!profile) { window.location.href = "login.html"; return null; }
   if (!profile?.has_recouvra && profile?.role !== "super_admin") {
     document.body.innerHTML = `<main class="shell"><section class="panel access-panel"><span class="eyebrow">Module Premium</span><h1>Recouvra</h1><p>Le suivi des paiements et des relances n'est pas encore activé pour ce compte.</p><button class="button" onclick="requestRecouvra()">Demander l'activation</button></section></main>`;
     return null;

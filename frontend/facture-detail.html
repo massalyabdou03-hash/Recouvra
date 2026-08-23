@@ -132,7 +132,7 @@ async function loadFacture() {
           ${(lignes || []).map(l => `
             <tr>
               <td>${esc(l.designation)}</td>
-              <td class="num">${l.quantite}</td>
+              <td class="num">${l.quantite_affichee ?? l.quantite} ${esc(MEASURE_UNIT_LABELS[l.unite_gros] || MEASURE_UNIT_LABELS[l.unite_mesure] || l.unite_mesure || "pcs")}</td>
               <td class="num">${fmtMoney(l.prix_unitaire)}</td>
               <td class="num">${fmtMoney(l.montant)}</td>
             </tr>`).join("")}
