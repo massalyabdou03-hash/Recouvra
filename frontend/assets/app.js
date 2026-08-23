@@ -781,12 +781,16 @@ async function handleRecouvraNavigation(event) {
   const { data: profile } = await supabaseClient.from("profiles").select("id,entreprise_id,has_recouvra").eq("id", userData.user.id).maybeSingle();
   if (profile?.has_recouvra) { window.location.href = "recouvra.html"; return; }
 
+  openSubscriptionModal(profile);
+}
+
+function openSubscriptionModal(profile) {
   const existing = document.getElementById("premium-access-modal");
   if (existing) return;
   const modal = document.createElement("div");
   modal.id = "premium-access-modal";
   modal.className = "premium-access-modal";
-  modal.innerHTML = `<div class="premium-access-dialog" role="dialog" aria-modal="true" aria-labelledby="premium-access-title"><button type="button" class="premium-access-close" aria-label="Fermer">×</button><span class="eyebrow">Module Premium</span><h2 id="premium-access-title">Activez Recouvra</h2><p>Suivez les créances, enregistrez les paiements et relancez vos clients depuis la même plateforme.</p><button type="button" class="button" data-premium-request>Demander l'activation</button><p class="premium-access-message" aria-live="polite"></p></div>`;
+  modal.innerHTML = `<div class="premium-access-dialog" role="dialog" aria-modal="true" aria-labelledby="premium-access-title"><button type="button" class="premium-access-close" aria-label="Fermer">×</button><span class="eyebrow">Abonnement Recouvra</span><h2 id="premium-access-title">15 000 FCFA / mois</h2><p>Faites un transfert Wave de <strong>15 000 FCFA au 77 033 80 30</strong>, puis saisissez la référence de la transaction.</p><label for="wave-reference">Référence / ID Transaction Wave</label><input id="wave-reference" type="text" required maxlength="120" placeholder="Ex : TXN-123456"><button type="button" class="button" data-premium-request>Soumettre le paiement</button><p class="premium-access-message" aria-live="polite"></p></div>`;
   document.body.appendChild(modal);
   const close = () => modal.remove();
   modal.querySelector(".premium-access-close").addEventListener("click", close);
@@ -794,9 +798,12 @@ async function handleRecouvraNavigation(event) {
   modal.querySelector("[data-premium-request]").addEventListener("click", async () => {
     const button = modal.querySelector("[data-premium-request]");
     const message = modal.querySelector(".premium-access-message");
+    const reference = modal.querySelector("#wave-reference").value.trim();
+    if (!reference) { message.textContent = "Saisissez la référence Wave."; return; }
     button.disabled = true;
-    const { error } = await supabaseClient.from("recouvra_activation_requests").insert({ entreprise_id: profile?.entreprise_id, requested_by: userData.user.id });
-    message.textContent = error ? "La demande n'a pas pu être envoyée." : "Demande envoyée. Votre administrateur doit valider l'activation.";
+    const user = (await supabaseClient.auth.getUser()).data.user;
+    const { error } = await supabaseClient.from("demandes_abonnement").insert({ entreprise_id: profile?.entreprise_id, submitted_by: user.id, reference_wave: reference, montant: 15000 });
+    message.textContent = error ? (error.code === "23505" ? "Une demande est déjà en attente." : error.message) : "Paiement envoyé. L'activation sera faite après vérification.";
     button.textContent = error ? "Réessayer" : "Demande envoyée";
     button.disabled = false;
   });
@@ -824,8 +831,7 @@ async function requireRecouvra() {
 async function requestRecouvra() {
   const profile = await currentProfile();
   if (!profile) return;
-  const { error } = await supabaseClient.from("recouvra_activation_requests").insert({ entreprise_id: profile.entreprise_id, requested_by: profile.id });
-  showToast(error ? error.message : "Demande envoyée.", error ? "error" : "success");
+  openSubscriptionModal(profile);
 }
 
 function money(value) { return `${Number(value || 0).toLocaleString("fr-FR")} F`; }
@@ -837,7 +843,12 @@ async function getCompanySettings() {
     companySettingsPromise = currentProfile().then(async profile => {
       if (!profile?.entreprise_id) return null;
       const { data } = await supabaseClient.from("entreprise_settings").select("*").eq("entreprise_id", profile.entreprise_id).maybeSingle();
-      return data || null;
+      if (!data) return null;
+      if (data.logo_path && !data.logo_path.startsWith("http")) {
+        const { data: signed } = await supabaseClient.storage.from("company-logos").createSignedUrl(data.logo_path, 3600);
+        data.logo_url = signed?.signedUrl || null;
+      } else data.logo_url = data.logo_path;
+      return data;
     });
   }
   return companySettingsPromise;
@@ -849,7 +860,7 @@ async function applyCompanySettings() {
   if (settings.primary_color) document.documentElement.style.setProperty("--accent", settings.primary_color);
   if (settings.secondary_color) document.documentElement.style.setProperty("--secondary", settings.secondary_color);
   document.querySelectorAll("[data-company-name]").forEach(el => { el.textContent = settings.nom_commercial || "Entreprise"; });
-  document.querySelectorAll(".global-nav-brand img").forEach(img => { img.src = settings.logo_path || "assets/img/logo-sylla-icon.png"; img.alt = settings.nom_commercial || "Entreprise"; });
+  document.querySelectorAll(".global-nav-brand img").forEach(img => { img.src = settings.logo_url || "assets/img/logo-sylla-icon.png"; img.alt = settings.nom_commercial || "Entreprise"; });
 }
 
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", applyCompanySettings);

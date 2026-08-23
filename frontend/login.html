@@ -3,59 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Connexion — Sylla Automobile</title>
-<link rel="icon" href="assets/img/sylla.ico">
+<title>Connexion — Gestion Stock & Recouvra</title>
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-  <div class="login-wrap">
-    <div class="login-box">
-      <div class="brand"><img src="assets/img/logo-sylla-icon.png" class="brand-logo" alt="Sylla Automobile"> Sylla Automobile</div>
-      <p class="hint" style="margin-top:-10px; margin-bottom:18px;">Ziguinchor · Entre le code d'accès de la boutique.</p>
-      <form id="login-form">
-        <label for="code">Code d'accès</label>
-        <input id="code" type="password" required autocomplete="current-password" minlength="6" inputmode="text">
-        <button type="submit" class="btn" style="width:100%; margin-top:20px;" id="submit-btn">Se connecter</button>
+  <main class="auth-layout">
+    <section class="auth-card">
+      <div class="auth-brand"><span class="auth-mark">R</span><div><strong>Recouvra SaaS</strong><span>Gestion Stock & Facturation</span></div></div>
+      <div class="auth-tabs"><button type="button" class="auth-tab active" data-auth-tab="login">Se connecter</button><button type="button" class="auth-tab" data-auth-tab="signup">Créer un compte</button></div>
+      <form id="login-form" class="auth-form">
+        <label>Email<input id="login-email" type="email" required autocomplete="email"></label>
+        <label>Mot de passe<input id="login-password" type="password" required autocomplete="current-password"></label>
+        <button type="submit" class="button">Se connecter</button>
       </form>
-      <div id="msg"></div>
-    </div>
-  </div>
-
+      <form id="signup-form" class="auth-form" hidden>
+        <label>Nom de l'entreprise<input id="signup-company" required maxlength="150"></label>
+        <label>Nom du gérant<input id="signup-manager" required maxlength="150"></label>
+        <label>Téléphone WhatsApp<input id="signup-phone" required maxlength="30" inputmode="tel"></label>
+        <label>Email<input id="signup-email" type="email" required autocomplete="email"></label>
+        <label>Mot de passe<input id="signup-password" type="password" required minlength="8" autocomplete="new-password"></label>
+        <button type="submit" class="button">Créer mon compte</button>
+      </form>
+      <p id="auth-message" class="auth-message" aria-live="polite"></p>
+    </section>
+  </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
 <script>
-  (async () => {
-    const { data } = await supabaseClient.auth.getSession();
-    if (data.session) window.location.href = "index.html";
-  })();
-
-  const form = document.getElementById("login-form");
-  const msg = document.getElementById("msg");
-  const btn = document.getElementById("submit-btn");
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    clearMsg(msg);
-    btn.disabled = true;
-    btn.textContent = "Connexion...";
-    const code = document.getElementById("code").value.trim();
-
-    // Le code d'accès sert à la fois d'identifiant et de mot de passe :
-    // on le transforme en email technique pour Supabase Auth (invisible pour l'utilisateur).
-    const { error } = await supabaseClient.auth.signInWithPassword({
-      email: codeToEmail(code),
-      password: code,
-    });
-
-    if (error) {
-      showMsg(msg, friendlyError(error));
-      btn.disabled = false;
-      btn.textContent = "Se connecter";
-    } else {
-      window.location.href = "index.html";
-    }
+  const authMessage = document.getElementById("auth-message");
+  const setAuthMessage = text => { authMessage.textContent = text; };
+  document.querySelectorAll("[data-auth-tab]").forEach(tab => tab.addEventListener("click", () => {
+    const signup = tab.dataset.authTab === "signup";
+    document.querySelectorAll(".auth-tab").forEach(item => item.classList.toggle("active", item === tab));
+    document.getElementById("login-form").hidden = signup;
+    document.getElementById("signup-form").hidden = !signup;
+    setAuthMessage("");
+  }));
+  document.getElementById("login-form").addEventListener("submit", async event => {
+    event.preventDefault(); setAuthMessage("Connexion...");
+    const { error } = await supabaseClient.auth.signInWithPassword({ email: document.getElementById("login-email").value.trim(), password: document.getElementById("login-password").value });
+    if (error) { setAuthMessage(error.message); return; }
+    window.location.href = "index.html";
   });
+  document.getElementById("signup-form").addEventListener("submit", async event => {
+    event.preventDefault(); setAuthMessage("Création du compte...");
+    const company = document.getElementById("signup-company").value.trim();
+    const manager = document.getElementById("signup-manager").value.trim();
+    const phone = document.getElementById("signup-phone").value.trim();
+    const email = document.getElementById("signup-email").value.trim();
+    const password = document.getElementById("signup-password").value;
+    const { data, error } = await supabaseClient.auth.signUp({ email, password, options: { data: { entreprise_nom: company, gerant_nom: manager, telephone: phone } } });
+    if (error) { setAuthMessage(error.message); return; }
+    setAuthMessage(data.session ? "Compte créé. Vous pouvez commencer avec le module Stock." : "Compte créé. Consultez votre email pour confirmer votre adresse.");
+    if (data.session) setTimeout(() => { window.location.href = "index.html"; }, 700);
+  });
+  supabaseClient.auth.getSession().then(({ data }) => { if (data.session) window.location.href = "index.html"; });
 </script>
 </body>
 </html>
