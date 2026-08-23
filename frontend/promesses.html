@@ -1,1 +1,42 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Promesses de paiement</title><link rel="stylesheet" href="assets/style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="assets/config.js"></script><script src="assets/app.js" defer></script><script src="assets/promesses.js" defer></script></head><body><div class="app"><nav class="sidebar"></nav><main class="main"><a href="index.html" class="btn-back" style="margin-bottom:16px;"><span class="arrow">←</span> Retour à l'app de gestion</a><header class="topbar"><h1>Promesses de paiement</h1><nav class="subnav"><a href="recouvra.html">Recouvra</a><a href="paiements.html">Paiements</a><a href="promesses.html" class="active">Promesses</a></nav></header><section class="panel"><form id="promise-form" class="form-grid"><label>Facture<input id="invoice" type="number" required></label><label>Client<input id="client" type="number" required></label><label>Montant promis<input id="amount" type="number" min="1" required></label><label>Date promise<input id="due" type="datetime-local" required></label><button class="button">Créer la promesse</button></form><p id="message"></p></section><section id="promises" class="cards"></section></main></div></body></html>
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Promesses de règlement</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/config.js"></script>
+<script src="assets/app.js" defer></script>
+<script src="assets/promesses.js" defer></script>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar"></nav>
+<main class="main">
+  <a href="index.html" class="btn-back" style="margin-bottom:16px;"><span class="arrow">←</span> Retour à l'app de gestion</a>
+  <header class="topbar">
+    <h1>Promesses de règlement</h1>
+    <nav class="subnav"><a href="recouvra.html">Recouvra</a><a href="paiements.html">Paiements</a><a href="promesses.html" class="active">Promesses de règlement</a></nav>
+  </header>
+
+  <div class="card">
+    <div class="card-head"><h3>Créer une promesse de règlement</h3></div>
+    <form id="promise-form" class="form-grid">
+      <label>Facture impayée<select id="invoice" required><option value="">Sélectionner une facture...</option></select></label>
+      <label>Client<div class="promise-client-readout" id="client-display">—</div><input type="hidden" id="client"></label>
+      <label>Montant promis<input id="amount" type="number" min="1" step="1" required></label>
+      <label>Date promise<input id="due" type="date" required></label>
+      <button class="button recouvra-cta" type="submit">Enregistrer l'engagement</button>
+    </form>
+    <div id="message"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Promesses en cours</h3></div>
+    <div id="promises-content">Chargement...</div>
+  </div>
+</main>
+</div>
+</body>
+</html>

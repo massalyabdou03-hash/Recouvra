@@ -802,7 +802,7 @@ function openSubscriptionModal(profile) {
   const modal = document.createElement("div");
   modal.id = "premium-access-modal";
   modal.className = "premium-access-modal";
-  modal.innerHTML = `<div class="premium-access-dialog" role="dialog" aria-modal="true" aria-labelledby="premium-access-title"><button type="button" class="premium-access-close" aria-label="Fermer">×</button><span class="eyebrow">Abonnement Recouvra</span><h2 id="premium-access-title">15 000 FCFA / mois</h2><p>Faites un transfert Wave de <strong>15 000 FCFA au 77 033 80 30</strong>, puis saisissez la référence de la transaction.</p><label for="wave-reference">Référence / ID Transaction Wave</label><input id="wave-reference" type="text" required maxlength="120" placeholder="Ex : TXN-123456"><button type="button" class="button" data-premium-request>Soumettre le paiement</button><p class="premium-access-message" aria-live="polite"></p></div>`;
+  modal.innerHTML = `<div class="premium-access-dialog" role="dialog" aria-modal="true" aria-labelledby="premium-access-title"><button type="button" class="premium-access-close" aria-label="Fermer">×</button><span class="eyebrow">Abonnement Recouvra</span><h2 id="premium-access-title">15 000 FCFA / mois</h2><p>Faites un transfert Wave de <strong>15 000 FCFA au 77 033 80 30</strong>, puis saisissez la référence de la transaction.</p><label for="wave-reference">Référence / ID Transaction Wave</label><input id="wave-reference" type="text" required maxlength="120" placeholder="Ex : TXN-123456"><button type="button" class="button recouvra-cta" data-premium-request>Soumettre le paiement</button><p class="premium-access-message" aria-live="polite"></p></div>`;
   document.body.appendChild(modal);
   const close = () => modal.remove();
   modal.querySelector(".premium-access-close").addEventListener("click", close);
@@ -835,7 +835,7 @@ async function requireRecouvra() {
   const profile = await currentProfile();
   if (!profile) { window.location.href = "login.html"; return null; }
   if (!profile?.has_recouvra && profile?.role !== "super_admin") {
-    document.body.innerHTML = `<main class="shell"><section class="panel access-panel"><span class="eyebrow">Module Premium</span><h1>Recouvra</h1><p>Le suivi des paiements et des relances n'est pas encore activé pour ce compte.</p><button class="button" onclick="requestRecouvra()">Demander l'activation</button></section></main>`;
+    document.body.innerHTML = `<main class="shell"><section class="panel access-panel"><span class="eyebrow">Module Premium</span><h1>Recouvra</h1><p>Le suivi des paiements et des relances n'est pas encore activé pour ce compte.</p><button class="button recouvra-cta" onclick="requestRecouvra()">Demander l'activation</button></section></main>`;
     return null;
   }
   return profile;
