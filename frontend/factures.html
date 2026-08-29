@@ -96,7 +96,7 @@
     <div class="card">
       <div class="card-head"><h3>Historique</h3></div>
       <div class="toolbar" style="margin-bottom:16px;">
-        <input class="search-input" id="historique-search" placeholder="Rechercher (client, n° facture)..." oninput="renderFacturesList()">
+        <input class="search-input" id="historique-search" placeholder="Rechercher (client, n° facture, pièce)..." oninput="renderFacturesList()">
       </div>
       <div id="table-content">Chargement...</div>
     </div>
@@ -508,7 +508,7 @@ let facturesList = [];
 async function loadFactures() {
   const { items, offline, savedAt } = await loadWithCache("factures", () =>
     supabaseClient
-      .from("factures").select("id, numero_facture, statut, montant_total, mode_paiement, created_at, paye, date_echeance, client_id, clients(nom, telephone)")
+      .from("factures").select("id, numero_facture, statut, montant_total, mode_paiement, created_at, paye, date_echeance, client_id, clients(nom, telephone), factures_lignes(designation)")
       .neq("statut", "ANNULEE")
       .order("created_at", { ascending: false }).limit(100)
   );
@@ -525,7 +525,8 @@ function renderFacturesList() {
   const q = (document.getElementById("historique-search")?.value || "").trim().toLowerCase();
   const items = q ? facturesList.filter(f =>
     (f.clients?.nom || "").toLowerCase().includes(q) ||
-    (f.numero_facture || "").toLowerCase().includes(q)
+    (f.numero_facture || "").toLowerCase().includes(q) ||
+    (f.factures_lignes || []).some(l => (l.designation || "").toLowerCase().includes(q))
   ) : facturesList;
 
   if (items.length === 0) { el.innerHTML = `<div class="empty-state">Aucun résultat pour cette recherche.</div>`; return; }
