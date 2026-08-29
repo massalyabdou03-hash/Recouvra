@@ -15,7 +15,7 @@
 // postes déjà installés continueront de servir l'ancienne version en cache.
 // =============================================================================
 
-const CACHE_VERSION = "v18";
+const CACHE_VERSION = "v19";
 const SHELL_CACHE = `recouvra-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `recouvra-runtime-${CACHE_VERSION}`;
 
@@ -29,11 +29,28 @@ const SHELL_ASSETS = [
   "facture-detail.html",
   "credits.html",
   "clients.html",
+  "parametres.html",
+  "recouvra.html",
+  "recouvra-detail.html",
+  "paiements.html",
+  "promesses.html",
+  "abonnement.html",
   "manifest.json",
   "assets/style.css",
   "assets/app.js",
   "assets/config.js",
+  "assets/parametres.js",
+  "assets/recouvra.js",
+  "assets/paiements.js",
+  "assets/promesses.js",
+  "assets/abonnement.js",
   "assets/img/icon.svg",
+  "assets/img/apple-touch-icon.png",
+  "assets/img/icon-192.png",
+  "assets/img/icon-512.png",
+  "assets/img/icon-512-maskable.png",
+  "assets/img/logo-sylla.png",
+  "assets/img/logo-sylla-icon.png",
 ];
 
 self.addEventListener("install", (event) => {
