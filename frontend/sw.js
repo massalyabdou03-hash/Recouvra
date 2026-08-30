@@ -15,7 +15,7 @@
 // postes déjà installés continueront de servir l'ancienne version en cache.
 // =============================================================================
 
-const CACHE_VERSION = "v23";
+const CACHE_VERSION = "v24";
 const SHELL_CACHE = `recouvra-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `recouvra-runtime-${CACHE_VERSION}`;
 
@@ -53,8 +53,6 @@ const SHELL_ASSETS = [
   "assets/img/icon-192.png",
   "assets/img/icon-512.png",
   "assets/img/icon-512-maskable.png",
-  "assets/img/logo-sylla.png",
-  "assets/img/logo-sylla-icon.png",
 ];
 
 self.addEventListener("install", (event) => {
