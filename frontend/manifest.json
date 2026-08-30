@@ -2,7 +2,7 @@
   "name": "Recouvra SaaS",
   "short_name": "Recouvra",
   "description": "Gestion de stock, factures et recouvrement de créances",
-  "start_url": "index.html",
+  "start_url": "login.html",
   "scope": ".",
   "display": "standalone",
   "orientation": "portrait-primary",
