@@ -23,9 +23,9 @@ async function loadDebts() {
 
   const today = new Date();
   el.innerHTML = filterBanner + `
-    <div class="table-wrapper">
+    <div style="overflow-x:auto;">
     <table>
-      <thead><tr><th>N° Facture / Date</th><th>Client</th><th class="num">Montant total</th><th class="num">Reste à payer</th><th>Statut</th><th></th></tr></thead>
+      <thead><tr><th>N° Facture / Date</th><th>Client</th><th class="num col-optional-mobile">Montant total</th><th class="num">Reste à payer</th><th>Statut</th><th></th></tr></thead>
       <tbody>
         ${data.map(invoice => {
           const late = Boolean(invoice.date_echeance && new Date(invoice.date_echeance) < today);
@@ -33,7 +33,7 @@ async function loadDebts() {
           <tr>
             <td><span class="ref">${esc(invoice.numero_facture || `Facture #${invoice.id}`)}</span><br><span class="hint">${date(invoice.created_at)}</span></td>
             <td>${esc(invoice.clients?.nom || "Client")}</td>
-            <td class="num">${money(invoice.montant_total)}</td>
+            <td class="num col-optional-mobile">${money(invoice.montant_total)}</td>
             <td class="num"><strong>${money(invoice.montant_restant)}</strong></td>
             <td><span class="badge ${late ? "badge-danger" : "badge-warn"}">${late ? "En retard" : "Partielle"}</span></td>
             <td class="actions-cell">

@@ -157,6 +157,7 @@ function setupValeurStockToggle(valeur) {
     alertesEl.innerHTML = `<div class="empty-state">Aucune alerte — tout le stock est au-dessus du seuil.</div>`;
   } else {
     alertesEl.innerHTML = `
+      <div style="overflow-x:auto;">
       <table>
         <thead><tr><th>Référence OEM</th><th>Désignation</th><th>Marque</th><th>Emplacement</th><th class="num">Stock</th><th class="num">Seuil</th></tr></thead>
         <tbody>
@@ -170,7 +171,8 @@ function setupValeurStockToggle(valeur) {
               <td class="num">${a.seuil_alerte}</td>
             </tr>`).join("")}
         </tbody>
-      </table>`;
+      </table>
+      </div>`;
   }
 
   await loadActiviteCommerciale();
@@ -224,13 +226,15 @@ async function loadActiviteCommerciale() {
       const top = [...parProduit.entries()].sort((a, b) => b[1].quantite - a[1].quantite).slice(0, 8);
 
       topEl.innerHTML = `
+        <div style="overflow-x:auto;">
         <table>
           <thead><tr><th>Désignation</th><th class="num">Quantité vendue</th><th class="num">Chiffre d'affaires</th></tr></thead>
           <tbody>
             ${top.map(([designation, v]) => `
               <tr><td>${esc(designation)}</td><td class="num">${v.quantite}</td><td class="num">${fmtMoney(v.montant)}</td></tr>`).join("")}
           </tbody>
-        </table>`;
+        </table>
+        </div>`;
     }
   } catch {
     ["jour", "semaine", "mois"].forEach(p => {

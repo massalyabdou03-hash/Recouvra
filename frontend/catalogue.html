@@ -237,13 +237,13 @@ function renderTable(pieces) {
   }
   el.innerHTML = `
     <div style="overflow-x:auto;">
-    <table style="table-layout:fixed;">
+    <table class="catalogue-table" style="table-layout:fixed;">
       <colgroup>
         <col style="width:130px;"><col style="width:160px;"><col style="width:160px;"><col style="width:160px;">
         <col style="width:100px;"><col style="width:100px;"><col style="width:90px;"><col style="width:70px;"><col style="width:124px;">
       </colgroup>
       <thead><tr>
-        <th>Référence</th><th>Désignation</th><th>Description</th><th>Infos complémentaires</th><th>Marque</th><th>Emplacement</th>
+        <th>Référence</th><th>Désignation</th><th class="col-optional-mobile">Description</th><th class="col-optional-mobile">Infos complémentaires</th><th class="col-optional-mobile">Marque</th><th class="col-optional-mobile">Emplacement</th>
         <th class="num">Prix vente</th><th class="num">Stock</th><th></th>
       </tr></thead>
       <tbody>
@@ -254,10 +254,10 @@ function renderTable(pieces) {
               ${sameRef(p.reference_oem, p.reference_interne) ? "" : `<div class="hint" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${esc(p.reference_interne)}">${esc(p.reference_interne)}</div>`}
             </td>
             <td style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(p.designation)}</td>
-            <td style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${esc(p.description || "")}">${esc(p.description || "—")}</td>
-            <td style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${esc(p.informations_complementaires || "")}">${esc(p.informations_complementaires || "—")}</td>
-            <td>${esc(p.marque || "—")}</td>
-            <td>${esc(p.emplacement || "—")}</td>
+            <td class="col-optional-mobile" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${esc(p.description || "")}">${esc(p.description || "—")}</td>
+            <td class="col-optional-mobile" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${esc(p.informations_complementaires || "")}">${esc(p.informations_complementaires || "—")}</td>
+            <td class="col-optional-mobile">${esc(p.marque || "—")}</td>
+            <td class="col-optional-mobile">${esc(p.emplacement || "—")}</td>
             <td class="num">${fmtMoney(p.prix_vente)}</td>
             <td class="num"><span class="badge ${p.quantite_stock <= p.seuil_alerte ? (p.quantite_stock === 0 ? "badge-danger" : "badge-warn") : "badge-success"}">${p.quantite_stock} ${unitLabel(p.unite_mesure)}</span></td>
             <td class="actions-cell">

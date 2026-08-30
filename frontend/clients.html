@@ -175,11 +175,11 @@ function renderTable(clients) {
     return;
   }
   el.innerHTML = `
-    <div class="table-wrapper">
+    <div style="overflow-x:auto;">
     <table>
       <thead><tr>
-        <th>Nom</th><th>Téléphone</th><th>Email</th><th>Adresse</th><th>Client depuis</th>
-        <th class="num">Factures</th><th class="num">Total acheté</th><th class="num">Solde dû</th><th></th>
+        <th>Nom</th><th>Téléphone</th><th class="col-optional-mobile">Email</th><th class="col-optional-mobile">Adresse</th><th class="col-optional-mobile">Client depuis</th>
+        <th class="num col-optional-mobile">Factures</th><th class="num col-optional-mobile">Total acheté</th><th class="num">Solde dû</th><th></th>
       </tr></thead>
       <tbody>
         ${clients.map(c => {
@@ -188,11 +188,11 @@ function renderTable(clients) {
           <tr style="cursor:pointer;" onclick="openDetailModal(${c.id})">
             <td>${esc(c.nom)}</td>
             <td class="hint">${esc(c.telephone || "—")}</td>
-            <td class="hint">${esc(c.email || "—")}</td>
-            <td class="hint" style="max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${esc(c.adresse || "")}">${esc(c.adresse || "—")}</td>
-            <td class="hint">${fmtDate(c.created_at)}</td>
-            <td class="num">${s.nbFactures}</td>
-            <td class="num">${fmtMoney(s.totalAchete)}</td>
+            <td class="hint col-optional-mobile">${esc(c.email || "—")}</td>
+            <td class="hint col-optional-mobile" style="max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${esc(c.adresse || "")}">${esc(c.adresse || "—")}</td>
+            <td class="hint col-optional-mobile">${fmtDate(c.created_at)}</td>
+            <td class="num col-optional-mobile">${s.nbFactures}</td>
+            <td class="num col-optional-mobile">${fmtMoney(s.totalAchete)}</td>
             <td class="num">${s.du > 0 ? `<span class="badge badge-warn">${fmtMoney(s.du)}</span>` : "—"}</td>
             <td class="actions-cell">
               <button class="btn-icon clients-write-action" title="Modifier" onclick="event.stopPropagation(); editClient(${c.id})"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></button>

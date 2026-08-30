@@ -201,15 +201,15 @@ function addLigne() {
   const tr = document.createElement("tr");
   tr.id = `ligne-${id}`;
   tr.innerHTML = `
-    <td>
+    <td data-label="Pièce">
       <div class="piece-search">
         <input type="text" class="piece-search-input" placeholder="Rechercher une pièce..." autocomplete="off">
         <div class="piece-search-results"></div>
       </div>
     </td>
-    <td><div class="quantity-control"><input type="number" class="ligne-qte" min="0.001" step="1" value="1" onchange="recalcLigne(${id})"><span class="ligne-unite">pcs</span></div><label class="lot-check"><input type="checkbox" class="ligne-lot" onchange="recalcLigne(${id})"> Lot/rouleau</label></td>
-    <td><input type="number" class="ligne-prix" min="0" step="1" value="0" onchange="recalcLigne(${id})"></td>
-    <td class="num ligne-montant mono">0 F</td>
+    <td data-label="Quantité"><div class="quantity-control"><input type="number" class="ligne-qte" min="0.001" step="1" value="1" onchange="recalcLigne(${id})"><span class="ligne-unite">pcs</span></div><label class="lot-check"><input type="checkbox" class="ligne-lot" onchange="recalcLigne(${id})"> Lot/rouleau</label></td>
+    <td data-label="Prix unitaire"><input type="number" class="ligne-prix" min="0" step="1" value="0" onchange="recalcLigne(${id})"></td>
+    <td class="num ligne-montant mono" data-label="Montant">0 F</td>
     <td><button type="button" class="btn-icon" onclick="removeLigne(${id})"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></button></td>
   `;
   tbody.appendChild(tr);
@@ -546,6 +546,7 @@ function renderFacturesList() {
 
   const today = new Date();
   el.innerHTML = `
+    <div style="overflow-x:auto;">
     <table>
       <thead><tr><th>N° facture</th><th>Client</th><th>Statut</th><th>Paiement</th><th class="num">Montant</th><th></th></tr></thead>
       <tbody>
@@ -566,7 +567,8 @@ function renderFacturesList() {
           }).join("")}
         `).join("")}
       </tbody>
-    </table>`;
+    </table>
+    </div>`;
 }
 
 function renderPendingSales() {
@@ -584,6 +586,7 @@ function renderPendingSales() {
   };
 
   el.innerHTML = `
+    <div style="overflow-x:auto;">
     <table>
       <thead><tr><th>Client</th><th>Lignes</th><th class="num">Total</th><th>Statut</th><th></th></tr></thead>
       <tbody>
@@ -602,7 +605,8 @@ function renderPendingSales() {
             </td>
           </tr>`).join("")}
       </tbody>
-    </table>`;
+    </table>
+    </div>`;
 }
 
 async function cancelPendingSale(id) {
