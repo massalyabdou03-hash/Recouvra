@@ -90,7 +90,10 @@
     <div class="card">
       <div class="card-head">
         <h3>Produits sous le seuil d'alerte</h3>
-        <a href="catalogue.html" class="hint">Voir le catalogue →</a>
+        <div style="display:flex; align-items:center; gap:14px;">
+          <button class="btn btn-secondary" id="export-alertes-pdf-btn" onclick="partagerAlertesPdf()" disabled><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v19l-3-2-3 2-3-2-3 2V2z"/><path d="M9 8h6M9 12h6"/></svg>Commande fournisseur (PDF)</button>
+          <a href="catalogue.html" class="hint">Voir le catalogue →</a>
+        </div>
       </div>
       <div id="alertes-content">Chargement...</div>
     </div>
@@ -98,9 +101,131 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@4.2.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@5.0.8/dist/jspdf.plugin.autotable.min.js"></script>
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
 <script>
+let alertesPieces = [];
+
+// ---------- Bon de commande fournisseur (PDF) — même moteur jsPDF/autoTable que
+// facture-detail.html, pour un rendu identique en Web/PWA/TWA sans dépendance serveur.
+function hexToRgb(hex) {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || "");
+  return m ? [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)] : [79, 70, 229];
+}
+function pdfNum(n) { return String(n).replace(/ /g, " "); }
+async function logoDataUrl(url) {
+  if (!url || !url.startsWith("http")) return null;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
+}
+
+async function buildAlertesPdf() {
+  const settings = await getCompanySettings();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const marginX = 15;
+  const accent = hexToRgb(settings?.primary_color || "#4F46E5");
+  const dark = [23, 23, 23];
+  const muted = [110, 110, 110];
+  let y = 20;
+  let textX = marginX;
+
+  const logo = await logoDataUrl(settings?.logo_url || settings?.logo_path);
+  if (logo) {
+    try {
+      const format = logo.startsWith("data:image/png") ? "PNG" : "JPEG";
+      doc.addImage(logo, format, marginX, y - 5, 20, 20);
+      textX = marginX + 26;
+    } catch { /* logo non supporte par jsPDF (ex: SVG) : on continue sans */ }
+  }
+
+  doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(...dark);
+  doc.text(settings?.nom_commercial || "Entreprise", textX, y);
+  if (settings?.adresse) {
+    y += 5.5;
+    doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...muted);
+    doc.text(settings.adresse, textX, y);
+  }
+
+  let yContact = 20;
+  doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...muted);
+  [settings?.telephone ? `Tél : ${settings.telephone}` : null, settings?.email].filter(Boolean)
+    .forEach((line) => { doc.text(line, pageWidth - marginX, yContact, { align: "right" }); yContact += 4.5; });
+
+  y = Math.max(y, yContact, marginX + 15) + 5;
+  doc.setDrawColor(...accent); doc.setLineWidth(0.7);
+  doc.line(marginX, y, pageWidth - marginX, y);
+  y += 10;
+
+  doc.setFont("helvetica", "bold"); doc.setFontSize(13); doc.setTextColor(...dark);
+  doc.text("Bon de commande fournisseur", marginX, y);
+  doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...muted);
+  doc.text(`Produits sous le seuil d'alerte — ${fmtDate(new Date().toISOString())}`, marginX, y + 5);
+  y += 16;
+
+  doc.autoTable({
+    startY: y,
+    margin: { left: marginX, right: marginX, bottom: 22 },
+    head: [["Référence", "Désignation", "Marque", "Emplacement", "Stock", "Seuil", "Qté à commander"]],
+    body: alertesPieces.map((p) => [
+      p.reference_oem || p.reference_interne || "—",
+      p.designation,
+      p.marque || "—",
+      p.emplacement || "—",
+      pdfNum(p.quantite_stock),
+      pdfNum(p.seuil_alerte),
+      pdfNum(Math.max(p.seuil_alerte - p.quantite_stock, 1)),
+    ]),
+    theme: "grid",
+    headStyles: { fillColor: accent, textColor: [255, 255, 255], fontStyle: "bold", fontSize: 8.5 },
+    bodyStyles: { fontSize: 9, textColor: dark },
+    columnStyles: { 4: { halign: "right" }, 5: { halign: "right" }, 6: { halign: "right" } },
+  });
+
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(...muted);
+    doc.text(`Page ${i} / ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: "center" });
+  }
+
+  return doc;
+}
+
+async function partagerAlertesPdf() {
+  if (alertesPieces.length === 0) return;
+  const btn = document.getElementById("export-alertes-pdf-btn");
+  btn.disabled = true;
+  try {
+    const doc = await buildAlertesPdf();
+    const filename = `commande-fournisseur_${new Date().toISOString().slice(0, 10)}.pdf`;
+    const file = new File([doc.output("blob")], filename, { type: "application/pdf" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: filename });
+    } else {
+      doc.save(filename);
+    }
+  } catch (err) {
+    if (err?.name !== "AbortError") showToast("Impossible de générer le PDF : " + (err?.message || err), "error");
+  } finally {
+    btn.disabled = alertesPieces.length === 0;
+  }
+}
 // La valeur du stock (achat) est une information sensible qu'on ne veut pas laisser
 // affichée en permanence à l'écran : l'utilisateur peut la masquer, et ce choix est
 // mémorisé (localStorage) pour rester masquée aux prochaines visites sur ce poste.
@@ -152,6 +277,8 @@ function setupValeurStockToggle(valeur) {
     .filter(p => p.quantite_stock <= p.seuil_alerte)
     .sort((a, b) => a.quantite_stock - b.quantite_stock);
   document.getElementById("stat-alertes").textContent = alertes.length;
+  alertesPieces = alertes;
+  document.getElementById("export-alertes-pdf-btn").disabled = alertes.length === 0;
 
   if (alertes.length === 0) {
     alertesEl.innerHTML = `<div class="empty-state">Aucune alerte — tout le stock est au-dessus du seuil.</div>`;
