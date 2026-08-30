@@ -15,12 +15,13 @@
 // postes déjà installés continueront de servir l'ancienne version en cache.
 // =============================================================================
 
-const CACHE_VERSION = "v20";
+const CACHE_VERSION = "v21";
 const SHELL_CACHE = `recouvra-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `recouvra-runtime-${CACHE_VERSION}`;
 
 const SHELL_ASSETS = [
   "login.html",
+  "onboarding.html",
   "index.html",
   "catalogue.html",
   "stock.html",
@@ -46,6 +47,7 @@ const SHELL_ASSETS = [
   "assets/promesses.js",
   "assets/relances.js",
   "assets/abonnement.js",
+  "assets/onboarding.js",
   "assets/img/icon.svg",
   "assets/img/apple-touch-icon.png",
   "assets/img/icon-192.png",

@@ -9,25 +9,49 @@
 </head>
 <body>
   <main class="auth-layout">
-    <section class="auth-card">
-      <div class="auth-brand"><span class="auth-mark">R</span><div><strong>Recouvra SaaS</strong><span>Gestion Stock & Facturation</span></div></div>
-      <p class="auth-pitch">La plateforme globale pour gérer votre stock, éditer vos factures et automatiser vos relances d'impayés sur WhatsApp.</p>
-      <div class="auth-tabs"><button type="button" class="auth-tab active" data-auth-tab="login">Se connecter</button><button type="button" class="auth-tab" data-auth-tab="signup">Créer un compte</button></div>
-      <form id="login-form" class="auth-form">
-        <label>Email<input id="login-email" type="email" required autocomplete="email"></label>
-        <label>Mot de passe<input id="login-password" type="password" required autocomplete="current-password"></label>
-        <button type="submit" class="button">Se connecter</button>
-      </form>
-      <form id="signup-form" class="auth-form" hidden>
-        <label>Nom de l'entreprise<input id="signup-company" required maxlength="150"></label>
-        <label>Nom du gérant<input id="signup-manager" required maxlength="150"></label>
-        <label>Téléphone WhatsApp<input id="signup-phone" required maxlength="30" inputmode="tel"></label>
-        <label>Email<input id="signup-email" type="email" required autocomplete="email"></label>
-        <label>Mot de passe<input id="signup-password" type="password" required minlength="8" autocomplete="new-password"></label>
-        <button type="submit" class="button">Créer mon compte</button>
-      </form>
-      <p id="auth-message" class="auth-message" aria-live="polite"></p>
+    <section class="auth-showcase">
+      <div class="auth-brand"><span class="auth-mark">R</span><div><strong>Recouvra</strong><span>Gestion Stock &amp; Facturation</span></div></div>
+      <p class="auth-mobile-pitch">De la vente au recouvrement, Recouvra vous aide à garder le contrôle.</p>
+      <h1 class="auth-headline">Gérez votre commerce. Suivez votre stock. Facturez. Récupérez votre argent.</h1>
+      <ul class="auth-benefits">
+        <li>Gérez votre stock en temps réel</li>
+        <li>Créez des factures professionnelles</li>
+        <li>Suivez les paiements et les impayés</li>
+        <li>Relancez vos clients facilement via WhatsApp</li>
+        <li>Gardez toute votre activité au même endroit</li>
+      </ul>
+      <p class="auth-tagline-strong">Ne perdez plus le contrôle de votre stock et de vos créances.</p>
+      <p class="auth-tagline">Recouvra accompagne votre commerce de la vente au recouvrement.</p>
     </section>
+
+    <div class="auth-card-wrap">
+      <section class="auth-card">
+        <div class="auth-tabs"><button type="button" class="auth-tab" data-auth-tab="login">Se connecter</button><button type="button" class="auth-tab active" data-auth-tab="signup">Créer un compte</button></div>
+
+        <form id="login-form" class="auth-form" hidden>
+          <h2 class="auth-form-title">Bon retour</h2>
+          <label>Email<input id="login-email" type="email" required autocomplete="email"></label>
+          <label>Mot de passe<input id="login-password" type="password" required autocomplete="current-password"></label>
+          <button type="submit" class="button">Se connecter</button>
+          <p class="auth-switch">Pas encore de compte ? <button type="button" class="text-button" data-auth-tab="signup">Créer un compte</button></p>
+        </form>
+
+        <form id="signup-form" class="auth-form">
+          <h2 class="auth-form-title">Créez votre compte Recouvra</h2>
+          <p class="auth-form-sub">Commencez à organiser votre commerce simplement.</p>
+          <label>Nom complet<input id="signup-manager" required maxlength="150" autocomplete="name"></label>
+          <label>Nom de l'entreprise<input id="signup-company" required maxlength="150"></label>
+          <label>Téléphone WhatsApp<input id="signup-phone" required maxlength="30" inputmode="tel"></label>
+          <label>Email<input id="signup-email" type="email" required autocomplete="email"></label>
+          <label>Mot de passe<input id="signup-password" type="password" required minlength="8" autocomplete="new-password"></label>
+          <label>Confirmer le mot de passe<input id="signup-password-confirm" type="password" required minlength="8" autocomplete="new-password"></label>
+          <button type="submit" class="button">Créer mon compte</button>
+          <p class="auth-switch">Vous avez déjà un compte ? <button type="button" class="text-button" data-auth-tab="login">Se connecter</button></p>
+        </form>
+
+        <p id="auth-message" class="auth-message" aria-live="polite"></p>
+      </section>
+    </div>
   </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
 <script src="assets/config.js"></script>
@@ -35,32 +59,65 @@
 <script>
   const authMessage = document.getElementById("auth-message");
   const setAuthMessage = text => { authMessage.textContent = text; };
-  document.querySelectorAll("[data-auth-tab]").forEach(tab => tab.addEventListener("click", () => {
-    const signup = tab.dataset.authTab === "signup";
-    document.querySelectorAll(".auth-tab").forEach(item => item.classList.toggle("active", item === tab));
-    document.getElementById("login-form").hidden = signup;
-    document.getElementById("signup-form").hidden = !signup;
+
+  // friendlyError() (app.js) traduit "Invalid login credentials" en "Code d'accès
+  // incorrect", pensé pour l'ancienne connexion par code numérique — trompeur ici où
+  // le formulaire est un vrai email/mot de passe. Mapping dédié à cette page.
+  function authErrorMessage(err) {
+    const msg = err?.message || String(err);
+    if (msg.includes("Invalid login credentials")) return "Email ou mot de passe incorrect.";
+    if (msg.includes("User already registered")) return "Un compte existe déjà avec cet email.";
+    if (msg.includes("Password should be at least")) return "Le mot de passe doit contenir au moins 8 caractères.";
+    return msg;
+  }
+
+  function showAuthTab(name) {
+    document.querySelectorAll("[data-auth-tab]").forEach(el => el.classList?.toggle("active", el.dataset.authTab === name));
+    document.getElementById("login-form").hidden = name !== "login";
+    document.getElementById("signup-form").hidden = name !== "signup";
     setAuthMessage("");
-  }));
+  }
+  document.querySelectorAll("[data-auth-tab]").forEach(el => el.addEventListener("click", () => showAuthTab(el.dataset.authTab)));
+
   document.getElementById("login-form").addEventListener("submit", async event => {
     event.preventDefault(); setAuthMessage("Connexion...");
-    const { error } = await supabaseClient.auth.signInWithPassword({ email: document.getElementById("login-email").value.trim(), password: document.getElementById("login-password").value });
-    if (error) { setAuthMessage(error.message); return; }
-    window.location.href = "index.html";
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email: document.getElementById("login-email").value.trim(), password: document.getElementById("login-password").value });
+    if (error) { setAuthMessage(authErrorMessage(error)); return; }
+    await redirectAfterAuth(data.session);
   });
+
   document.getElementById("signup-form").addEventListener("submit", async event => {
-    event.preventDefault(); setAuthMessage("Création du compte...");
+    event.preventDefault();
     const company = document.getElementById("signup-company").value.trim();
     const manager = document.getElementById("signup-manager").value.trim();
     const phone = document.getElementById("signup-phone").value.trim();
     const email = document.getElementById("signup-email").value.trim();
     const password = document.getElementById("signup-password").value;
+    const passwordConfirm = document.getElementById("signup-password-confirm").value;
+
+    if (password !== passwordConfirm) { setAuthMessage("Les deux mots de passe ne correspondent pas."); return; }
+
+    setAuthMessage("Création du compte...");
     const { data, error } = await supabaseClient.auth.signUp({ email, password, options: { data: { entreprise_nom: company, gerant_nom: manager, telephone: phone } } });
-    if (error) { setAuthMessage(error.message); return; }
-    setAuthMessage(data.session ? "Compte créé. Vous pouvez commencer avec le module Stock." : "Compte créé. Consultez votre email pour confirmer votre adresse.");
-    if (data.session) setTimeout(() => { window.location.href = "index.html"; }, 700);
+    if (error) { setAuthMessage(authErrorMessage(error)); return; }
+    if (!data.session) { setAuthMessage("Compte créé. Consultez votre email pour confirmer votre adresse."); return; }
+    setAuthMessage("Compte créé.");
+    await redirectAfterAuth(data.session);
   });
-  supabaseClient.auth.getSession().then(({ data }) => { if (data.session) window.location.href = "index.html"; });
+
+  // L'onboarding (bienvenue -> type de commerce -> besoins -> mise en place) ne doit
+  // s'afficher qu'une seule fois : on vérifie onboarding_completed_at plutôt que de se
+  // fier au seul fait de venir d'un signup, pour couvrir aussi le cas où l'email de
+  // confirmation retarde la première vraie connexion.
+  async function redirectAfterAuth(session) {
+    if (!session) return;
+    const { data: profile } = await supabaseClient
+      .from("profiles").select("entreprises(onboarding_completed_at)").eq("id", session.user.id).maybeSingle();
+    const done = profile?.entreprises?.onboarding_completed_at;
+    window.location.href = done ? "index.html" : "onboarding.html";
+  }
+
+  supabaseClient.auth.getSession().then(({ data }) => { if (data.session) redirectAfterAuth(data.session); });
 </script>
 </body>
 </html>

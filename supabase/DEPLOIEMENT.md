@@ -17,6 +17,7 @@ environnement qui les a deja recus.
 5. `upgrade_paiements_sync.sql` — synchronisation des deux modeles de suivi de paiement (`paye`/`paye_at` cote Emprunts, `montant_paye`/`montant_restant`/`statut_paiement` cote Recouvra).
 6. `upgrade_pieces_description.sql` — champs description libres du catalogue.
 7. `secure_sylla_access_codes.sql` — verrouille (RLS) une table d'un ancien mecanisme de connexion, non utilisee par le frontend actuel. A executer sur **tout** projet ayant deja execute `setup_sylla_code_access.sql`.
+8. `upgrade_onboarding.sql` — champs type de commerce / besoins / date de fin d'onboarding sur `entreprises`, pour le parcours post-inscription.
 
 **Specifiques a une instance client existante — ne jamais lancer sur un nouveau projet :**
 
