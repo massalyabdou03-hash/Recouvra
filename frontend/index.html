@@ -55,10 +55,36 @@
         <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 17h.01"/></svg></div>
         <div class="stat-body"><div class="label">Alertes réappro</div><div class="value" id="stat-alertes">—</div></div>
       </div>
+    </div>
+
+    <div class="topbar" style="margin-bottom:14px;">
+      <div><h3 style="margin:0;">Activité commerciale</h3><div class="subtitle">Aujourd'hui, cette semaine, ce mois</div></div>
+    </div>
+    <div class="grid-stats">
+      <div class="stat-card">
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <div class="stat-body"><div class="label">Ventes du jour</div><div class="value" id="stat-ca-jour">—</div><div class="hint" id="stat-nb-jour"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+        <div class="stat-body"><div class="label">Ventes de la semaine</div><div class="value" id="stat-ca-semaine">—</div><div class="hint" id="stat-nb-semaine"></div></div>
+      </div>
       <div class="stat-card">
         <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v19l-3-2-3 2-3-2-3 2V2z"/><path d="M9 8h6M9 12h6"/></svg></div>
-        <div class="stat-body"><div class="label">Factures validées (mois)</div><div class="value" id="stat-factures">—</div></div>
+        <div class="stat-body"><div class="label">Ventes du mois</div><div class="value" id="stat-ca-mois">—</div><div class="hint" id="stat-nb-mois"></div></div>
       </div>
+      <div class="stat-card danger">
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
+        <div class="stat-body"><div class="label">Créances (impayés)</div><div class="value" id="stat-creances">—</div><a href="credits.html" class="hint">Voir les emprunts →</a></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Produits les plus vendus</h3>
+        <span class="hint">30 derniers jours</span>
+      </div>
+      <div id="top-produits-content">Chargement...</div>
     </div>
 
     <div class="card">
@@ -119,20 +145,6 @@ function setupValeurStockToggle(valeur) {
   const valeur = pieces.reduce((sum, p) => sum + (p.quantite_stock * Number(p.prix_achat)), 0);
   setupValeurStockToggle(valeur);
 
-  // Stat: factures validées ce mois-ci
-  const debutMois = new Date(); debutMois.setDate(1); debutMois.setHours(0,0,0,0);
-  try {
-    const { data: factures, error } = await supabaseClient
-      .from("factures").select("id").eq("statut", "VALIDEE").gte("validated_at", debutMois.toISOString());
-    if (error) throw error;
-    document.getElementById("stat-factures").textContent = factures ? factures.length : "0";
-  } catch {
-    // Hors ligne : on ne peut compter que ce qu'on a déjà vu passer sur la page Factures.
-    const cachedFactures = getCachedCollection("factures").items;
-    const count = cachedFactures.filter(f => f.statut === "VALIDEE" && f.created_at && new Date(f.created_at) >= debutMois).length;
-    document.getElementById("stat-factures").textContent = cachedFactures.length ? count : "—";
-  }
-
   // Alertes stock — dérivées directement du catalogue (en ligne comme hors ligne),
   // pour ne pas dépendre d'une deuxième requête réseau qui échouerait hors connexion.
   const alertesEl = document.getElementById("alertes-content");
@@ -143,24 +155,104 @@ function setupValeurStockToggle(valeur) {
 
   if (alertes.length === 0) {
     alertesEl.innerHTML = `<div class="empty-state">Aucune alerte — tout le stock est au-dessus du seuil.</div>`;
-    return;
+  } else {
+    alertesEl.innerHTML = `
+      <table>
+        <thead><tr><th>Référence OEM</th><th>Désignation</th><th>Marque</th><th>Emplacement</th><th class="num">Stock</th><th class="num">Seuil</th></tr></thead>
+        <tbody>
+          ${alertes.slice(0, 50).map(a => `
+            <tr>
+              <td class="ref">${esc(a.reference_oem)}</td>
+              <td>${esc(a.designation)}</td>
+              <td>${esc(a.marque || "—")}</td>
+              <td>${esc(a.emplacement || "—")}</td>
+              <td class="num"><span class="badge ${a.quantite_stock === 0 ? "badge-danger" : "badge-warn"}">${a.quantite_stock} ${MEASURE_UNIT_LABELS[a.unite_mesure] || ""}</span></td>
+              <td class="num">${a.seuil_alerte}</td>
+            </tr>`).join("")}
+        </tbody>
+      </table>`;
   }
-  alertesEl.innerHTML = `
-    <table>
-      <thead><tr><th>Référence OEM</th><th>Désignation</th><th>Marque</th><th>Emplacement</th><th class="num">Stock</th><th class="num">Seuil</th></tr></thead>
-      <tbody>
-        ${alertes.slice(0, 50).map(a => `
-          <tr>
-            <td class="ref">${esc(a.reference_oem)}</td>
-            <td>${esc(a.designation)}</td>
-            <td>${esc(a.marque || "—")}</td>
-            <td>${esc(a.emplacement || "—")}</td>
-            <td class="num"><span class="badge ${a.quantite_stock === 0 ? "badge-danger" : "badge-warn"}">${a.quantite_stock} ${MEASURE_UNIT_LABELS[a.unite_mesure] || ""}</span></td>
-            <td class="num">${a.seuil_alerte}</td>
-          </tr>`).join("")}
-      </tbody>
-    </table>`;
+
+  await loadActiviteCommerciale();
 })();
+
+// Ventes du jour / de la semaine / du mois + créances totales + produits les plus
+// vendus. Une seule requête large (factures validées depuis le début du mois) suffit
+// pour dériver jour/semaine/mois côté client, plutôt que 3 requêtes réseau distinctes.
+async function loadActiviteCommerciale() {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const debutSemaine = new Date(today);
+  const jourSemaine = (debutSemaine.getDay() + 6) % 7; // lundi = 0
+  debutSemaine.setDate(debutSemaine.getDate() - jourSemaine);
+  const debutMois = new Date(today.getFullYear(), today.getMonth(), 1);
+
+  const setVentes = (prefix, rows) => {
+    const total = rows.reduce((s, f) => s + Number(f.montant_total), 0);
+    document.getElementById(`stat-ca-${prefix}`).textContent = fmtMoney(total);
+    document.getElementById(`stat-nb-${prefix}`).textContent = `${rows.length} vente${rows.length > 1 ? "s" : ""}`;
+  };
+
+  try {
+    const { data: ventesMois, error } = await supabaseClient
+      .from("factures")
+      .select("id, montant_total, validated_at")
+      .eq("statut", "VALIDEE")
+      .gte("validated_at", debutMois.toISOString());
+    if (error) throw error;
+
+    const rows = ventesMois || [];
+    setVentes("mois", rows);
+    setVentes("semaine", rows.filter(f => new Date(f.validated_at) >= debutSemaine));
+    setVentes("jour", rows.filter(f => new Date(f.validated_at) >= today));
+
+    const idsMois = rows.map(f => f.id);
+    const topEl = document.getElementById("top-produits-content");
+    if (idsMois.length === 0) {
+      topEl.innerHTML = `<div class="empty-state">Aucune vente validée ce mois-ci.</div>`;
+    } else {
+      const { data: lignes, error: errLignes } = await supabaseClient
+        .from("factures_lignes").select("designation, quantite, montant").in("facture_id", idsMois);
+      if (errLignes) throw errLignes;
+
+      const parProduit = new Map();
+      (lignes || []).forEach(l => {
+        const cur = parProduit.get(l.designation) || { quantite: 0, montant: 0 };
+        cur.quantite += Number(l.quantite);
+        cur.montant += Number(l.montant);
+        parProduit.set(l.designation, cur);
+      });
+      const top = [...parProduit.entries()].sort((a, b) => b[1].quantite - a[1].quantite).slice(0, 8);
+
+      topEl.innerHTML = `
+        <table>
+          <thead><tr><th>Désignation</th><th class="num">Quantité vendue</th><th class="num">Chiffre d'affaires</th></tr></thead>
+          <tbody>
+            ${top.map(([designation, v]) => `
+              <tr><td>${esc(designation)}</td><td class="num">${v.quantite}</td><td class="num">${fmtMoney(v.montant)}</td></tr>`).join("")}
+          </tbody>
+        </table>`;
+    }
+  } catch {
+    ["jour", "semaine", "mois"].forEach(p => {
+      document.getElementById(`stat-ca-${p}`).textContent = "—";
+      document.getElementById(`stat-nb-${p}`).textContent = "Connexion requise";
+    });
+    document.getElementById("top-produits-content").innerHTML = `<div class="empty-state">Connexion requise pour afficher les produits les plus vendus.</div>`;
+  }
+
+  // Créances totales : même logique que credits.html/Recouvra (montant_restant > 0
+  // sur les factures non annulées), affichée ici indépendamment de l'abonnement
+  // Recouvra puisque ce total est déjà visible sans lui sur la page Emprunts.
+  try {
+    const { data: creances, error } = await supabaseClient
+      .from("factures").select("montant_restant").neq("statut", "ANNULEE").gt("montant_restant", 0);
+    if (error) throw error;
+    const total = (creances || []).reduce((s, f) => s + Number(f.montant_restant), 0);
+    document.getElementById("stat-creances").textContent = fmtMoney(total);
+  } catch {
+    document.getElementById("stat-creances").textContent = "—";
+  }
+}
 </script>
 </body>
 </html>

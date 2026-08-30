@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Historique des relances</title>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#4F46E5"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Recouvra"><link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/app.js" defer></script>
+<script src="assets/relances.js" defer></script>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar"></nav>
+<main class="main">
+  <a href="index.html" class="btn-back" style="margin-bottom:16px;"><span class="arrow">←</span> Retour au tableau de bord</a>
+  <header class="topbar">
+    <h1>Historique des relances</h1>
+    <nav class="subnav"><a href="recouvra.html">Recouvra</a><a href="paiements.html">Paiements</a><a href="promesses.html">Promesses de règlement</a><a href="relances.html" class="active">Relances</a></nav>
+  </header>
+
+  <div class="card">
+    <div class="card-head"><h3>Relances envoyées</h3></div>
+    <div id="relances-content">Chargement...</div>
+  </div>
+</main>
+</div>
+</body>
+</html>

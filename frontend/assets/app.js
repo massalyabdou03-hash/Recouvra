@@ -762,7 +762,7 @@ function initGlobalNavigation() {
     { key: "credits", label: "Emprunts", href: "credits.html", pages: ["credits.html"] },
     { key: "clients", label: "Clients", href: "clients.html", pages: ["clients.html"] },
     { key: "settings", label: "Paramètres", href: "parametres.html", pages: ["parametres.html"] },
-    { key: "recouvra", label: "Recouvra", href: "recouvra.html", pages: ["recouvra.html", "recouvra-detail.html", "paiements.html", "promesses.html"], group: "Extension premium", power: true },
+    { key: "recouvra", label: "Recouvra", href: "recouvra.html", pages: ["recouvra.html", "recouvra-detail.html", "paiements.html", "promesses.html", "relances.html"], group: "Extension premium", power: true },
   ];
   const icons = {
     home: '<path d="m3 10 9-7 9 7v10H3z"/><path d="M9 21v-6h6v6"/>',
