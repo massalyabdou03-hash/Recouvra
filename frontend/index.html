@@ -82,7 +82,7 @@
     <div class="card">
       <div class="card-head">
         <h3>Produits les plus vendus</h3>
-        <span class="hint">30 derniers jours</span>
+        <span class="hint">Ce mois-ci</span>
       </div>
       <div id="top-produits-content">Chargement...</div>
     </div>
@@ -195,17 +195,22 @@ async function loadActiviteCommerciale() {
   };
 
   try {
-    const { data: ventesMois, error } = await supabaseClient
+    // La semaine (lundi) peut commencer avant le 1er du mois (ex: le 2 du mois si le
+    // 1er est un mardi) : on charge depuis la plus ancienne des deux bornes, puis on
+    // filtre chaque période côté client, sinon "ventes de la semaine" sous-compte les
+    // ventes des tout premiers jours d'un mois.
+    const debutChargement = debutSemaine < debutMois ? debutSemaine : debutMois;
+    const { data: ventes, error } = await supabaseClient
       .from("factures")
       .select("id, montant_total, validated_at")
       .eq("statut", "VALIDEE")
-      .gte("validated_at", debutMois.toISOString());
+      .gte("validated_at", debutChargement.toISOString());
     if (error) throw error;
 
-    const rows = ventesMois || [];
+    const rows = (ventes || []).filter(f => new Date(f.validated_at) >= debutMois);
     setVentes("mois", rows);
-    setVentes("semaine", rows.filter(f => new Date(f.validated_at) >= debutSemaine));
-    setVentes("jour", rows.filter(f => new Date(f.validated_at) >= today));
+    setVentes("semaine", (ventes || []).filter(f => new Date(f.validated_at) >= debutSemaine));
+    setVentes("jour", (ventes || []).filter(f => new Date(f.validated_at) >= today));
 
     const idsMois = rows.map(f => f.id);
     const topEl = document.getElementById("top-produits-content");

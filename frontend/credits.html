@@ -118,7 +118,7 @@ async function loadCreditsData() {
   const { items, offline, savedAt } = await loadWithCache("credits", () =>
     supabaseClient
       .from("factures")
-      .select("id, client_id, numero_facture, montant_total, created_at, echeance_type, date_echeance, paye, paye_at, clients(nom, telephone)")
+      .select("id, client_id, numero_facture, montant_total, montant_restant, created_at, echeance_type, date_echeance, paye, paye_at, clients(nom, telephone)")
       .eq("mode_paiement", "CREDIT").eq("statut", "VALIDEE")
       .order("date_echeance", { ascending: true })
   );
@@ -128,7 +128,9 @@ async function loadCreditsData() {
 
 function loadStats() {
   const rows = allCredits.filter(f => !f.paye);
-  const total = rows.reduce((s, f) => s + Number(f.montant_total), 0);
+  // montant_restant (pas montant_total) : un bon partiellement réglé via Recouvra reste
+  // "non payé" ici mais ne doit plus compter sa valeur d'origine en entier.
+  const total = rows.reduce((s, f) => s + Number(f.montant_restant ?? f.montant_total), 0);
 
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const dansUneSemaine = new Date(today); dansUneSemaine.setDate(today.getDate() + 7);
@@ -181,7 +183,7 @@ function renderEmprunts() {
       </thead>
       <tbody>
         ${[...groups.values()].map(g => {
-          const totalDu = g.rows.filter(f => !f.paye).reduce((s, f) => s + Number(f.montant_total), 0);
+          const totalDu = g.rows.filter(f => !f.paye).reduce((s, f) => s + Number(f.montant_restant ?? f.montant_total), 0);
           const unpaidIds = g.rows.filter(f => !f.paye).map(f => f.id);
           const idsCsv = unpaidIds.join(",");
           const allSelected = unpaidIds.length > 0 && unpaidIds.every(id => selectedIds.has(id));
@@ -205,7 +207,7 @@ function renderEmprunts() {
               <td></td>
               <td class="hint"></td>
               <td class="ref">${esc(f.numero_facture || "—")}</td>
-              <td class="num">${fmtMoney(f.montant_total)}</td>
+              <td class="num">${fmtMoney(f.paye ? f.montant_total : (f.montant_restant ?? f.montant_total))}</td>
               <td class="hint">${fmtDate(f.created_at)}</td>
               <td><span class="badge badge-muted">${f.echeance_type === "SEMAINE" ? "Sous 1 semaine" : "Sous 1 mois"}</span></td>
               <td class="hint">${fmtDate(f.date_echeance)}</td>
