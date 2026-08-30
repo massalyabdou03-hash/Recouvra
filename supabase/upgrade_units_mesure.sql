@@ -30,6 +30,10 @@ select id, reference_oem, reference_interne, designation, quantite_stock, seuil_
 from pieces where actif = true and quantite_stock <= seuil_alerte
 order by (quantite_stock - seuil_alerte) asc;
 
+-- Remplace la version a p_quantite integer (schema.sql) : sans ce drop, les deux
+-- signatures coexistent en base et Postgres ne peut plus choisir laquelle appeler
+-- ("Could not choose the best candidate function"), ce qui bloque tout ajustement de stock.
+drop function if exists enregistrer_mouvement_stock(bigint, varchar, integer, varchar);
 create or replace function enregistrer_mouvement_stock(p_piece_id bigint, p_type varchar, p_quantite numeric, p_motif varchar)
 returns void language plpgsql security definer set search_path = public as $$
 declare v_stock_actuel numeric(12,3); v_nouveau_stock numeric(12,3);
