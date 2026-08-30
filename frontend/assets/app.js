@@ -789,9 +789,20 @@ function initGlobalNavigation() {
   nav.querySelector('[data-nav-key="recouvra"]')?.addEventListener("click", handleRecouvraNavigation);
   currentProfile().then(profile => {
     const badge = nav.querySelector("[data-recouvra-badge]");
-    if (!badge) return;
-    const active = Boolean(profile?.has_recouvra || profile?.role === "super_admin");
-    badge.textContent = active ? "ACTIF" : "PREMIUM";
+    if (badge) {
+      const active = Boolean(profile?.has_recouvra || profile?.role === "super_admin");
+      badge.textContent = active ? "ACTIF" : "PREMIUM";
+    }
+
+    if (profile?.role === "super_admin") {
+      const linksContainer = nav.querySelector(".global-nav-links");
+      const adminLink = document.createElement("a");
+      adminLink.className = `global-nav-link${currentPage === "super-admin.html" ? " active" : ""}`;
+      adminLink.href = "super-admin.html";
+      adminLink.dataset.navKey = "super-admin";
+      adminLink.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 6v6c0 5 3.8 8.5 9 10 5.2-1.5 9-5 9-10V6z"/><path d="m9 12 2 2 4-4"/></svg><span>Administration</span>`;
+      linksContainer?.appendChild(adminLink);
+    }
   });
 }
 

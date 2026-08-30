@@ -65,16 +65,67 @@ async function finishOnboarding() {
     onboarding_completed_at: new Date().toISOString(),
   }).eq("id", profile.entreprise_id);
 
-  btn.disabled = false; btn.textContent = "Démarrer ma mise en place — 50 000 FCFA";
+  if (error) {
+    btn.disabled = false; btn.textContent = "J'ai effectué le paiement";
+    showMsg(msgEl, friendlyError(error));
+    return;
+  }
 
-  if (error) { showMsg(msgEl, friendlyError(error)); return; }
+  // V1 du paiement : lien Wave Business + declaration client + validation manuelle
+  // par un administrateur (voir super-admin.html). Aucune activation directe ici :
+  // subscriptions.status ne passe a "active" que via confirm_subscription_payment(),
+  // cote base, apres verification humaine du paiement dans Wave Business.
+  const { data: subscription } = await supabaseClient.from("subscriptions").select("id").eq("entreprise_id", profile.entreprise_id).maybeSingle();
+  if (!subscription) {
+    btn.disabled = false; btn.textContent = "J'ai effectué le paiement";
+    showMsg(msgEl, "Configuration de votre compte incomplète. Contactez le support Recouvra.");
+    return;
+  }
 
-  // Le paiement PayDunya (Edge Function + webhook) n'est pas encore branché a ce jour :
-  // en attendant, on active l'acces normalement plutot que de bloquer l'utilisateur sur
-  // un bouton qui ne mene nulle part. A remplacer par la redirection vers la creation de
-  // facture PayDunya des que ce systeme est en place (voir architecture d'abonnement).
-  showToast("Compte activé. L'équipe Recouvra vous contactera pour finaliser le paiement de la mise en place.", "info", 6000);
-  window.location.href = "index.html";
+  let proofPath = null;
+  const proofFile = document.getElementById("payment-proof")?.files?.[0];
+  if (proofFile) {
+    const extension = proofFile.name.split(".").pop().toLowerCase();
+    proofPath = `${profile.entreprise_id}/setup-${Date.now()}.${extension}`;
+    const upload = await supabaseClient.storage.from("payment-proofs").upload(proofPath, proofFile, { upsert: false, contentType: proofFile.type });
+    if (upload.error) {
+      btn.disabled = false; btn.textContent = "J'ai effectué le paiement";
+      showMsg(msgEl, upload.error.message);
+      return;
+    }
+  }
+
+  const { error: paymentError } = await supabaseClient.from("subscription_payments").insert({
+    entreprise_id: profile.entreprise_id,
+    subscription_id: subscription.id,
+    submitted_by: userData.user.id,
+    payment_type: "setup",
+    amount: 50000,
+    payment_reference: document.getElementById("payment-reference")?.value.trim() || null,
+    proof_path: proofPath,
+  });
+
+  btn.disabled = false; btn.textContent = "J'ai effectué le paiement";
+
+  if (paymentError) {
+    if (proofPath) await supabaseClient.storage.from("payment-proofs").remove([proofPath]);
+    showMsg(msgEl, paymentError.code === "23505" ? "Un paiement est déjà en attente de vérification." : friendlyError(paymentError));
+    return;
+  }
+
+  document.getElementById("payment-step-initial").hidden = true;
+  document.getElementById("payment-step-pending").hidden = false;
+  pollSubscriptionActivation(profile.entreprise_id);
+}
+
+function pollSubscriptionActivation(entrepriseId) {
+  const interval = setInterval(async () => {
+    const { data } = await supabaseClient.from("subscriptions").select("status").eq("entreprise_id", entrepriseId).maybeSingle();
+    if (data?.status === "active") {
+      clearInterval(interval);
+      window.location.href = "index.html";
+    }
+  }, 4000);
 }
 
 (async () => {

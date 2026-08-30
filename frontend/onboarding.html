@@ -102,23 +102,38 @@
 
         <h3 style="margin:0 0 12px; font-size:1rem;">Comment fonctionne le paiement ?</h3>
         <ol class="payment-steps">
-          <li>Vous choisissez votre offre</li>
-          <li>Vous payez via le moyen de paiement disponible</li>
-          <li>Recouvra vérifie automatiquement votre paiement</li>
-          <li>Votre compte est activé</li>
-          <li>Vous commencez votre mise en place</li>
+          <li>Cliquez sur « Payer avec Wave »</li>
+          <li>Effectuez le paiement de 50 000 FCFA</li>
+          <li>Revenez sur Recouvra et cliquez sur « J'ai effectué le paiement »</li>
+          <li>Notre équipe vérifie votre paiement</li>
+          <li>Votre espace est activé après confirmation</li>
         </ol>
 
         <div class="reassurance-box">
           <span class="icon">🔒</span>
-          <span><strong>Paiement sécurisé.</strong> Vos données restent associées à votre entreprise et ne sont jamais supprimées simplement parce qu'un abonnement arrive à expiration.</span>
+          <span><strong>Vos données ne sont jamais supprimées</strong> simplement parce qu'un abonnement arrive à expiration.</span>
         </div>
       </div>
 
-      <div id="onboarding-msg"></div>
-      <div class="onboarding-nav">
-        <button type="button" class="btn-back" onclick="goToStep(4)"><span class="arrow">←</span> Retour</button>
-        <button type="button" class="btn" id="finish-btn" onclick="finishOnboarding()">Démarrer ma mise en place — 50 000 FCFA</button>
+      <div id="payment-step-initial">
+        <a href="https://pay.wave.com/m/M_sn_JSmkfYmhcg2h/c/sn/" target="_blank" rel="noopener" class="btn" style="display:block; text-align:center; text-decoration:none;">Payer 50 000 FCFA avec Wave</a>
+        <p class="onboarding-note">Après votre paiement, revenez ici et cliquez sur « J'ai effectué le paiement ».</p>
+
+        <label>Référence ou commentaire du paiement Wave (facultatif)<input id="payment-reference" type="text" maxlength="200" placeholder="Ex : référence de la transaction"></label>
+        <label>Capture d'écran du paiement (facultatif)<input id="payment-proof" type="file" accept="image/jpeg,image/png,application/pdf"></label>
+
+        <div id="onboarding-msg"></div>
+        <div class="onboarding-nav">
+          <button type="button" class="btn-back" onclick="goToStep(4)"><span class="arrow">←</span> Retour</button>
+          <button type="button" class="btn" id="finish-btn" onclick="finishOnboarding()">J'ai effectué le paiement</button>
+        </div>
+      </div>
+
+      <div id="payment-step-pending" hidden>
+        <div class="reassurance-box">
+          <span class="icon">⏳</span>
+          <span><strong>Paiement en attente de vérification.</strong> Notre équipe vérifie votre paiement Wave. Cette page passera automatiquement à votre tableau de bord dès la confirmation.</span>
+        </div>
       </div>
     </section>
   </div>

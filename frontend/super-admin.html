@@ -1,1 +1,100 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Super-admin</title><link rel="stylesheet" href="assets/style.css"><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#4F46E5"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Recouvra"><link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/app.js" defer></script><script src="assets/super-admin.js" defer></script></head><body><main class="shell"><section class="settings-page"><div class="settings-heading"><span class="eyebrow">Administration</span><h1>Paiements Recouvra</h1><p>Validez les transferts Wave reçus pour activer le module entreprise par entreprise.</p></div><section id="requests" class="cards"></section></section></main></body></html>
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Super-admin</title><link rel="stylesheet" href="assets/style.css"><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#4F46E5"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Recouvra"><link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<style>
+  .payments-notice{ display:flex; align-items:center; gap:10px; background:var(--warn-dim); color:var(--warn-hi); border:1px solid var(--warn); border-radius:var(--radius); padding:12px 16px; margin:0 0 20px; font-weight:600; font-size:0.92rem; }
+  .payments-filters{ display:flex; gap:8px; flex-wrap:wrap; margin:22px 0 14px; }
+  .filter-chip{ padding:7px 14px; border-radius:999px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-muted); font-size:0.82rem; font-weight:600; cursor:pointer; }
+  .filter-chip.active{ background:var(--accent-dim); color:var(--accent-hi); border-color:var(--accent); }
+  .payments-table-wrap{ overflow-x:auto; border:1px solid var(--border-soft); border-radius:var(--radius); background:var(--surface); }
+  table.payments-table{ width:100%; border-collapse:collapse; font-size:0.86rem; min-width:760px; }
+  table.payments-table th{ text-align:left; padding:10px 14px; color:var(--text-muted); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1px solid var(--border-soft); background:var(--surface-2); }
+  table.payments-table td{ padding:10px 14px; border-bottom:1px solid var(--border-soft); vertical-align:middle; }
+  table.payments-table tr:last-child td{ border-bottom:none; }
+  .payments-empty{ padding:24px; text-align:center; color:var(--text-muted); }
+  .detail-row{ display:flex; justify-content:space-between; gap:16px; padding:8px 0; border-bottom:1px solid var(--border-soft); font-size:0.9rem; }
+  .detail-row:last-child{ border-bottom:none; }
+  .detail-row .k{ color:var(--text-muted); }
+  .detail-row .v{ font-weight:600; text-align:right; }
+  .admin-reminder{ display:flex; gap:10px; align-items:flex-start; background:var(--warn-dim); border:1px solid var(--warn); border-radius:var(--radius); padding:12px 14px; font-size:0.86rem; color:var(--warn-hi); margin:16px 0; }
+  .section-divider{ margin:44px 0 18px; border-top:1px solid var(--border-soft); padding-top:24px; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/app.js" defer></script><script src="assets/super-admin.js" defer></script></head><body><main class="shell"><section class="settings-page">
+<a href="index.html" class="btn-back" style="margin-bottom:16px;"><span class="arrow">←</span> Retour au tableau de bord</a>
+<div class="settings-heading"><span class="eyebrow">Administration</span><h1>Paiements Recouvra</h1><p>Validez les paiements Wave pour activer les comptes et abonnements.</p></div>
+
+<div id="payments-notice" class="payments-notice" hidden></div>
+
+<div class="grid-stats">
+  <div class="stat-card warn">
+    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg></div>
+    <div class="stat-body"><div class="label">Paiements en attente</div><div class="value" id="stat-pending-count">—</div></div>
+  </div>
+  <div class="stat-card warn">
+    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
+    <div class="stat-body"><div class="label">Montant en attente</div><div class="value" id="stat-pending-amount">—</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+    <div class="stat-body"><div class="label">Paiements confirmés</div><div class="value" id="stat-confirmed-count">—</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+    <div class="stat-body"><div class="label">Revenus confirmés</div><div class="value" id="stat-confirmed-amount">—</div></div>
+  </div>
+</div>
+
+<div class="payments-filters" id="payments-filters">
+  <button type="button" class="filter-chip active" data-filter="pending">En attente</button>
+  <button type="button" class="filter-chip" data-filter="confirmed">Confirmés</button>
+  <button type="button" class="filter-chip" data-filter="rejected">Rejetés</button>
+  <button type="button" class="filter-chip" data-filter="all">Tous</button>
+</div>
+
+<div class="payments-table-wrap"><table class="payments-table"><thead><tr>
+  <th>Entreprise</th><th>Client</th><th>Téléphone</th><th>Montant</th><th>Type</th><th>Méthode</th><th>Date</th><th>Statut</th><th></th>
+</tr></thead><tbody id="payments-tbody"></tbody></table></div>
+
+<div class="section-divider"><span class="eyebrow">Ancien système — module Recouvra (15 000 FCFA/mois)</span></div>
+<section id="requests" class="cards"></section>
+</section></main>
+
+<div class="modal-backdrop" id="payment-detail-backdrop">
+  <div class="modal modal-lg">
+    <div class="modal-head"><h3>Paiement à vérifier</h3><button class="close-x" onclick="closePaymentDetail()">×</button></div>
+    <div id="payment-detail-content"></div>
+    <div class="admin-reminder"><span>⚠️</span><span>Vérifiez d'abord votre compte Wave Business afin de confirmer que le paiement a bien été reçu.</span></div>
+    <div class="modal-actions" id="payment-detail-actions"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="confirm-backdrop">
+  <div class="modal modal-sm modal-confirm">
+    <h3>Confirmer le paiement ?</h3>
+    <p id="confirm-text"></p>
+    <div id="confirm-msg"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" onclick="closeConfirmModal()">Annuler</button>
+      <button type="button" class="btn" id="confirm-final-btn">Confirmer définitivement</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="reject-backdrop">
+  <div class="modal modal-sm">
+    <div class="modal-head"><h3>Rejeter le paiement</h3><button class="close-x" onclick="closeRejectModal()">×</button></div>
+    <label for="reject-reason-select">Motif</label>
+    <select id="reject-reason-select">
+      <option value="Paiement introuvable">Paiement introuvable</option>
+      <option value="Montant incorrect">Montant incorrect</option>
+      <option value="Preuve insuffisante">Preuve insuffisante</option>
+      <option value="Paiement déjà utilisé">Paiement déjà utilisé</option>
+      <option value="Autre">Autre</option>
+    </select>
+    <div id="reject-other-wrap" hidden><label for="reject-other-text">Précisez</label><textarea id="reject-other-text" rows="2"></textarea></div>
+    <div id="reject-msg"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" onclick="closeRejectModal()">Annuler</button>
+      <button type="button" class="btn btn-danger" id="reject-final-btn">Rejeter</button>
+    </div>
+  </div>
+</div>
+</body></html>
