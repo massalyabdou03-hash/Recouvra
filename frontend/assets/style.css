@@ -1354,3 +1354,215 @@ button{ font-family:var(--font-body); cursor:pointer; }
 .sales-history .section-title {
     margin-bottom: 16px;
 }
+/* ============================================================================
+   PAGE MES CLIENTS - CARTES SIMPLIFIÉES
+   ============================================================================ */
+
+/* --- Statistiques rapides --- */
+.client-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.client-stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    border: 1px solid #eee;
+}
+
+.client-stat-card.warning {
+    background: #FEF3C7;
+    border-color: #F59E0B;
+}
+
+.client-stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.client-stat-label {
+    font-size: 12px;
+    color: #888;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* --- Barre de recherche --- */
+.search-bar-big {
+    margin-bottom: 16px;
+}
+
+.search-bar-big input {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.search-bar-big input:focus {
+    border-color: #4F46E5;
+}
+
+/* --- Bouton principal --- */
+.btn-primary-big {
+    width: 100%;
+    padding: 16px;
+    background: #4F46E5;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary-big:hover {
+    background: #4338CA;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+}
+
+/* --- Liste des clients --- */
+.clients-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.client-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid #eee;
+    position: relative;
+}
+
+.client-card:hover {
+    border-color: #4F46E5;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transform: translateX(4px);
+}
+
+.client-avatar {
+    width: 48px;
+    height: 48px;
+    background: #4F46E5;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.client-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.client-name {
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 2px;
+}
+
+.client-phone {
+    font-size: 13px;
+    color: #888;
+}
+
+.client-sales-info {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.client-total {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.client-nb-factures {
+    font-size: 11px;
+    color: #888;
+}
+
+.client-debt {
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-align: center;
+    min-width: 80px;
+}
+
+.client-debt.has-debt {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.client-debt.ok {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.debt-amount {
+    display: block;
+    font-weight: 800;
+    font-size: 14px;
+}
+
+.debt-label {
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+.debt-clear {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.client-arrow {
+    font-size: 20px;
+    color: #ccc;
+    flex-shrink: 0;
+}
+
+/* --- Responsive mobile --- */
+@media (max-width: 600px) {
+    .client-card {
+        flex-wrap: wrap;
+    }
+    
+    .client-sales-info {
+        width: 100%;
+        text-align: left;
+        margin-top: 4px;
+    }
+    
+    .client-debt {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+    }
+    
+    .client-arrow {
+        display: none;
+    }
+}
