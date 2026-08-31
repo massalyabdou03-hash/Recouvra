@@ -77,6 +77,33 @@
     }
 }
 
+/* ============================================================================
+   CORRECTIONS MOBILE GLOBALES (AJOUTÉES)
+   ============================================================================ */
+@media (max-width: 768px) {
+    body { overflow-x: hidden; }
+}
+
+body.menu-open .mobile-menu-btn { display: none; }
+
+@media (max-width: 600px) {
+    .modal-backdrop { padding: 16px 10px; }
+    .modal { margin: 0 auto; width: calc(100% - 32px); max-height: calc(100vh - 32px); }
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+    width: 100%;
+}
+
+.table-wrapper > table { min-width: 720px; }
+
+@media (max-width: 480px) {
+    .table-wrapper > table { min-width: 100%; }
+}
+
 body.dark-mode {
     --surface: #1F2937;
     --surface-2: #374151;
@@ -800,6 +827,7 @@ function toggleSidebar() {
     const overlay = document.querySelector('.sidebar-overlay');
     if (sidebar) sidebar.classList.toggle('open');
     if (overlay) overlay.classList.toggle('active');
+    document.body.classList.toggle('menu-open', sidebar?.classList.contains('open'));
 }
 
 document.addEventListener('click', (e) => {
@@ -808,6 +836,7 @@ document.addEventListener('click', (e) => {
         const overlay = document.querySelector('.sidebar-overlay');
         if (sidebar) sidebar.classList.remove('open');
         if (overlay) overlay.classList.remove('active');
+        document.body.classList.remove('menu-open');
     }
 });
 
@@ -1228,7 +1257,7 @@ async function loadTodaySales() {
                     </thead>
                     <tbody>
                         ${data.map(f => `
-                            <tr>
+                            <tr onclick="window.location.href='facture-detail.html?id=${f.id}'" style="cursor:pointer;">
                                 <td class="ref">${esc(f.numero_facture || '—')}</td>
                                 <td>${esc(f.clients?.nom || '—')}</td>
                                 <td class="num"><strong>${fmtMoney(f.montant_total)}</strong></td>
