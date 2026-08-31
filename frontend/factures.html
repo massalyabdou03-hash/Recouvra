@@ -3,110 +3,178 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Factures — Entreprise</title>
+<title>Vendre — Ma Boutique</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
-<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#4F46E5"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Recouvra"><link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4F46E5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ma Boutique">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 <div class="app">
+  
+  <!-- ==================== NAVIGATION SIMPLIFIÉE ==================== -->
   <nav class="sidebar">
-    <div class="brand"><img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo"> <span data-company-name>Entreprise</span></div>
-    <a class="nav-link" href="index.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> Tableau de bord</a>
-    <a class="nav-link" href="catalogue.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg> Catalogue</a>
-    <a class="nav-link" href="stock.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v18"/><path d="M4 7l4-4 4 4"/><path d="M16 21V3"/><path d="M20 17l-4 4-4-4"/></svg> Mouvements stock</a>
-    <a class="nav-link" href="rupture-stock.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 17h.01"/></svg> Ruptures de stock</a>
-    <a class="nav-link active" href="factures.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v19l-3-2-3 2-3-2-3 2V2z"/><path d="M9 8h6M9 12h6"/></svg> Factures</a>
-    <a class="nav-link" href="credits.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg> Emprunts</a>
-    <a class="nav-link" href="clients.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Clients</a>
+    <div class="brand">
+      <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
+      <span data-company-name>Ma Boutique</span>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Quotidien</div>
+      <a href="index.html" class="nav-link">
+        <span class="nav-emoji">🏠</span> Accueil
+      </a>
+      <a href="factures.html" class="nav-link active">
+        <span class="nav-emoji">🧾</span> Vendre
+      </a>
+      <a href="clients.html" class="nav-link">
+        <span class="nav-emoji">👥</span> Mes Clients
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Stock</div>
+      <a href="catalogue.html" class="nav-link">
+        <span class="nav-emoji">📦</span> Mes Articles
+      </a>
+      <a href="stock.html" class="nav-link">
+        <span class="nav-emoji">🔄</span> Entrées / Sorties
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Argent</div>
+      <a href="credits.html" class="nav-link">
+        <span class="nav-emoji">💸</span> On me doit
+      </a>
+      <a href="recouvra.html" class="nav-link premium">
+        <span class="nav-emoji">📣</span> Relancer
+        <span class="badge-premium">PRO</span>
+      </a>
+    </div>
+
     <div class="sidebar-footer">
-      <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
+      <a href="parametres.html" class="nav-link">
+        <span class="nav-emoji">⚙️</span> Réglages
+      </a>
       <button class="btn-logout" onclick="logout()">Déconnexion</button>
     </div>
   </nav>
 
+  <!-- ==================== CONTENU PRINCIPAL ==================== -->
   <main class="main">
-    <div class="topbar">
-      <div><h1>Factures</h1><div class="subtitle">Brouillons et factures validées</div></div>
-      <button class="btn" onclick="toggleNewForm()" id="toggle-new-btn">+ Nouvelle facture</button>
+    
+    <!-- En-tête -->
+    <div class="page-header-simple">
+      <a href="index.html" class="btn-back">
+        <span class="arrow">←</span> Accueil
+      </a>
+      <h1>🧾 Faire une vente</h1>
+      <p>Vendez en 3 étapes simples.</p>
     </div>
 
-    <div class="card" id="new-facture-card" style="display:none;">
-      <h3>Nouvelle facture (brouillon)</h3>
-      <label>Client *</label>
-      <div class="input-with-action" id="client-select-row">
-        <select id="client_id" required onchange="updateOfflineFieldsVisibility()"><option value="">Sélectionner un client...</option></select>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="openQuickClient()">+ Nouveau</button>
+    <!-- ÉTAPE 1 : Qui achète ? -->
+    <div class="sell-step-card">
+      <div class="sell-step-header">
+        <span class="step-number">1</span>
+        <h3>Qui achète ?</h3>
       </div>
-      <label style="display:flex; align-items:center; gap:8px; margin-top:10px; cursor:pointer;">
-        <input type="checkbox" id="vente-comptoir-check" style="width:auto; margin:0;" onchange="toggleVenteComptoir()">
-        <span class="hint" style="margin:0;">Vente comptoir — client de passage, sans nom ni coordonnées</span>
-      </label>
-
-      <table style="margin-top:16px;">
-        <thead><tr><th>Pièce</th><th style="width:90px;">Qté</th><th style="width:120px;">Prix unit.</th><th style="width:110px;">Montant</th><th></th></tr></thead>
-        <tbody id="lignes-body"></tbody>
-      </table>
-      <button type="button" class="btn btn-secondary btn-sm" style="margin-top:10px;" onclick="addLigne()">+ Ajouter une ligne</button>
-
-      <div id="offline-payment-fields" style="display:none; margin-top:16px;">
-        <p class="hint" style="margin-top:0;">Hors connexion : choisis le mode de paiement maintenant — la facture sera validée automatiquement (numéro officiel + déstockage) dès le retour de la connexion.</p>
-        <div class="field-row">
-          <div>
-            <label>Mode de paiement *</label>
-            <select id="offline_mode_paiement" onchange="onOfflineModePaiementChange()">
-              <option value="ESPECES">Espèces</option>
-              <option value="CARTE">Carte</option>
-              <option value="VIREMENT">Virement</option>
-              <option value="WAVE">Wave</option>
-              <option value="OM">Orange Money</option>
-              <option value="CHEQUE">Chèque</option>
-              <option value="CREDIT">Crédit (bon — le client paie plus tard)</option>
-            </select>
-          </div>
-          <div id="offline-echeance-field" style="display:none;">
-            <label>Le client paie sous *</label>
-            <select id="offline_echeance_type">
-              <option value="SEMAINE">1 semaine</option>
-              <option value="MOIS">1 mois</option>
-            </select>
-          </div>
+      
+      <div class="client-quick-select">
+        <button class="client-passing active" onclick="selectClient('passing', this)">
+          <span class="client-passing-icon">🏪</span>
+          <span>Client de passage</span>
+        </button>
+        <div class="client-select-wrap">
+          <select id="client-select" onchange="onClientChange(this.value)">
+            <option value="">Choisir un client...</option>
+            <!-- Clients chargés dynamiquement -->
+          </select>
         </div>
       </div>
+      
+      <button class="btn-link" onclick="openQuickClient()">
+        ➕ Nouveau client
+      </button>
+    </div>
 
-      <div style="text-align:right; margin-top:16px; font-family:var(--font-display); font-size:1.2rem;">
-        Total : <span id="total-facture" class="mono">0 F</span>
+    <!-- ÉTAPE 2 : Quoi vendre ? -->
+    <div class="sell-step-card">
+      <div class="sell-step-header">
+        <span class="step-number">2</span>
+        <h3>Qu'est-ce qu'il achète ?</h3>
       </div>
 
-      <div id="new-facture-msg"></div>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary" onclick="toggleNewForm()">Annuler</button>
-        <button type="button" class="btn" id="save-facture-btn" onclick="saveFacture()">Enregistrer en brouillon</button>
+      <div class="sell-search-bar">
+        <input type="text" id="product-search" placeholder="🔍 Rechercher un article..." oninput="filterProducts()">
+      </div>
+
+      <div class="sell-products-grid" id="products-grid">
+        <!-- Articles chargés dynamiquement -->
+        <div class="empty-state">Chargement des articles...</div>
       </div>
     </div>
 
-    <div class="card" id="pending-sales-card" style="display:none;">
-      <div class="card-head">
-        <h3>Ventes en attente de synchronisation</h3>
-        <button class="btn btn-secondary btn-sm" onclick="syncPendingSales()">Synchroniser maintenant</button>
+    <!-- ÉTAPE 3 : Récapitulatif + Paiement -->
+    <div class="sell-step-card" id="cart-section" style="display:none;">
+      <div class="sell-step-header">
+        <span class="step-number">3</span>
+        <h3>Récapitulatif</h3>
       </div>
-      <div id="pending-sales-content"></div>
+
+      <div id="cart-items"></div>
+
+      <div class="cart-total">
+        <span>Total à payer</span>
+        <strong id="cart-total">0 F</strong>
+      </div>
+
+      <!-- GROS BOUTONS DE PAIEMENT -->
+      <div class="payment-buttons">
+        <button class="pay-button cash" onclick="completeSale('ESPECES')">
+          <span class="pay-icon">💵</span>
+          <span class="pay-label">Espèces</span>
+        </button>
+        <button class="pay-button wave" onclick="completeSale('WAVE')">
+          <span class="pay-icon">📱</span>
+          <span class="pay-label">Wave</span>
+        </button>
+        <button class="pay-button om" onclick="completeSale('OM')">
+          <span class="pay-icon">🟠</span>
+          <span class="pay-label">Orange Money</span>
+        </button>
+        <button class="pay-button credit" onclick="completeSale('CREDIT')">
+          <span class="pay-icon">📝</span>
+          <span class="pay-label">À crédit</span>
+        </button>
+      </div>
+
+      <div id="sale-msg"></div>
     </div>
 
-    <div class="card">
-      <div class="card-head"><h3>Historique</h3></div>
-      <div class="toolbar" style="margin-bottom:16px;">
-        <input class="search-input" id="historique-search" placeholder="Rechercher (client, n° facture, pièce)..." oninput="renderFacturesList()">
+    <!-- Historique des ventes du jour -->
+    <div class="sales-history">
+      <div class="section-title">Ventes d'aujourd'hui</div>
+      <div id="today-sales">
+        <div class="empty-state">Aucune vente aujourd'hui pour le moment.</div>
       </div>
-      <div id="table-content">Chargement...</div>
     </div>
+
   </main>
 </div>
 
 <!-- Modal création rapide de client -->
 <div class="modal-backdrop" id="quick-client-backdrop">
   <div class="modal modal-sm">
-    <div class="modal-head"><h3>Nouveau client</h3><button class="close-x" onclick="closeQuickClient()">×</button></div>
+    <div class="modal-head">
+      <h3>Nouveau client</h3>
+      <button class="close-x" onclick="closeQuickClient()">×</button>
+    </div>
     <form id="quick-client-form">
       <label>Nom / Raison sociale *</label>
       <input id="qc-nom" required>
@@ -127,526 +195,428 @@
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
 <script>
-let piecesList = [];
-let ligneCounter = 0;
-let ligneWidgets = {}; // id de ligne -> instance du champ de recherche de pièce (initPieceSearch)
-let pendingNewClients = {}; // clients créés hors ligne, en attente d'un vrai id Supabase
+// ============================================================================
+// VENDRE - LOGIQUE SIMPLIFIÉE EN 3 ÉTAPES
+// ============================================================================
 
-function toggleNewForm() {
-  const card = document.getElementById("new-facture-card");
-  const isOpen = card.style.display !== "none";
-  card.style.display = isOpen ? "none" : "block";
-  if (!isOpen) {
-    if (document.getElementById("lignes-body").children.length === 0) addLigne();
-    updateOfflineFieldsVisibility();
-  }
-}
+let allProducts = [];
+let cart = [];
+let selectedClientId = null;
+let isPassingClient = true;
 
-// Ouvre le formulaire de nouvelle facture avec une pièce déjà ajoutée en première ligne —
-// utilisé quand on arrive depuis le Catalogue via "Facturer cette pièce" (?piece_id=...).
-function openNewFormWithPiece(piece) {
-  document.getElementById("new-facture-card").style.display = "block";
-  resetClientSelection();
-  document.getElementById("lignes-body").innerHTML = "";
-  ligneWidgets = {};
-  addLigne();
-  const rowId = ligneCounter;
-  const tr = document.getElementById(`ligne-${rowId}`);
-  ligneWidgets[rowId].setSelected(piece);
-  applyPieceToRow(tr, piece);
-  recalcLigne(rowId);
-  updateOfflineFieldsVisibility();
-  tr.querySelector(".ligne-qte").focus();
-  tr.querySelector(".ligne-qte").select();
-}
+document.addEventListener('DOMContentLoaded', async () => {
+    const session = await requireAuth();
+    if (!session) return;
 
-// Met à jour le prix, l'unité affichée, le pas décimal et la case "Lot/rouleau" d'une
-// ligne pour la pièce choisie — utilisé à la fois par la recherche manuelle et par
-// l'arrivée depuis "Facturer cette pièce" (qui pré-sélectionne sans passer par onSelect).
-function applyPieceToRow(tr, p) {
-  tr.querySelector(".ligne-prix").value = p.prix_vente;
-  tr.querySelector(".ligne-unite").textContent = MEASURE_UNIT_LABELS[p.unite_mesure] || p.unite_mesure || "pcs";
-  const quantity = tr.querySelector(".ligne-qte");
-  quantity.step = p.permettre_fractionnement ? "0.01" : "1";
-  quantity.min = p.permettre_fractionnement ? "0.01" : "1";
-  const lot = tr.querySelector(".ligne-lot");
-  lot.disabled = !p.unite_gros_facteur;
-  if (!p.unite_gros_facteur) lot.checked = false;
-}
+    await loadProducts();
+    await loadClients();
+    await loadTodaySales();
+});
 
-function updateOfflineFieldsVisibility() {
-  // Un client créé hors ligne doit passer par la file d'attente même si la connexion
-  // est revenue entre-temps (il n'a pas encore de vrai id Supabase).
-  const clientId = document.getElementById("client_id").value;
-  const isComptoir = document.getElementById("vente-comptoir-check").checked;
-  // Vente comptoir : paiement toujours espèces, jamais besoin de le demander.
-  const needsOfflineFields = !isComptoir && (!appIsOnline || clientId.startsWith("new-"));
-  document.getElementById("offline-payment-fields").style.display = needsOfflineFields ? "block" : "none";
-
-  let label = "Enregistrer en brouillon";
-  if (isComptoir) label = "Valider comme vente";
-  else if (needsOfflineFields) label = "Enregistrer la vente (hors ligne)";
-  document.getElementById("save-facture-btn").textContent = label;
-}
-
-function onOfflineModePaiementChange() {
-  const isCredit = document.getElementById("offline_mode_paiement").value === "CREDIT";
-  document.getElementById("offline-echeance-field").style.display = isCredit ? "block" : "none";
-}
-
-function addLigne() {
-  ligneCounter++;
-  const id = ligneCounter;
-  const tbody = document.getElementById("lignes-body");
-  const tr = document.createElement("tr");
-  tr.id = `ligne-${id}`;
-  tr.innerHTML = `
-    <td data-label="Pièce">
-      <div class="piece-search">
-        <input type="text" class="piece-search-input" placeholder="Rechercher une pièce..." autocomplete="off">
-        <div class="piece-search-results"></div>
-      </div>
-    </td>
-    <td data-label="Quantité"><div class="quantity-control"><input type="number" class="ligne-qte" min="0.001" step="1" value="1" onchange="recalcLigne(${id})"><span class="ligne-unite">pcs</span></div><label class="lot-check"><input type="checkbox" class="ligne-lot" onchange="recalcLigne(${id})"> Lot/rouleau</label></td>
-    <td data-label="Prix unitaire"><input type="number" class="ligne-prix" min="0" step="1" value="0" onchange="recalcLigne(${id})"></td>
-    <td class="num ligne-montant mono" data-label="Montant">0 F</td>
-    <td><button type="button" class="btn-icon" onclick="removeLigne(${id})"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></button></td>
-  `;
-  tbody.appendChild(tr);
-
-  ligneWidgets[id] = initPieceSearch(tr.querySelector(".piece-search"), piecesList, {
-    getStockLabel: (p) => computeEffectiveStock(p.id, p.quantite_stock),
-    onSelect: (p) => {
-      if (p) applyPieceToRow(tr, p);
-      recalcLigne(id);
-    },
-  });
-}
-
-function removeLigne(id) {
-  document.getElementById(`ligne-${id}`)?.remove();
-  delete ligneWidgets[id];
-  recalcTotal();
-}
-
-function recalcLigne(id) {
-  const tr = document.getElementById(`ligne-${id}`);
-  const qte = Number(tr.querySelector(".ligne-qte").value) || 0;
-  const piece = ligneWidgets[id]?.getSelected();
-  const lot = Boolean(tr.querySelector(".ligne-lot")?.checked);
-  const stockQuantity = qte * (lot && piece?.unite_gros_facteur ? Number(piece.unite_gros_facteur) : 1);
-  const prix = Number(tr.querySelector(".ligne-prix").value) || 0;
-  tr.querySelector(".ligne-montant").textContent = fmtMoney(stockQuantity * prix);
-  recalcTotal();
-}
-
-function recalcTotal() {
-  let total = 0;
-  document.querySelectorAll("#lignes-body tr").forEach(tr => {
-    const qte = Number(tr.querySelector(".ligne-qte").value) || 0;
-    const piece = ligneWidgets[Number(tr.id.replace("ligne-", ""))]?.getSelected();
-    const lot = Boolean(tr.querySelector(".ligne-lot")?.checked);
-    const stockQuantity = qte * (lot && piece?.unite_gros_facteur ? Number(piece.unite_gros_facteur) : 1);
-    const prix = Number(tr.querySelector(".ligne-prix")?.value) || 0;
-    total += stockQuantity * prix;
-  });
-  document.getElementById("total-facture").textContent = fmtMoney(total);
-}
-
-async function saveFacture() {
-  const msgEl = document.getElementById("new-facture-msg");
-  clearMsg(msgEl);
-
-  const clientIdRaw = document.getElementById("client_id").value;
-  if (!clientIdRaw) { showMsg(msgEl, "Sélectionne un client, ou coche \"Vente comptoir\"."); return; }
-
-  const lignes = [];
-  document.querySelectorAll("#lignes-body tr").forEach(tr => {
-    const rowId = Number(tr.id.replace("ligne-", ""));
-    const piece = ligneWidgets[rowId]?.getSelected();
-    const qte = Number(tr.querySelector(".ligne-qte").value) || 0;
-    const prix = Number(tr.querySelector(".ligne-prix").value) || 0;
-    const lot = Boolean(tr.querySelector(".ligne-lot")?.checked);
-    const factor = lot && piece?.unite_gros_facteur ? Number(piece.unite_gros_facteur) : 1;
-    const stockQuantity = qte * factor;
-    if (piece && qte > 0) {
-      lignes.push({ piece_id: piece.id, designation: piece.designation, quantite: stockQuantity, quantite_affichee: qte, unite_mesure: piece.unite_mesure || "PCS", unite_gros: lot ? (piece.unite_gros || "LOT") : null, vente_par_lot: lot, prix_unitaire: prix, montant: stockQuantity * prix });
+// --- Chargement des produits ---
+async function loadProducts() {
+    const { items, offline, savedAt } = await loadWithCache('pieces', () =>
+        fetchAllRows(() => supabaseClient.from('pieces').select('*').eq('actif', true).order('designation'))
+    );
+    
+    allProducts = items;
+    renderProducts(allProducts);
+    
+    if (offline && savedAt) {
+        showToast(`Hors ligne : données du ${fmtDateTime(savedAt)}.`, 'info');
     }
-  });
+}
 
-  if (lignes.length === 0) { showMsg(msgEl, "Ajoute au moins une ligne valide."); return; }
-
-  const total = lignes.reduce((s, l) => s + l.montant, 0);
-  const isDraftClient = clientIdRaw.startsWith("new-");
-  const isComptoir = document.getElementById("vente-comptoir-check").checked;
-
-  // Vente comptoir : pas de choix de mode de paiement (toujours espèces) et pas de
-  // brouillon à valider séparément sur facture-detail.html — un seul geste : pièce(s),
-  // quantité(s), et c'est déstocké. En ligne comme hors ligne.
-  if (isComptoir) {
-    if (!appIsOnline) {
-      queuePendingSale({
-        client: { mode: "existing", id: Number(clientIdRaw), nom: "Client de passage" },
-        lignes, total, mode_paiement: "ESPECES", echeance_type: null,
-      });
-      showToast("Vente enregistrée hors ligne — elle sera synchronisée automatiquement au retour de la connexion.", "info");
-      resetFactureForm();
-      renderPendingSales();
-      return;
+function renderProducts(products) {
+    const grid = document.getElementById('products-grid');
+    
+    if (products.length === 0) {
+        grid.innerHTML = `<div class="empty-state">Aucun article. Ajoutez des articles au catalogue.</div>`;
+        return;
     }
 
-    const btn = document.getElementById("save-facture-btn");
-    btn.disabled = true; btn.textContent = "Enregistrement...";
+    grid.innerHTML = products.map(p => {
+        const stockClass = p.quantite_stock === 0 ? 'danger' : (p.quantite_stock <= p.seuil_alerte ? 'warning' : 'success');
+        const stockLabel = p.quantite_stock === 0 ? 'Rupture' : `${p.quantite_stock} en stock`;
+        
+        return `
+            <button class="product-button ${p.quantite_stock === 0 ? 'disabled' : ''}" 
+                    onclick="addToCart(${p.id})" 
+                    ${p.quantite_stock === 0 ? 'disabled' : ''}>
+                <span class="product-emoji">📦</span>
+                <span class="product-name">${esc(p.designation)}</span>
+                <span class="product-price">${fmtMoney(p.prix_vente)}</span>
+                <span class="product-stock ${stockClass}">${stockLabel}</span>
+            </button>
+        `;
+    }).join('');
+}
 
-    const { data: facture, error: errFacture } = await supabaseClient
-      .from("factures").insert({ client_id: Number(clientIdRaw), montant_total: total }).select().single();
-    if (errFacture) {
-      btn.disabled = false; btn.textContent = "Valider comme vente";
-      showMsg(msgEl, friendlyError(errFacture));
-      return;
+function filterProducts() {
+    const q = document.getElementById('product-search').value.trim().toLowerCase();
+    if (!q) {
+        renderProducts(allProducts);
+        return;
     }
+    
+    const filtered = allProducts.filter(p =>
+        (p.designation || '').toLowerCase().includes(q) ||
+        (p.reference_oem || '').toLowerCase().includes(q) ||
+        (p.marque || '').toLowerCase().includes(q)
+    );
+    renderProducts(filtered);
+}
 
-    const lignesPayload = lignes.map(l => ({ ...l, facture_id: facture.id }));
-    const { error: errLignes } = await supabaseClient.from("factures_lignes").insert(lignesPayload);
-    if (errLignes) {
-      btn.disabled = false; btn.textContent = "Valider comme vente";
-      showMsg(msgEl, friendlyError(errLignes));
-      return;
+// --- Panier ---
+function addToCart(productId) {
+    const product = allProducts.find(p => p.id === productId);
+    if (!product) return;
+    
+    const existing = cart.find(item => item.id === productId);
+    
+    if (existing) {
+        existing.quantity += 1;
+        if (existing.quantity > product.quantite_stock) {
+            existing.quantity = product.quantite_stock;
+            showToast(`Stock maximum atteint pour ${product.designation}`, 'warning');
+        }
+    } else {
+        if (product.quantite_stock < 1) {
+            showToast('Stock insuffisant', 'error');
+            return;
+        }
+        cart.push({
+            id: product.id,
+            designation: product.designation,
+            prix: product.prix_vente,
+            quantity: 1,
+            maxStock: product.quantite_stock,
+        });
     }
-
-    const { error: errValidation } = await supabaseClient.rpc("valider_facture", {
-      p_facture_id: facture.id, p_mode_paiement: "ESPECES", p_echeance_type: null,
-    });
-    btn.disabled = false; btn.textContent = "Valider comme vente";
-    if (errValidation) { showMsg(msgEl, friendlyError(errValidation)); return; }
-
-    showToast(`Vente enregistrée (${fmtMoney(total)}) — stock mis à jour.`, "success");
-    resetFactureForm();
-    loadFactures();
-    return;
-  }
-
-  // Un client créé hors ligne n'a pas de vrai id Supabase : on passe forcément par la
-  // file d'attente pour lui, même si la connexion est déjà revenue entre-temps.
-  if (!appIsOnline || isDraftClient) {
-    const modePaiement = document.getElementById("offline_mode_paiement").value;
-    const echeanceType = modePaiement === "CREDIT" ? document.getElementById("offline_echeance_type").value : null;
-    if (modePaiement === "CREDIT" && !echeanceType) { showMsg(msgEl, "Précise l'échéance du crédit."); return; }
-
-    const clientPayload = isDraftClient
-      ? { mode: "new", ...pendingNewClients[clientIdRaw] }
-      : { mode: "existing", id: Number(clientIdRaw), nom: document.getElementById("client_id").selectedOptions[0]?.textContent || "" };
-
-    queuePendingSale({ client: clientPayload, lignes, total, mode_paiement: modePaiement, echeance_type: echeanceType });
-    showToast("Vente enregistrée hors ligne — elle sera synchronisée automatiquement au retour de la connexion.", "info");
-    resetFactureForm();
-    renderPendingSales();
-    if (appIsOnline) syncPendingSales();
-    return;
-  }
-
-  const btn = document.getElementById("save-facture-btn");
-  btn.disabled = true; btn.textContent = "Enregistrement...";
-
-  const { data: facture, error: errFacture } = await supabaseClient
-    .from("factures").insert({ client_id: Number(clientIdRaw), montant_total: total }).select().single();
-
-  if (errFacture) {
-    btn.disabled = false; btn.textContent = "Enregistrer en brouillon";
-    showMsg(msgEl, friendlyError(errFacture));
-    return;
-  }
-
-  const lignesPayload = lignes.map(l => ({ ...l, facture_id: facture.id }));
-  const { error: errLignes } = await supabaseClient.from("factures_lignes").insert(lignesPayload);
-
-  btn.disabled = false; btn.textContent = "Enregistrer en brouillon";
-
-  if (errLignes) { showMsg(msgEl, friendlyError(errLignes)); return; }
-
-  window.location.href = `facture-detail.html?id=${facture.id}`;
+    
+    renderCart();
 }
 
-async function loadPieces() {
-  const { items, offline, savedAt } = await loadWithCache("pieces", () =>
-    fetchAllRows(() => supabaseClient.from("pieces").select("*").eq("actif", true).order("designation").order("id"))
-  );
-  piecesList = items;
-  if (offline && savedAt) showToast(`Catalogue hors ligne : données du ${fmtDateTime(savedAt)}.`, "info");
+function removeFromCart(productId) {
+    cart = cart.filter(item => item.id !== productId);
+    renderCart();
 }
 
-async function loadClientsSelect() {
-  const { data, error } = await supabaseClient.from("clients").select("id, nom").order("nom");
-  let clients;
-  if (!error && data) {
-    clients = data;
-    cacheClientsLocally(data);
-  } else {
-    clients = getCachedClients().items;
-  }
-  const sel = document.getElementById("client_id");
-  clients.forEach(c => {
-    const opt = document.createElement("option");
-    opt.value = c.id; opt.textContent = c.nom;
-    sel.appendChild(opt);
-  });
-  await ensureClientDePassage(clients);
+function updateQuantity(productId, delta) {
+    const item = cart.find(i => i.id === productId);
+    if (!item) return;
+    
+    item.quantity += delta;
+    if (item.quantity < 1) {
+        removeFromCart(productId);
+        return;
+    }
+    if (item.quantity > item.maxStock) {
+        item.quantity = item.maxStock;
+        showToast(`Stock maximum atteint`, 'warning');
+    }
+    
+    renderCart();
 }
 
-// Certaines ventes se font sans relever l'identité du client (vente comptoir). Plutôt que
-// de rendre client_id optionnel en base (et de gérer un cas "sans client" partout), on
-// réutilise un client générique unique "Client de passage", créé une seule fois puis
-// retrouvé ensuite comme n'importe quel autre client — aucune autre règle à changer.
-let clientDePassageId = null;
-
-async function ensureClientDePassage(clients) {
-  const existing = clients.find(c => c.nom === "Client de passage");
-  if (existing) { clientDePassageId = existing.id; return; }
-  if (!appIsOnline) return; // sera créé à la prochaine visite en ligne
-
-  const { data, error } = await supabaseClient.from("clients").insert({ nom: "Client de passage" }).select().single();
-  if (!error && data) {
-    clientDePassageId = data.id;
-    const opt = document.createElement("option");
-    opt.value = data.id; opt.textContent = data.nom;
-    document.getElementById("client_id").appendChild(opt);
-    // Met aussi à jour le cache local tout de suite, sinon ce client resterait absent
-    // hors ligne tant que la page n'a pas été rechargée une fois en ligne.
-    cacheClientsLocally(clients.concat(data));
-  }
+function renderCart() {
+    const cartSection = document.getElementById('cart-section');
+    const cartItems = document.getElementById('cart-items');
+    
+    if (cart.length === 0) {
+        cartSection.style.display = 'none';
+        return;
+    }
+    
+    cartSection.style.display = 'block';
+    
+    cartItems.innerHTML = cart.map(item => `
+        <div class="cart-item">
+            <div class="cart-item-info">
+                <span class="cart-item-name">${esc(item.designation)}</span>
+                <span class="cart-item-price">${fmtMoney(item.prix)} × ${item.quantity}</span>
+            </div>
+            <div class="cart-item-actions">
+                <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">−</button>
+                <span class="qty-value">${item.quantity}</span>
+                <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                <button class="remove-btn" onclick="removeFromCart(${item.id})">🗑️</button>
+            </div>
+        </div>
+    `).join('');
+    
+    const total = cart.reduce((s, item) => s + (item.prix * item.quantity), 0);
+    document.getElementById('cart-total').textContent = fmtMoney(total);
 }
 
-function resetClientSelection() {
-  document.getElementById("vente-comptoir-check").checked = false;
-  document.getElementById("client-select-row").style.display = "flex";
-  document.getElementById("client_id").value = "";
+// --- Clients ---
+async function loadClients() {
+    const { data, error } = await supabaseClient.from('clients').select('id, nom').order('nom');
+    if (error) {
+        console.error('Erreur chargement clients:', error);
+        return;
+    }
+    
+    const select = document.getElementById('client-select');
+    select.innerHTML = `
+        <option value="">Choisir un client...</option>
+        ${data.map(c => `
+            <option value="${c.id}">${esc(c.nom)}</option>
+        `).join('')}
+    `;
 }
 
-// Remet le formulaire "Nouvelle facture" à zéro et referme la carte — utilisé après
-// chaque vente enregistrée avec succès (comptoir ou normale, en ligne ou hors ligne).
-function resetFactureForm() {
-  document.getElementById("new-facture-card").style.display = "none";
-  document.getElementById("lignes-body").innerHTML = "";
-  ligneWidgets = {};
-  document.getElementById("total-facture").textContent = fmtMoney(0);
-  resetClientSelection();
-  updateOfflineFieldsVisibility();
+function selectClient(type, btn) {
+    if (type === 'passing') {
+        isPassingClient = true;
+        selectedClientId = null;
+        document.getElementById('client-select').value = '';
+    }
+    
+    // UI : mettre en évidence le bouton sélectionné
+    document.querySelectorAll('.client-passing').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
 }
 
-function toggleVenteComptoir() {
-  const checked = document.getElementById("vente-comptoir-check").checked;
-  const row = document.getElementById("client-select-row");
-  const sel = document.getElementById("client_id");
-
-  if (checked && !clientDePassageId) {
-    showToast("Le client \"comptoir\" n'a pas pu être préparé (connexion requise la première fois). Réessaie une fois en ligne.", "error");
-    document.getElementById("vente-comptoir-check").checked = false;
-    return;
-  }
-
-  row.style.display = checked ? "none" : "flex";
-  sel.value = checked ? String(clientDePassageId) : "";
-  updateOfflineFieldsVisibility();
+function onClientChange(value) {
+    if (value) {
+        isPassingClient = false;
+        selectedClientId = Number(value);
+        document.querySelectorAll('.client-passing').forEach(b => b.classList.remove('active'));
+    } else {
+        isPassingClient = true;
+        selectedClientId = null;
+        document.querySelector('.client-passing')?.classList.add('active');
+    }
 }
 
+// --- Création rapide client ---
 function openQuickClient() {
-  document.getElementById("quick-client-form").reset();
-  clearMsg(document.getElementById("quick-client-msg"));
-  document.getElementById("quick-client-backdrop").classList.add("open");
-  document.getElementById("qc-nom").focus();
+    document.getElementById('quick-client-form').reset();
+    clearMsg(document.getElementById('quick-client-msg'));
+    document.getElementById('quick-client-backdrop').classList.add('open');
+    document.getElementById('qc-nom').focus();
 }
 
 function closeQuickClient() {
-  document.getElementById("quick-client-backdrop").classList.remove("open");
+    document.getElementById('quick-client-backdrop').classList.remove('open');
 }
 
-document.getElementById("quick-client-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const msgEl = document.getElementById("quick-client-msg");
-  clearMsg(msgEl);
-
-  const payload = {
-    nom: document.getElementById("qc-nom").value.trim(),
-    telephone: document.getElementById("qc-telephone").value.trim() || null,
-    email: document.getElementById("qc-email").value.trim() || null,
-  };
-  if (!payload.nom) { showMsg(msgEl, "Le nom est obligatoire."); return; }
-
-  const sel = document.getElementById("client_id");
-
-  if (!appIsOnline) {
-    // Pas d'id Supabase possible hors ligne : le client réel sera créé à la synchronisation.
-    const tempId = `new-${Date.now()}`;
-    pendingNewClients[tempId] = payload;
-    const opt = document.createElement("option");
-    opt.value = tempId; opt.textContent = `${payload.nom} (hors ligne)`;
-    sel.appendChild(opt);
-    sel.value = tempId;
-    updateOfflineFieldsVisibility();
+document.getElementById('quick-client-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msgEl = document.getElementById('quick-client-msg');
+    clearMsg(msgEl);
+    
+    const payload = {
+        nom: document.getElementById('qc-nom').value.trim(),
+        telephone: document.getElementById('qc-telephone').value.trim() || null,
+        email: document.getElementById('qc-email').value.trim() || null,
+    };
+    if (!payload.nom) { showMsg(msgEl, 'Le nom est obligatoire.'); return; }
+    
+    const btn = document.getElementById('qc-save-btn');
+    btn.disabled = true;
+    btn.textContent = 'Enregistrement...';
+    
+    const { data, error } = await supabaseClient.from('clients').insert(payload).select().single();
+    
+    btn.disabled = false;
+    btn.textContent = 'Enregistrer';
+    
+    if (error) { showMsg(msgEl, friendlyError(error)); return; }
+    
+    // Ajouter au select
+    const select = document.getElementById('client-select');
+    const opt = document.createElement('option');
+    opt.value = data.id;
+    opt.textContent = data.nom;
+    select.appendChild(opt);
+    select.value = data.id;
+    onClientChange(data.id);
+    
     closeQuickClient();
-    return;
-  }
-
-  const btn = document.getElementById("qc-save-btn");
-  btn.disabled = true; btn.textContent = "Enregistrement...";
-
-  const { data, error } = await supabaseClient.from("clients").insert(payload).select().single();
-
-  btn.disabled = false; btn.textContent = "Enregistrer";
-  if (error) { showMsg(msgEl, friendlyError(error)); return; }
-
-  const opt = document.createElement("option");
-  opt.value = data.id; opt.textContent = data.nom;
-  sel.appendChild(opt);
-  sel.value = data.id;
-
-  closeQuickClient();
+    showToast('Client créé avec succès.', 'success');
 });
 
-let facturesList = [];
-
-async function loadFactures() {
-  const { items, offline, savedAt } = await loadWithCache("factures", () =>
-    supabaseClient
-      .from("factures").select("id, numero_facture, statut, montant_total, mode_paiement, created_at, paye, date_echeance, client_id, clients(nom, telephone), factures_lignes(designation)")
-      .neq("statut", "ANNULEE")
-      .order("created_at", { ascending: false }).limit(100)
-  );
-
-  if (offline && savedAt) showToast(`Historique hors ligne : données du ${fmtDateTime(savedAt)}.`, "info");
-  facturesList = items;
-  renderFacturesList();
-}
-
-function renderFacturesList() {
-  const el = document.getElementById("table-content");
-  if (facturesList.length === 0) { el.innerHTML = `<div class="empty-state">Aucune facture pour le moment.</div>`; return; }
-
-  const q = (document.getElementById("historique-search")?.value || "").trim().toLowerCase();
-  const items = q ? facturesList.filter(f =>
-    (f.clients?.nom || "").toLowerCase().includes(q) ||
-    (f.numero_facture || "").toLowerCase().includes(q) ||
-    (f.factures_lignes || []).some(l => (l.designation || "").toLowerCase().includes(q))
-  ) : facturesList;
-
-  if (items.length === 0) { el.innerHTML = `<div class="empty-state">Aucun résultat pour cette recherche.</div>`; return; }
-
-  const badgeClass = { BROUILLON: "badge-muted", VALIDEE: "badge-success", ANNULEE: "badge-danger" };
-
-  // Regroupe par jour (les factures sont déjà triées du plus récent au plus ancien) :
-  // c'est ce qui sert le mieux la lecture au quotidien (caisse, clôture du jour), la
-  // recherche ci-dessus couvrant déjà le besoin de retrouver un client précis.
-  const groups = [];
-  let currentKey = null;
-  for (const f of items) {
-    const key = fmtDate(f.created_at);
-    if (key !== currentKey) { groups.push({ key, rows: [] }); currentKey = key; }
-    groups[groups.length - 1].rows.push(f);
-  }
-
-  const today = new Date();
-  el.innerHTML = `
-    <div style="overflow-x:auto;">
-    <table>
-      <thead><tr><th>N° facture</th><th>Client</th><th>Statut</th><th>Paiement</th><th class="num">Montant</th><th></th></tr></thead>
-      <tbody>
-        ${groups.map(g => `
-          <tr class="table-group-row table-group-date"><td colspan="6">${g.key}</td></tr>
-          ${g.rows.map(f => {
-            const impayee = f.statut === "VALIDEE" && f.mode_paiement === "CREDIT" && !f.paye;
-            const enRetard = impayee && f.date_echeance && new Date(f.date_echeance) < today;
-            return `
-            <tr style="cursor:pointer;" onclick="window.location.href='facture-detail.html?id=${f.id}'">
-              <td class="ref">${esc(f.numero_facture || "brouillon-" + f.id)}</td>
-              <td>${esc(f.clients?.nom || "—")}</td>
-              <td><span class="badge ${badgeClass[f.statut]}">${f.statut}</span>${enRetard ? ' <span class="badge badge-danger">En retard</span>' : impayee ? ' <span class="badge badge-warn">Impayée</span>' : ""}</td>
-              <td class="hint">${f.mode_paiement ? esc(MODE_PAIEMENT_LABELS[f.mode_paiement] || f.mode_paiement) : "—"}</td>
-              <td class="num">${fmtMoney(f.montant_total)}</td>
-              <td class="actions-cell">${impayee ? `<button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); window.location.href='recouvra.html?facture=${f.id}'">💬 Relancer via Recouvra</button>` : ""}</td>
-            </tr>`;
-          }).join("")}
-        `).join("")}
-      </tbody>
-    </table>
-    </div>`;
-}
-
-function renderPendingSales() {
-  const card = document.getElementById("pending-sales-card");
-  const el = document.getElementById("pending-sales-content");
-  const sales = getPendingSales();
-
-  if (sales.length === 0) { card.style.display = "none"; return; }
-  card.style.display = "block";
-
-  const statusBadge = {
-    pending: '<span class="badge badge-warn">En attente</span>',
-    syncing: '<span class="badge badge-info">Synchronisation...</span>',
-    error: '<span class="badge badge-danger">Erreur</span>',
-  };
-
-  el.innerHTML = `
-    <div style="overflow-x:auto;">
-    <table>
-      <thead><tr><th>Client</th><th>Lignes</th><th class="num">Total</th><th>Statut</th><th></th></tr></thead>
-      <tbody>
-        ${sales.map(s => `
-          <tr>
-            <td>${esc(s.client.nom)}</td>
-            <td class="hint">${s.lignes.map(l => `${esc(l.designation)} ×${l.quantite}`).join(", ")}</td>
-            <td class="num">${fmtMoney(s.total)}</td>
-            <td>
-              ${statusBadge[s.status] || ""}
-              ${s.status === "error" ? `<div class="hint" style="color:var(--danger); margin-top:4px;">${esc(s.errorMsg || "")}</div>` : ""}
-            </td>
-            <td class="actions-cell">
-              ${s.status === "error" ? `<button type="button" class="btn btn-secondary btn-sm" onclick="syncPendingSales()">Réessayer</button>` : ""}
-              <button type="button" class="btn-icon" title="Annuler cette vente" onclick="cancelPendingSale('${s.id}')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
-            </td>
-          </tr>`).join("")}
-      </tbody>
-    </table>
-    </div>`;
-}
-
-async function cancelPendingSale(id) {
-  const ok = await confirmDialog("Annuler cette vente en attente ? Elle ne sera jamais envoyée à Supabase.", {
-    title: "Annuler la vente",
-    confirmLabel: "Annuler la vente",
-    danger: true,
-  });
-  if (!ok) return;
-  removePendingSale(id);
-  showToast("Vente en attente annulée.", "info");
-}
-
-(async () => {
-  const session = await requireAuth();
-  if (!session) return;
-  await loadPieces();
-  await loadClientsSelect();
-  loadFactures();
-  renderPendingSales();
-
-  // Arrivée depuis le Catalogue via "Facturer cette pièce" : ouvre directement une
-  // facture avec la pièce déjà en première ligne, sans avoir à la rechercher deux fois.
-  const preselectPieceId = new URLSearchParams(window.location.search).get("piece_id");
-  if (preselectPieceId) {
-    const piece = piecesList.find(p => String(p.id) === preselectPieceId);
-    if (piece) {
-      openNewFormWithPiece(piece);
-    } else {
-      showToast("Cette pièce est introuvable dans le catalogue.", "error");
+// --- Vente complète ---
+async function completeSale(modePaiement) {
+    if (cart.length === 0) {
+        showToast('Ajoutez des articles au panier.', 'error');
+        return;
     }
-    window.history.replaceState({}, "", "factures.html");
-  }
+    
+    // Vérifier le client
+    if (!isPassingClient && !selectedClientId) {
+        showToast('Sélectionnez un client ou utilisez "Client de passage".', 'error');
+        return;
+    }
+    
+    // Vérifier le stock
+    for (const item of cart) {
+        const product = allProducts.find(p => p.id === item.id);
+        if (product && item.quantity > product.quantite_stock) {
+            showToast(`Stock insuffisant pour ${item.designation}`, 'error');
+            return;
+        }
+    }
+    
+    const total = cart.reduce((s, item) => s + (item.prix * item.quantity), 0);
+    
+    const btn = document.querySelector(`.pay-button.${modePaiement.toLowerCase()}`);
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = '...';
+    }
+    
+    try {
+        // Si vente comptoir, trouver ou créer le client de passage
+        let clientId = selectedClientId;
+        
+        if (isPassingClient) {
+            // Chercher le client de passage
+            const { data: existing } = await supabaseClient
+                .from('clients')
+                .select('id')
+                .eq('nom', 'Client de passage')
+                .maybeSingle();
+                
+            if (existing) {
+                clientId = existing.id;
+            } else {
+                const { data: created } = await supabaseClient
+                    .from('clients')
+                    .insert({ nom: 'Client de passage' })
+                    .select('id')
+                    .single();
+                clientId = created.id;
+            }
+        }
+        
+        // 1. Créer la facture
+        const { data: facture, error: errFacture } = await supabaseClient
+            .from('factures')
+            .insert({ client_id: clientId, montant_total: total })
+            .select('id')
+            .single();
+            
+        if (errFacture) throw errFacture;
+        
+        // 2. Ajouter les lignes
+        const lignesPayload = cart.map(item => ({
+            facture_id: facture.id,
+            piece_id: item.id,
+            designation: item.designation,
+            quantite: item.quantity,
+            prix_unitaire: item.prix,
+            montant: item.prix * item.quantity,
+        }));
+        
+        const { error: errLignes } = await supabaseClient
+            .from('factures_lignes')
+            .insert(lignesPayload);
+            
+        if (errLignes) throw errLignes;
+        
+        // 3. Valider la facture
+        const { error: errValidation } = await supabaseClient
+            .rpc('valider_facture', {
+                p_facture_id: facture.id,
+                p_mode_paiement: modePaiement,
+            });
+            
+        if (errValidation) throw errValidation;
+        
+        // 4. Succès !
+        showToast(`✅ Vente de ${fmtMoney(total)} enregistrée !`, 'success');
+        
+        // Réinitialiser
+        cart = [];
+        renderCart();
+        selectedClientId = null;
+        isPassingClient = true;
+        document.getElementById('client-select').value = '';
+        document.querySelector('.client-passing')?.classList.add('active');
+        
+        // Recharger
+        await loadProducts();
+        await loadTodaySales();
+        
+    } catch (error) {
+        console.error('Erreur vente:', error);
+        showToast(friendlyError(error), 'error');
+    } finally {
+        const btn = document.querySelector(`.pay-button.${modePaiement.toLowerCase()}`);
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = btn.dataset.originalText || btn.textContent;
+        }
+    }
+}
 
-  document.addEventListener("sylla:connectivity-changed", updateOfflineFieldsVisibility);
-  document.addEventListener("sylla:pending-sales-updated", () => {
-    renderPendingSales();
-    loadFactures();
-  });
-})();
+// --- Ventes du jour ---
+async function loadTodaySales() {
+    const el = document.getElementById('today-sales');
+    
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const { data, error } = await supabaseClient
+            .from('factures')
+            .select('id, numero_facture, montant_total, mode_paiement, created_at, clients(nom)')
+            .eq('statut', 'VALIDEE')
+            .gte('validated_at', today.toISOString())
+            .order('created_at', { ascending: false });
+            
+        if (error) throw error;
+        
+        if (!data || data.length === 0) {
+            el.innerHTML = '<div class="empty-state">Aucune vente aujourd\'hui pour le moment.</div>';
+            return;
+        }
+        
+        const modeLabels = {
+            ESPECES: '💵 Espèces',
+            WAVE: '📱 Wave',
+            OM: '🟠 Orange Money',
+            CREDIT: '📝 Crédit',
+            CARTE: '💳 Carte',
+            VIREMENT: '🏦 Virement',
+            CHEQUE: '📄 Chèque',
+        };
+        
+        el.innerHTML = `
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>N° Facture</th>
+                            <th>Client</th>
+                            <th>Montant</th>
+                            <th>Paiement</th>
+                            <th>Heure</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(f => `
+                            <tr>
+                                <td class="ref">${esc(f.numero_facture || '—')}</td>
+                                <td>${esc(f.clients?.nom || '—')}</td>
+                                <td class="num"><strong>${fmtMoney(f.montant_total)}</strong></td>
+                                <td>${modeLabels[f.mode_paiement] || f.mode_paiement}</td>
+                                <td class="hint">${new Date(f.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+    } catch (error) {
+        console.error('Erreur chargement ventes du jour:', error);
+        el.innerHTML = `<div class="error-msg">${friendlyError(error)}</div>`;
+    }
+}
 </script>
 </body>
 </html>
