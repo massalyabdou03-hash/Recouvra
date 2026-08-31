@@ -606,30 +606,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Message d'accueil personnalisé
 async function loadWelcomeMessage() {
-    try {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) return;
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) return;
 
-        const { data: profile } = await supabaseClient
-            .from('profiles')
-            .select('*, entreprises(nom, gerant_nom)')
-            .eq('id', session.user.id)
-            .single();
+    const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('*, entreprises(nom, gerant_nom)')
+        .eq('id', session.user.id)
+        .single();
 
-        if (!profile) return;
+    if (!profile) return;
 
-        const gerantNom = profile.entreprises?.gerant_nom || 'Gérant';
-        const boutiqueNom = profile.entreprises?.nom || 'votre boutique';
-        const prenom = gerantNom.split(' ')[0] || 'Gérant';
+    // Priorité : entreprise.gerant_nom -> user_metadata.gerant_nom -> 'Gérant'
+    const gerantNom =
+        profile.entreprises?.gerant_nom ||
+        session.user?.user_metadata?.gerant_nom ||
+        'Gérant';
 
-        const welcomeTitle = document.getElementById('welcome-name');
-        const welcomeCompany = document.getElementById('welcome-company');
+    const boutiqueNom = profile.entreprises?.nom || 'votre boutique';
+    const prenom = gerantNom.split(' ')[0] || 'Gérant';
 
-        if (welcomeTitle) welcomeTitle.textContent = `Bonjour ${prenom} 👋`;
-        if (welcomeCompany) welcomeCompany.textContent = `Voici ce qui se passe dans votre boutique ${boutiqueNom}.`;
-    } catch (error) {
-        console.error('Erreur chargement message accueil:', error);
-    }
+    document.getElementById('welcome-name').textContent = `Bonjour ${prenom} 👋`;
+    document.getElementById('welcome-company').textContent = `Voici ce qui se passe dans votre boutique ${boutiqueNom}.`;
 }
 
 // Charger les données du tableau de bord
