@@ -71,9 +71,6 @@
     
     <!-- En-tête -->
     <div class="page-header-simple">
-      <a href="index.html" class="btn-back">
-        <span class="arrow">←</span> Accueil
-      </a>
       <h1>👥 Mes Clients</h1>
       <p>Tous vos clients et ce qu'ils vous doivent.</p>
     </div>
@@ -112,6 +109,20 @@
     </div>
 
   </main>
+</div>
+
+<!-- Modal détail client -->
+<div class="modal-backdrop" id="client-detail-backdrop">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="client-detail-title">Détail du client</h3>
+      <button class="close-x" onclick="closeClientDetail()">×</button>
+    </div>
+    <div id="client-detail-content"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" onclick="closeClientDetail()">Fermer</button>
+    </div>
+  </div>
 </div>
 
 <!-- Modal ajout/édition client -->
@@ -196,7 +207,6 @@ async function loadClientStats() {
             s.total += Number(f.montant_total);
             s.nbFactures += 1;
             
-            // Calculer ce qui est dû
             if (f.mode_paiement === 'CREDIT' && !f.paye) {
                 s.du += Number(f.montant_restant || f.montant_total);
             }
@@ -268,15 +278,86 @@ function filterClients() {
     renderClients(filtered);
 }
 
-// --- Ouvrir détail client ---
+// --- Ouvrir détail client (dans un modal) ---
 function openClientDetail(id) {
     const client = allClients.find(c => c.id === id);
     if (!client) return;
     
     const stats = clientStats[id] || { total: 0, du: 0, nbFactures: 0 };
     
-    // Rediriger vers la page de détail existante
-    window.location.href = `client-detail.html?id=${id}`;
+    document.getElementById('client-detail-title').textContent = client.nom;
+    
+    const modalContent = document.getElementById('client-detail-content');
+    if (!modalContent) return;
+    
+    modalContent.innerHTML = `
+        <div class="detail-grid">
+            <div>
+                <div class="hint">Téléphone</div>
+                <div>${esc(client.telephone || '—')}</div>
+            </div>
+            <div>
+                <div class="hint">Email</div>
+                <div>${esc(client.email || '—')}</div>
+            </div>
+            <div>
+                <div class="hint">Adresse</div>
+                <div>${esc(client.adresse || '—')}</div>
+            </div>
+            <div>
+                <div class="hint">Client depuis</div>
+                <div>${fmtDate(client.created_at)}</div>
+            </div>
+            <div>
+                <div class="hint">Factures</div>
+                <div>${stats.nbFactures}</div>
+            </div>
+            <div>
+                <div class="hint">Total acheté</div>
+                <div>${fmtMoney(stats.total)}</div>
+            </div>
+            <div>
+                <div class="hint">Solde dû</div>
+                <div>${stats.du > 0 
+                    ? `<span class="badge badge-danger">${fmtMoney(stats.du)}</span>` 
+                    : `<span class="badge badge-success">À jour</span>`
+                }</div>
+            </div>
+        </div>
+        
+        ${stats.du > 0 ? `
+            <div style="margin-top:16px;">
+                <button class="btn btn-secondary" onclick="window.location.href='recouvra.html?client=${client.id}'">
+                    💬 Relancer via Recouvra
+                </button>
+            </div>
+        ` : ''}
+        
+        <div style="margin-top:24px; border-top:1px solid var(--border); padding-top:16px;">
+            <button class="btn btn-secondary" onclick="editClientFromDetail(${client.id})">
+                ✏️ Modifier
+            </button>
+            <button class="btn btn-danger" onclick="deleteClientFromDetail(${client.id})">
+                🗑️ Supprimer
+            </button>
+        </div>
+    `;
+    
+    document.getElementById('client-detail-backdrop').classList.add('open');
+}
+
+function closeClientDetail() {
+    document.getElementById('client-detail-backdrop').classList.remove('open');
+}
+
+function editClientFromDetail(id) {
+    document.getElementById('client-detail-backdrop').classList.remove('open');
+    editClient(id);
+}
+
+async function deleteClientFromDetail(id) {
+    document.getElementById('client-detail-backdrop').classList.remove('open');
+    await deleteClient(id);
 }
 
 // --- Modal ajout/édition ---
