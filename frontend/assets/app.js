@@ -902,8 +902,60 @@ async function applyCompanySettings() {
 
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", applyCompanySettings);
 else applyCompanySettings();
+
 // ============================================================================
-// SYSTÈME DE RESYNCHRONISATION GLOBALE
+// MODE SOMBRE GLOBAL (défini une seule fois ici)
+// ============================================================================
+
+function initDarkMode() {
+  if (localStorage.getItem('recouvra_dark_mode') === '1') {
+    document.body.classList.add('dark-mode');
+    const icon = document.getElementById('dark-mode-icon');
+    const label = document.getElementById('dark-mode-label');
+    if (icon) icon.textContent = '☀️';
+    if (label) label.textContent = 'Mode clair';
+  }
+}
+
+function toggleDarkMode() {
+  document.body.classList.toggle('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
+  const icon = document.getElementById('dark-mode-icon');
+  const label = document.getElementById('dark-mode-label');
+  if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+  if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre';
+}
+
+// AUTO-INITIALISATION : s'exécute automatiquement sur chaque page
+// sans avoir à modifier le DOMContentLoaded de chaque page
+document.addEventListener('DOMContentLoaded', initDarkMode);
+
+// ============================================================================
+// MENU MOBILE - FONCTIONS GLOBALES (défini une seule fois ici)
+// ============================================================================
+
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    if (sidebar) sidebar.classList.toggle('open');
+    if (overlay) overlay.classList.toggle('active');
+    document.body.classList.toggle('menu-open', sidebar?.classList.contains('open'));
+}
+
+// Fermer le menu quand on clique sur un lien
+document.addEventListener('click', (e) => {
+    if (e.target.closest('.nav-link')) {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+        document.body.classList.remove('menu-open');
+    }
+});
+
+// ============================================================================
+// SYSTÈME DE RESYNCHRONISATION GLOBALE (une seule définition)
 // ============================================================================
 
 // Écouteur de reconnexion
@@ -921,7 +973,6 @@ async function syncAllPendingData() {
         sales: await syncPendingSales(),
         movements: await syncPendingMovements(),
         fieldUpdates: await syncFieldUpdates(),
-        newClients: await syncPendingClients(),
     };
     
     // Notifier toutes les pages
@@ -931,241 +982,6 @@ async function syncAllPendingData() {
     
     console.log('✅ Synchronisation terminée', results);
     return results;
-}
-
-// ============================================================================
-// FONCTIONS DE SYNCHRONISATION PAR TYPE
-// ============================================================================
-
-// --- Ventes en attente ---
-async function syncPendingSales() {
-    const sales = getPendingSales();
-    const synced = [];
-    const errors = [];
-    
-    for (const sale of sales) {
-        if (sale.status === 'syncing') continue;
-        
-        try {
-            sale.status = 'syncing';
-            savePendingSales(sales);
-            
-            // 1. Créer ou récupérer le client
-            let clientId = sale.client.id;
-            if (sale.client.mode === 'new') {
-                const { data: client, error } = await supabaseClient
-                    .from('clients')
-                    .insert(sale.client.payload)
-                    .select('id')
-                    .single();
-                    
-                if (error) throw error;
-                clientId = client.id;
-                sale.client.id = clientId;
-            }
-            
-            // 2. Créer la facture
-            const { data: facture, error: errFacture } = await supabaseClient
-                .from('factures')
-                .insert({ 
-                    client_id: clientId, 
-                    montant_total: sale.total 
-                })
-                .select('id')
-                .single();
-                
-            if (errFacture) throw errFacture;
-            
-            // 3. Ajouter les lignes
-            const lignesPayload = sale.lignes.map(l => ({
-                ...l,
-                facture_id: facture.id
-            }));
-            
-            const { error: errLignes } = await supabaseClient
-                .from('factures_lignes')
-                .insert(lignesPayload);
-                
-            if (errLignes) throw errLignes;
-            
-            // 4. Valider la facture
-            const { error: errValidation } = await supabaseClient
-                .rpc('valider_facture', {
-                    p_facture_id: facture.id,
-                    p_mode_paiement: sale.mode_paiement,
-                    p_echeance_type: sale.echeance_type,
-                });
-                
-            if (errValidation) throw errValidation;
-            
-            // 5. Marquer comme synchronisé
-            sale.status = 'done';
-            sale.syncedAt = new Date().toISOString();
-            synced.push(sale);
-            
-        } catch (error) {
-            console.error('Erreur sync vente:', error);
-            sale.status = 'error';
-            sale.errorMsg = friendlyError(error);
-            errors.push(sale);
-        }
-    }
-    
-    // Nettoyer les ventes synchronisées
-    const remaining = sales.filter(s => s.status !== 'done');
-    savePendingSales(remaining);
-    
-    // Notifier les pages
-    document.dispatchEvent(new CustomEvent('sylla:pending-sales-updated'));
-    
-    return { synced, errors };
-}
-
-// --- Mouvements de stock en attente ---
-async function syncPendingMovements() {
-    const movements = getPendingMovements();
-    const synced = [];
-    const errors = [];
-    
-    for (const mvt of movements) {
-        if (mvt.status === 'syncing') continue;
-        
-        try {
-            mvt.status = 'syncing';
-            savePendingMovements(movements);
-            
-            const { error } = await supabaseClient
-                .rpc('enregistrer_mouvement_stock', {
-                    p_piece_id: mvt.piece_id,
-                    p_type: mvt.type_mouvement,
-                    p_quantite: mvt.quantite,
-                    p_motif: mvt.motif,
-                });
-                
-            if (error) throw error;
-            
-            mvt.status = 'done';
-            mvt.syncedAt = new Date().toISOString();
-            synced.push(mvt);
-            
-        } catch (error) {
-            console.error('Erreur sync mouvement:', error);
-            mvt.status = 'error';
-            mvt.errorMsg = friendlyError(error);
-            errors.push(mvt);
-        }
-    }
-    
-    // Nettoyer
-    const remaining = movements.filter(m => m.status !== 'done');
-    savePendingMovements(remaining);
-    
-    // Notifier
-    document.dispatchEvent(new CustomEvent('sylla:pending-movements-updated'));
-    
-    return { synced, errors };
-}
-
-// --- Mises à jour de champs en attente ---
-async function syncFieldUpdates() {
-    const updates = getPendingFieldUpdates();
-    const synced = [];
-    const errors = [];
-    
-    for (const update of updates) {
-        if (update.status === 'syncing') continue;
-        
-        try {
-            update.status = 'syncing';
-            savePendingFieldUpdates(updates);
-            
-            const { error } = await supabaseClient
-                .from(update.table)
-                .update(update.payload)
-                .eq('id', update.id);
-                
-            if (error) throw error;
-            
-            update.status = 'done';
-            update.syncedAt = new Date().toISOString();
-            synced.push(update);
-            
-        } catch (error) {
-            console.error('Erreur sync update:', error);
-            update.status = 'error';
-            update.errorMsg = friendlyError(error);
-            errors.push(update);
-        }
-    }
-    
-    // Nettoyer
-    const remaining = updates.filter(u => u.status !== 'done');
-    savePendingFieldUpdates(remaining);
-    
-    // Notifier
-    document.dispatchEvent(new CustomEvent('sylla:pending-updates-updated'));
-    
-    return { synced, errors };
-}
-
-// --- Clients créés hors ligne ---
-async function syncPendingClients() {
-    const clients = getPendingClients();
-    const synced = [];
-    const errors = [];
-    
-    for (const client of clients) {
-        if (client.status === 'syncing') continue;
-        
-        try {
-            client.status = 'syncing';
-            savePendingClients(clients);
-            
-            const { data, error } = await supabaseClient
-                .from('clients')
-                .insert(client.payload)
-                .select('id')
-                .single();
-                
-            if (error) throw error;
-            
-            // Mettre à jour les références temporaires
-            // Ex: si une facture référençait "new-12345", remplacer par le vrai id
-            await replaceTempClientReferences(client.tempId, data.id);
-            
-            client.status = 'done';
-            client.syncedAt = new Date().toISOString();
-            synced.push(client);
-            
-        } catch (error) {
-            console.error('Erreur sync client:', error);
-            client.status = 'error';
-            client.errorMsg = friendlyError(error);
-            errors.push(client);
-        }
-    }
-    
-    // Nettoyer
-    const remaining = clients.filter(c => c.status !== 'done');
-    savePendingClients(remaining);
-    
-    return { synced, errors };
-}
-
-// Remplacer les références temporaires par les vrais IDs
-async function replaceTempClientReferences(tempId, realId) {
-    const sales = getPendingSales();
-    let modified = false;
-    
-    sales.forEach(sale => {
-        if (sale.client.id === tempId) {
-            sale.client.id = realId;
-            sale.client.mode = 'existing';
-            modified = true;
-        }
-    });
-    
-    if (modified) savePendingSales(sales);
 }
 
 // Initialiser le système
@@ -1185,125 +1001,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }));
     });
 });
-// ============================================================================
-// MENU MOBILE - FONCTIONS GLOBALES
-// ============================================================================
-
-function toggleSidebar() {
-    const sidebar = document.querySelector('.sidebar');
-    const overlay = document.querySelector('.sidebar-overlay');
-    
-    if (sidebar) {
-        sidebar.classList.toggle('open');
-        if (overlay) overlay.classList.toggle('active');
-    }
-}
-
-// Fermer le menu quand on clique sur un lien
-document.addEventListener('click', (e) => {
-    if (e.target.closest('.nav-link')) {
-        const sidebar = document.querySelector('.sidebar');
-        const overlay = document.querySelector('.sidebar-overlay');
-        if (sidebar) sidebar.classList.remove('open');
-        if (overlay) overlay.classList.remove('active');
-    }
-});
-// ============================================================================
-// AMÉLIORATIONS SIMPLES - INDEX
-// ============================================================================
-
-async function loadGerantName() {
-    try {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) return;
-        
-        const { data: profile } = await supabaseClient
-            .from('profiles')
-            .select('id')
-            .eq('id', session.user.id)
-            .single();
-            
-        const { data: entreprise } = await supabaseClient
-            .from('entreprises')
-            .select('gerant_nom')
-            .eq('id', profile?.entreprise_id)
-            .single();
-            
-        if (entreprise?.gerant_nom) {
-            const prenom = entreprise.gerant_nom.split(' ')[0];
-            document.getElementById('gerant-nom').textContent = prenom;
-        }
-    } catch {
-        // Silencieux - pas bloquant
-    }
-}
-
-function calculerTendance() {
-    // Récupérer les données du cache ou du DOM
-    const caJour = document.getElementById('stat-ca-jour').textContent;
-    const trendEl = document.getElementById('trend-jour');
-    if (!trendEl) return;
-    
-    // Si pas de données, on affiche rien
-    if (caJour === '—' || caJour === '0 F') {
-        trendEl.textContent = '';
-        return;
-    }
-    
-    // Comparaison simple avec hier (si possible)
-    // On garde ça léger : on affiche juste le nombre de ventes
-    const nbVentes = document.getElementById('stat-nb-jour').textContent;
-    if (nbVentes) {
-        trendEl.textContent = '✅ ' + nbVentes;
-    }
-}
-// ============================================================================
-// MODE SOMBRE GLOBAL
-// ============================================================================
-
-function initDarkMode() {
-    if (localStorage.getItem('recouvra_dark_mode') === '1') {
-        document.body.classList.add('dark-mode');
-        const icon = document.getElementById('dark-mode-icon');
-        const label = document.getElementById('dark-mode-label');
-        if (icon) icon.textContent = '☀️';
-        if (label) label.textContent = 'Mode clair';
-    }
-}
-
-function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
-    const icon = document.getElementById('dark-mode-icon');
-    const label = document.getElementById('dark-mode-label');
-    if (icon) icon.textContent = isDark ? '☀️' : '🌙';
-    if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre';
-}
-// ============================================================================
-// MODE SOMBRE GLOBAL - AUTO-INITIALISATION
-// ============================================================================
-
-function initDarkMode() {
-    if (localStorage.getItem('recouvra_dark_mode') === '1') {
-        document.body.classList.add('dark-mode');
-        const icon = document.getElementById('dark-mode-icon');
-        const label = document.getElementById('dark-mode-label');
-        if (icon) icon.textContent = '☀️';
-        if (label) label.textContent = 'Mode clair';
-    }
-}
-
-function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
-    const icon = document.getElementById('dark-mode-icon');
-    const label = document.getElementById('dark-mode-label');
-    if (icon) icon.textContent = isDark ? '☀️' : '🌙';
-    if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre';
-}
-
-// AUTO-INITIALISATION : s'exécute automatiquement sur chaque page
-// sans avoir à modifier le DOMContentLoaded de chaque page
-document.addEventListener('DOMContentLoaded', initDarkMode);
