@@ -2134,3 +2134,215 @@ button{ font-family:var(--font-body); cursor:pointer; }
         min-width: auto;
     }
 }
+/* ============================================================================
+   PAGE ENTRÉES / SORTIES - SIMPLIFIÉE
+   ============================================================================ */
+
+/* --- Sélecteur de type (gros boutons) --- */
+.mvt-type-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.mvt-type-btn {
+    padding: 16px;
+    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s;
+}
+
+.mvt-type-btn:hover {
+    border-color: #4F46E5;
+    background: #EEF2FF;
+}
+
+.mvt-type-btn.active {
+    border-color: #4F46E5;
+    background: #EEF2FF;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+}
+
+.mvt-type-btn.entree.active {
+    border-color: #10B981;
+    background: #D1FAE5;
+}
+
+.mvt-type-btn.sortie.active {
+    border-color: #EF4444;
+    background: #FEE2E2;
+}
+
+.mvt-type-btn.ajustement.active {
+    border-color: #F59E0B;
+    background: #FEF3C7;
+}
+
+.mvt-type-icon {
+    font-size: 32px;
+}
+
+.mvt-type-label {
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.mvt-type-desc {
+    font-size: 11px;
+    color: #888;
+}
+
+/* --- Formulaire --- */
+.mvt-form-group {
+    margin-bottom: 16px;
+}
+
+.mvt-form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.quantity-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.quantity-input-wrap input {
+    flex: 1;
+    padding: 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 16px;
+    outline: none;
+}
+
+.quantity-input-wrap input:focus {
+    border-color: #4F46E5;
+}
+
+.qty-unit {
+    font-size: 16px;
+    font-weight: 600;
+    color: #888;
+    min-width: 40px;
+}
+
+/* --- Recherche article --- */
+.search-results {
+    position: absolute;
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    z-index: 100;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 4px;
+}
+
+.search-result-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.search-result-item:hover {
+    background: #EEF2FF;
+}
+
+.search-result-name {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.search-result-stock {
+    font-size: 12px;
+    color: #888;
+}
+
+.search-result-empty {
+    padding: 16px;
+    text-align: center;
+    color: #888;
+}
+
+/* --- Article sélectionné --- */
+.selected-piece {
+    margin-top: 12px;
+    padding: 12px;
+    background: #F0FDF4;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.selected-product-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.selected-product-name {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.selected-product-ref {
+    font-size: 12px;
+    color: #888;
+}
+
+.selected-product-price {
+    font-size: 14px;
+    font-weight: 700;
+    color: #4F46E5;
+}
+
+.selected-product-stock {
+    font-size: 13px;
+    font-weight: 600;
+    color: #059669;
+}
+
+/* --- Message formulaire --- */
+.form-msg {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.form-msg.error {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.form-msg.success {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+/* --- Ligne en attente --- */
+.pending-row {
+    background: #FFFBEB;
+}
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+    .mvt-type-selector {
+        grid-template-columns: 1fr;
+    }
+}
