@@ -5,9 +5,379 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bienvenue — Recouvra</title>
 <link rel="stylesheet" href="assets/style.css">
-<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#4F46E5"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Recouvra"><link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4F46E5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Recouvra">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+
+<style>
+/* ============================================================================
+   STYLES SPÉCIFIQUES ONBOARDING
+   ============================================================================ */
+
+.onboarding-shell {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: #f8f9fa;
+}
+
+.onboarding-card {
+    max-width: 800px;
+    width: 100%;
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.onboarding-progress {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 32px;
+    justify-content: center;
+}
+
+.onboarding-progress i {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    transition: all 0.3s;
+}
+
+.onboarding-progress i.active {
+    background: #4F46E5;
+    transform: scale(1.3);
+}
+
+.onboarding-progress i.done {
+    background: #10B981;
+}
+
+.onboarding-eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #4F46E5;
+    background: #EEF2FF;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+}
+
+.onboarding-step h1 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 16px;
+}
+
+.onboarding-step .lead {
+    font-size: 16px;
+    color: #6B7280;
+    margin-bottom: 24px;
+    line-height: 1.6;
+}
+
+.onboarding-choice-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.onboarding-choice {
+    padding: 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.onboarding-choice:hover {
+    border-color: #4F46E5;
+    background: #EEF2FF;
+}
+
+.onboarding-choice.selected {
+    border-color: #4F46E5;
+    background: #EEF2FF;
+    color: #4F46E5;
+}
+
+.onboarding-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+}
+
+.onboarding-nav .btn {
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: none;
+    background: #4F46E5;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.onboarding-nav .btn:hover {
+    background: #4338CA;
+    transform: translateY(-2px);
+}
+
+.onboarding-nav .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.onboarding-nav .btn-back {
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    color: #6B7280;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.onboarding-nav .btn-back:hover {
+    background: #f3f4f6;
+}
+
+/* Prix - Paliers */
+.pricing-card {
+    background: #f8f9fa;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+.pricing-card .label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #4F46E5;
+    margin-bottom: 4px;
+}
+
+.pricing-card .sub {
+    font-size: 13px;
+    color: #6B7280;
+    margin-bottom: 16px;
+}
+
+.pricing-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.pricing-option {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.pricing-option:hover {
+    border-color: #4F46E5;
+    box-shadow: 0 4px 12px rgba(79,70,229,0.1);
+}
+
+.pricing-option.selected {
+    border-color: #4F46E5;
+    background: #EEF2FF;
+}
+
+.pricing-option strong {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.pricing-option .amount {
+    font-size: 28px;
+    font-weight: 800;
+    color: #4F46E5;
+    margin-bottom: 12px;
+}
+
+.pricing-option ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.pricing-option ul li {
+    font-size: 13px;
+    color: #6B7280;
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pricing-option ul li::before {
+    content: "✓";
+    color: #10B981;
+    font-weight: 700;
+}
+
+.pricing-option .badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: #10B981;
+    color: white;
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-weight: 700;
+}
+
+.onboarding-note {
+    font-size: 13px;
+    color: #6B7280;
+    font-style: italic;
+    margin-bottom: 20px;
+}
+
+.payment-steps {
+    padding-left: 20px;
+    margin-bottom: 20px;
+}
+
+.payment-steps li {
+    font-size: 14px;
+    color: #6B7280;
+    margin-bottom: 8px;
+}
+
+.reassurance-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #F0FDF4;
+    border: 1px solid #10B981;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.reassurance-box .icon {
+    font-size: 24px;
+}
+
+.reassurance-box strong {
+    display: block;
+    font-size: 14px;
+    color: #065F46;
+    margin-bottom: 2px;
+}
+
+.reassurance-box span {
+    font-size: 13px;
+    color: #065F46;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+input[type="text"], input[type="file"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 16px;
+    background: white;
+}
+
+input[type="text"]:focus, input[type="file"]:focus {
+    border-color: #4F46E5;
+}
+
+#onboarding-msg {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+#onboarding-msg.success {
+    color: #059669;
+}
+
+#onboarding-msg.error {
+    color: #DC2626;
+}
+
+.pay-wave-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 16px;
+    background: #4F46E5;
+    color: white;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 16px;
+    text-decoration: none;
+    margin-bottom: 16px;
+    transition: all 0.2s;
+}
+
+.pay-wave-btn:hover {
+    background: #4338CA;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .onboarding-card {
+        padding: 24px;
+    }
+    
+    .onboarding-choice-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .pricing-options {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
 </head>
 <body>
+
 <main class="onboarding-shell">
   <div class="onboarding-card">
     <div class="onboarding-progress">
@@ -74,36 +444,71 @@
       </div>
     </section>
 
-    <!-- Étape 5 — Mise en place + abonnement + paiement -->
+    <!-- Étape 5 — Paiement selon la capacité du client -->
     <section class="onboarding-step" data-step="5" hidden>
       <span class="onboarding-eyebrow">Étape 5 sur 5</span>
       <h1>Votre commerce est prêt à passer à Recouvra</h1>
 
+      <!-- Paliers de paiement -->
       <div class="pricing-card">
         <div class="label">Mise en place Recouvra</div>
-        <div class="amount">50 000 FCFA</div>
-        <p class="sub">Paiement unique</p>
-        <ul class="pricing-includes">
-          <li>Configuration de votre entreprise</li>
-          <li>Configuration de vos produits</li>
-          <li>Import de votre stock</li>
-          <li>Configuration de vos clients</li>
-          <li>Personnalisation de vos factures</li>
-          <li>Configuration du recouvrement</li>
-          <li>Formation et accompagnement</li>
-        </ul>
+        <p class="sub">Choisissez le palier adapté à votre commerce</p>
+        
+        <div class="pricing-options">
+          <div class="pricing-option" onclick="selectPricing('essentiel')">
+            <strong>🌱 Essentiel</strong>
+            <div class="amount">25 000 FCFA</div>
+            <ul>
+              <li>Configuration de votre entreprise</li>
+              <li>Configuration de vos produits</li>
+              <li>Import de votre stock</li>
+              <li>Configuration de vos clients</li>
+              <li>Formation de base (30 min)</li>
+            </ul>
+          </div>
+          
+          <div class="pricing-option selected" onclick="selectPricing('standard')">
+            <strong>🔵 Standard</strong>
+            <div class="amount">50 000 FCFA</div>
+            <ul>
+              <li>Tout l'Essentiel</li>
+              <li>Personnalisation de vos factures</li>
+              <li>Configuration du recouvrement</li>
+              <li>Formation complète (1h)</li>
+              <li>Accompagnement 1 mois</li>
+            </ul>
+            <span class="badge badge-success">⭐ Populaire</span>
+          </div>
+          
+          <div class="pricing-option" onclick="selectPricing('premium')">
+            <strong>🟣 Premium</strong>
+            <div class="amount">100 000 FCFA</div>
+            <ul>
+              <li>Tout le Standard</li>
+              <li>Support prioritaire WhatsApp</li>
+              <li>Accompagnement 3 mois</li>
+              <li>Optimisation personnalisée</li>
+            </ul>
+          </div>
+        </div>
       </div>
+
       <p class="onboarding-note">Vous n'êtes pas simplement en train d'acheter une application. Nous vous aidons à mettre Recouvra en place dans votre commerce.</p>
 
-      <div style="border-top:1px solid var(--border-soft); margin:28px 0 22px; padding-top:24px;">
+      <div style="border-top:1px solid #e5e7eb; margin:28px 0 22px; padding-top:24px;">
         <h3 style="margin:0 0 4px;">Après la mise en place</h3>
-        <p class="lead" style="margin-bottom:16px;"><strong>Recouvra Pro — 10 000 FCFA / mois</strong> : gestion du stock, ventes, facturation, clients, paiements, créances, recouvrement, relances WhatsApp, historique.</p>
-        <p style="font-family:var(--font-display); color:var(--text-muted); font-style:italic; margin:0 0 22px;">Un seul espace pour gérer votre commerce au quotidien.</p>
+        <p class="lead" style="margin-bottom:16px; color:#6B7280;">
+          <strong>Recouvra Simple — 10 000 FCFA / mois</strong> : gestion du stock, ventes, facturation, clients, paiements.
+        </p>
+        <p class="lead" style="margin-bottom:16px; color:#6B7280;">
+          <strong>Recouvra Recouvrement — 15 000 FCFA / mois</strong> : tout le Simple + relances WhatsApp, suivi des créances, promesses de règlement.
+        </p>
+        <p style="font-size:14px; color:#6B7280; font-style:italic; margin:0 0 22px;">Un seul espace pour gérer votre commerce au quotidien.</p>
 
         <h3 style="margin:0 0 12px; font-size:1rem;">Comment fonctionne le paiement ?</h3>
         <ol class="payment-steps">
           <li>Cliquez sur « Payer avec Wave »</li>
-          <li>Effectuez le paiement de 50 000 FCFA</li>
+          <li>Effectuez le paiement du montant choisi</li>
           <li>Revenez sur Recouvra et cliquez sur « J'ai effectué le paiement »</li>
           <li>Notre équipe vérifie votre paiement</li>
           <li>Votre espace est activé après confirmation</li>
@@ -116,11 +521,17 @@
       </div>
 
       <div id="payment-step-initial">
-        <a href="https://pay.wave.com/m/M_sn_JSmkfYmhcg2h/c/sn/" target="_blank" rel="noopener" class="btn" style="display:block; text-align:center; text-decoration:none;">Payer 50 000 FCFA avec Wave</a>
+        <a href="https://pay.wave.com/m/M_sn_JSmkfYmhcg2h/c/sn/" target="_blank" rel="noopener" class="pay-wave-btn" id="pay-wave-btn">
+          Payer 50 000 FCFA avec Wave
+        </a>
         <p class="onboarding-note">Après votre paiement, revenez ici et cliquez sur « J'ai effectué le paiement ».</p>
 
-        <label>Référence ou commentaire du paiement Wave (facultatif)<input id="payment-reference" type="text" maxlength="200" placeholder="Ex : référence de la transaction"></label>
-        <label>Capture d'écran du paiement (facultatif)<input id="payment-proof" type="file" accept="image/jpeg,image/png,application/pdf"></label>
+        <label>Référence ou commentaire du paiement Wave (facultatif)
+          <input id="payment-reference" type="text" maxlength="200" placeholder="Ex : référence de la transaction">
+        </label>
+        <label>Capture d'écran du paiement (facultatif)
+          <input id="payment-proof" type="file" accept="image/jpeg,image/png,application/pdf">
+        </label>
 
         <div id="onboarding-msg"></div>
         <div class="onboarding-nav">
