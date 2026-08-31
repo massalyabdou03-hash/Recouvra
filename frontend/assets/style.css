@@ -1917,3 +1917,220 @@ button{ font-family:var(--font-body); cursor:pointer; }
         gap: 10px;
     }
 }
+/* ============================================================================
+   PAGE ON ME DOIT - CARTES CRÉDITS
+   ============================================================================ */
+
+.credit-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.credit-stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    border: 1px solid #eee;
+}
+
+.credit-stat-card.danger {
+    background: #FEE2E2;
+    border-color: #EF4444;
+}
+
+.credit-stat-card.warning {
+    background: #FEF3C7;
+    border-color: #F59E0B;
+}
+
+.credit-stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.credit-stat-label {
+    font-size: 12px;
+    color: #888;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.credit-filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.filter-btn {
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-btn.active {
+    background: #4F46E5;
+    color: white;
+    border-color: #4F46E5;
+}
+
+.filter-btn:hover:not(.active) {
+    background: #F3F4F6;
+}
+
+.credits-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.credit-client-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid #eee;
+}
+
+.credit-client-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.credit-client-info {
+    flex: 1;
+}
+
+.credit-client-name {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 4px;
+}
+
+.credit-client-phone {
+    font-size: 13px;
+    color: #888;
+}
+
+.credit-client-total {
+    text-align: right;
+}
+
+.credit-total-label {
+    font-size: 12px;
+    color: #888;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.credit-total-amount {
+    font-size: 24px;
+    font-weight: 800;
+    color: #EF4444;
+}
+
+.credit-invoices {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.credit-invoice-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #fafafa;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.credit-invoice-row.paid {
+    opacity: 0.6;
+    background: #f0fdf4;
+}
+
+.credit-invoice-info {
+    flex: 1;
+}
+
+.credit-invoice-num {
+    font-weight: 600;
+    font-size: 14px;
+    display: block;
+}
+
+.credit-invoice-date {
+    font-size: 12px;
+    color: #888;
+}
+
+.credit-invoice-amount {
+    font-weight: 700;
+    font-size: 16px;
+    text-align: right;
+    min-width: 100px;
+}
+
+.credit-invoice-status {
+    min-width: 100px;
+    text-align: center;
+}
+
+.credit-invoice-actions {
+    min-width: 80px;
+    text-align: right;
+}
+
+.btn-success {
+    background: #10B981;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-success:hover {
+    background: #059669;
+}
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+    .credit-client-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .credit-client-total {
+        text-align: left;
+    }
+    
+    .credit-invoice-row {
+        flex-wrap: wrap;
+    }
+    
+    .credit-invoice-amount {
+        min-width: auto;
+    }
+    
+    .credit-invoice-status {
+        min-width: auto;
+    }
+}
