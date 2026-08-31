@@ -15,9 +15,12 @@
 <link rel="stylesheet" href="assets/style.css">
 
 <style>
-/* Styles spécifiques à la page Admin */
+/* ============================================================================
+   STYLES SPÉCIFIQUES SUPER ADMIN
+   ============================================================================ */
+
 .admin-shell {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 24px;
 }
@@ -31,6 +34,8 @@
     background: white;
     border-radius: 16px;
     border: 1px solid #eee;
+    flex-wrap: wrap;
+    gap: 16px;
 }
 
 .admin-header-left {
@@ -63,6 +68,32 @@
     margin: 0;
 }
 
+.admin-header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Mode sombre toggle */
+.dark-mode-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.dark-mode-toggle:hover {
+    background: #f3f4f6;
+}
+
+/* Notifications */
 .payments-notice {
     display: flex;
     align-items: center;
@@ -77,6 +108,7 @@
     font-size: 0.92rem;
 }
 
+/* Filtres */
 .payments-filters {
     display: flex;
     gap: 8px;
@@ -103,9 +135,10 @@
 }
 
 .filter-chip:hover:not(.active) {
-    background: #F3F4F6;
+    background: #f3f4f6;
 }
 
+/* Tableau */
 .payments-table-wrap {
     overflow-x: auto;
     border: 1px solid #e5e7eb;
@@ -117,7 +150,7 @@ table.payments-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.86rem;
-    min-width: 760px;
+    min-width: 900px;
 }
 
 table.payments-table th {
@@ -128,12 +161,12 @@ table.payments-table th {
     text-transform: uppercase;
     letter-spacing: 0.04em;
     border-bottom: 1px solid #e5e7eb;
-    background: #F9FAFB;
+    background: #f9fafb;
 }
 
 table.payments-table td {
     padding: 12px 14px;
-    border-bottom: 1px solid #F3F4F6;
+    border-bottom: 1px solid #f3f4f6;
     vertical-align: middle;
 }
 
@@ -142,7 +175,7 @@ table.payments-table tr:last-child td {
 }
 
 table.payments-table tr:hover {
-    background: #F9FAFB;
+    background: #f9fafb;
 }
 
 .payments-empty {
@@ -151,12 +184,69 @@ table.payments-table tr:hover {
     color: #6B7280;
 }
 
+/* Actions dans le tableau */
+.admin-actions {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.admin-btn {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.admin-btn:hover {
+    background: #f3f4f6;
+}
+
+.admin-btn.success {
+    background: #D1FAE5;
+    color: #065F46;
+    border-color: #10B981;
+}
+
+.admin-btn.success:hover {
+    background: #A7F3D0;
+}
+
+.admin-btn.danger {
+    background: #FEE2E2;
+    color: #991B1B;
+    border-color: #EF4444;
+}
+
+.admin-btn.danger:hover {
+    background: #FECACA;
+}
+
+.admin-btn.info {
+    background: #DBEAFE;
+    color: #1E40AF;
+    border-color: #3B82F6;
+}
+
+.admin-btn.info:hover {
+    background: #BFDBFE;
+}
+
+/* Détail paiement */
 .detail-row {
     display: flex;
     justify-content: space-between;
     gap: 16px;
     padding: 8px 0;
-    border-bottom: 1px solid #F3F4F6;
+    border-bottom: 1px solid #f3f4f6;
     font-size: 0.9rem;
 }
 
@@ -188,7 +278,7 @@ table.payments-table tr:hover {
 
 .section-divider {
     margin: 44px 0 18px;
-    border-top: 1px solid #F3F4F6;
+    border-top: 1px solid #f3f4f6;
     padding-top: 24px;
 }
 
@@ -200,16 +290,127 @@ table.payments-table tr:hover {
     font-weight: 700;
 }
 
+/* Barre de recherche admin */
+.admin-search {
+    margin-bottom: 16px;
+}
+
+.admin-search input {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 15px;
+    outline: none;
+    background: white;
+}
+
+.admin-search input:focus {
+    border-color: #4F46E5;
+}
+
+/* Onglets admin */
+.admin-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.admin-tab {
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.admin-tab.active {
+    background: #4F46E5;
+    color: white;
+    border-color: #4F46E5;
+}
+
+.admin-tab:hover:not(.active) {
+    background: #f3f4f6;
+}
+
+/* Mode sombre */
+body.dark-mode {
+    --surface: #1F2937;
+    --surface-2: #374151;
+    --surface-3: #4B5563;
+    --border: #4B5563;
+    --border-soft: #374151;
+    --text: #F9FAFB;
+    --text-muted: #9CA3AF;
+    --text-light: #6B7280;
+    background: #111827;
+    color: #F9FAFB;
+}
+
+body.dark-mode .card {
+    background: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode .admin-header {
+    background: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode .payments-table-wrap {
+    background: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode table.payments-table th {
+    background: #374151;
+    color: #9CA3AF;
+}
+
+body.dark-mode table.payments-table td {
+    border-color: #374151;
+}
+
+body.dark-mode table.payments-table tr:hover {
+    background: #374151;
+}
+
+body.dark-mode .admin-btn {
+    background: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+body.dark-mode .filter-chip {
+    background: #374151;
+    border-color: #4B5563;
+    color: #9CA3AF;
+}
+
+body.dark-mode .filter-chip.active {
+    background: #4F46E5;
+    color: white;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .admin-shell {
         padding: 16px;
     }
-    
+
     .admin-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 12px;
+    }
+
+    .admin-header-actions {
+        width: 100%;
+        justify-content: space-between;
     }
 }
 </style>
@@ -223,12 +424,19 @@ table.payments-table tr:hover {
             <div class="admin-icon">🔐</div>
             <div>
                 <h1>Administration</h1>
-                <p>Gestion des paiements et abonnements</p>
+                <p>Gestion complète des paiements, entreprises et utilisateurs</p>
             </div>
         </div>
-        <a href="index.html" class="btn-back">
-            <span class="arrow">←</span> Retour au tableau de bord
-        </a>
+        <div class="admin-header-actions">
+            <!-- Toggle mode sombre -->
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()">
+                <span id="dark-mode-icon">🌙</span>
+                <span id="dark-mode-label">Mode sombre</span>
+            </button>
+            <a href="index.html" class="btn-back">
+                <span class="arrow">←</span> Retour
+            </a>
+        </div>
     </div>
 
     <!-- Notification paiements en attente -->
@@ -283,54 +491,121 @@ table.payments-table tr:hover {
                 <div class="value" id="stat-confirmed-amount">—</div>
             </div>
         </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+            </div>
+            <div class="stat-body">
+                <div class="label">Entreprises actives</div>
+                <div class="value" id="stat-entreprises">—</div>
+            </div>
+        </div>
     </div>
 
-    <!-- Filtres -->
-    <div class="payments-filters" id="payments-filters">
-        <button type="button" class="filter-chip active" data-filter="pending">🕐 En attente</button>
-        <button type="button" class="filter-chip" data-filter="confirmed">✅ Confirmés</button>
-        <button type="button" class="filter-chip" data-filter="rejected">❌ Rejetés</button>
-        <button type="button" class="filter-chip" data-filter="all">📋 Tous</button>
+    <!-- Onglets -->
+    <div class="admin-tabs">
+        <button class="admin-tab active" onclick="showTab('paiements')">💳 Paiements</button>
+        <button class="admin-tab" onclick="showTab('entreprises')">🏢 Entreprises</button>
+        <button class="admin-tab" onclick="showTab('utilisateurs')">👤 Utilisateurs</button>
     </div>
 
-    <!-- Tableau des paiements -->
-    <div class="payments-table-wrap">
-        <table class="payments-table">
-            <thead>
-                <tr>
-                    <th>Entreprise</th>
-                    <th>Client</th>
-                    <th>Téléphone</th>
-                    <th>Montant</th>
-                    <th>Type</th>
-                    <th>Méthode</th>
-                    <th>Date</th>
-                    <th>Statut</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="payments-tbody">
-                <tr>
-                    <td colspan="9" class="payments-empty">Chargement...</td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- Barre de recherche -->
+    <div class="admin-search">
+        <input type="text" id="admin-search" placeholder="🔍 Rechercher (entreprise, client, email, téléphone)..." oninput="filterData()">
     </div>
 
-    <!-- Section ancien système -->
-    <div class="section-divider">
-        <span class="eyebrow">Ancien système — Module Recouvra (15 000 FCFA/mois)</span>
+    <!-- ========== ONGLET PAIEMENTS ========== -->
+    <div id="tab-paiements">
+        <!-- Filtres -->
+        <div class="payments-filters" id="payments-filters">
+            <button type="button" class="filter-chip active" data-filter="pending">🕐 En attente</button>
+            <button type="button" class="filter-chip" data-filter="confirmed">✅ Confirmés</button>
+            <button type="button" class="filter-chip" data-filter="rejected">❌ Rejetés</button>
+            <button type="button" class="filter-chip" data-filter="all">📋 Tous</button>
+        </div>
+
+        <!-- Tableau des paiements -->
+        <div class="payments-table-wrap">
+            <table class="payments-table">
+                <thead>
+                    <tr>
+                        <th>Entreprise</th>
+                        <th>Client</th>
+                        <th>Téléphone</th>
+                        <th>Montant</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="payments-tbody">
+                    <tr>
+                        <td colspan="8" class="payments-empty">Chargement...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-    <section id="requests" class="cards"></section>
+
+    <!-- ========== ONGLET ENTREPRISES ========== -->
+    <div id="tab-entreprises" style="display:none;">
+        <div class="payments-table-wrap">
+            <table class="payments-table">
+                <thead>
+                    <tr>
+                        <th>Entreprise</th>
+                        <th>Gérant</th>
+                        <th>Téléphone</th>
+                        <th>Abonnement</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="entreprises-tbody">
+                    <tr>
+                        <td colspan="6" class="payments-empty">Chargement...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ========== ONGLET UTILISATEURS ========== -->
+    <div id="tab-utilisateurs" style="display:none;">
+        <div class="payments-table-wrap">
+            <table class="payments-table">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Entreprise</th>
+                        <th>Rôle</th>
+                        <th>Recouvra</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="utilisateurs-tbody">
+                    <tr>
+                        <td colspan="5" class="payments-empty">Chargement...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
 </main>
 
-<!-- Modal détail paiement -->
+<!-- ========== MODAL DÉTAIL PAIEMENT ========== -->
 <div class="modal-backdrop" id="payment-detail-backdrop">
     <div class="modal modal-lg">
         <div class="modal-head">
             <h3>Paiement à vérifier</h3>
-            <button class="close-x" onclick="closePaymentDetail()">×</button>
+            <button class="close-x" onclick="closeModal('payment-detail-backdrop')">×</button>
         </div>
         <div id="payment-detail-content"></div>
         <div class="admin-reminder">
@@ -341,43 +616,86 @@ table.payments-table tr:hover {
     </div>
 </div>
 
-<!-- Modal confirmation -->
-<div class="modal-backdrop" id="confirm-backdrop">
-    <div class="modal modal-sm modal-confirm">
-        <h3>Confirmer le paiement ?</h3>
-        <p id="confirm-text"></p>
-        <div id="confirm-msg"></div>
-        <div class="modal-actions">
-            <button type="button" class="btn btn-secondary" onclick="closeConfirmModal()">Annuler</button>
-            <button type="button" class="btn" id="confirm-final-btn">Confirmer définitivement</button>
+<!-- ========== MODAL MODIFIER ENTREPRISE ========== -->
+<div class="modal-backdrop" id="edit-entreprise-backdrop">
+    <div class="modal modal-lg">
+        <div class="modal-head">
+            <h3>Modifier l'entreprise</h3>
+            <button class="close-x" onclick="closeModal('edit-entreprise-backdrop')">×</button>
         </div>
+        <form id="edit-entreprise-form">
+            <input type="hidden" id="edit-entreprise-id">
+            <label>Nom de l'entreprise</label>
+            <input id="edit-entreprise-nom" required>
+            <label>Gérant</label>
+            <input id="edit-entreprise-gerant">
+            <label>Téléphone</label>
+            <input id="edit-entreprise-telephone">
+            <label>Email</label>
+            <input id="edit-entreprise-email" type="email">
+            <label>Statut abonnement</label>
+            <select id="edit-entreprise-statut">
+                <option value="active">✅ Actif</option>
+                <option value="pending">🕐 En attente</option>
+                <option value="expired">❌ Expiré</option>
+                <option value="cancelled">🚫 Annulé</option>
+            </select>
+            <div id="edit-entreprise-msg"></div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('edit-entreprise-backdrop')">Annuler</button>
+                <button type="submit" class="btn">Enregistrer</button>
+            </div>
+        </form>
     </div>
 </div>
 
-<!-- Modal rejet -->
-<div class="modal-backdrop" id="reject-backdrop">
+<!-- ========== MODAL RÉINITIALISER MOT DE PASSE ========== -->
+<div class="modal-backdrop" id="reset-password-backdrop">
     <div class="modal modal-sm">
         <div class="modal-head">
-            <h3>Rejeter le paiement</h3>
-            <button class="close-x" onclick="closeRejectModal()">×</button>
+            <h3>Réinitialiser le mot de passe</h3>
+            <button class="close-x" onclick="closeModal('reset-password-backdrop')">×</button>
         </div>
-        <label for="reject-reason-select">Motif</label>
-        <select id="reject-reason-select">
-            <option value="Paiement introuvable">Paiement introuvable</option>
-            <option value="Montant incorrect">Montant incorrect</option>
-            <option value="Preuve insuffisante">Preuve insuffisante</option>
-            <option value="Paiement déjà utilisé">Paiement déjà utilisé</option>
-            <option value="Autre">Autre</option>
-        </select>
-        <div id="reject-other-wrap" hidden>
-            <label for="reject-other-text">Précisez</label>
-            <textarea id="reject-other-text" rows="2"></textarea>
+        <form id="reset-password-form">
+            <input type="hidden" id="reset-password-user-id">
+            <label>Email de l'utilisateur</label>
+            <input id="reset-password-email" type="email" readonly>
+            <label>Nouveau mot de passe</label>
+            <input id="reset-password-new" type="password" required minlength="8">
+            <div id="reset-password-msg"></div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('reset-password-backdrop')">Annuler</button>
+                <button type="submit" class="btn">Réinitialiser</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ========== MODAL MODIFIER UTILISATEUR ========== -->
+<div class="modal-backdrop" id="edit-user-backdrop">
+    <div class="modal modal-sm">
+        <div class="modal-head">
+            <h3>Modifier l'utilisateur</h3>
+            <button class="close-x" onclick="closeModal('edit-user-backdrop')">×</button>
         </div>
-        <div id="reject-msg"></div>
-        <div class="modal-actions">
-            <button type="button" class="btn btn-secondary" onclick="closeRejectModal()">Annuler</button>
-            <button type="button" class="btn btn-danger" id="reject-final-btn">Rejeter</button>
-        </div>
+        <form id="edit-user-form">
+            <input type="hidden" id="edit-user-id">
+            <label>Rôle</label>
+            <select id="edit-user-role">
+                <option value="super_admin">🔐 Super Admin</option>
+                <option value="admin">👑 Admin</option>
+                <option value="vendeur">🛒 Vendeur</option>
+                <option value="magasinier">📦 Magasinier</option>
+            </select>
+            <label>
+                <input type="checkbox" id="edit-user-recouvra"> Accès Recouvra (PRO)
+            </label>
+            <div id="edit-user-msg"></div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('edit-user-backdrop')">Annuler</button>
+                <button type="submit" class="btn">Enregistrer</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -386,22 +704,23 @@ table.payments-table tr:hover {
 <script src="assets/app.js"></script>
 <script>
 // ============================================================================
-// ADMINISTRATION - GESTION DES PAIEMENTS
+// SUPER ADMIN - GESTION COMPLÈTE
 // ============================================================================
 
 let currentPaymentFilter = 'pending';
 let allPayments = [];
+let allEntreprises = [];
+let allUsers = [];
 let currentPaymentDetail = null;
+let currentAdminTab = 'paiements';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Vérifier l'authentification
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session) {
         window.location.href = 'login.html';
         return;
     }
 
-    // Vérifier que l'utilisateur est super-admin
     const { data: profile, error } = await supabaseClient
         .from('profiles')
         .select('role')
@@ -414,10 +733,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // Charger les paiements
     await loadPayments();
+    await loadEntreprises();
+    await loadUsers();
 
-    // Écouter les filtres
+    if (localStorage.getItem('recouvra_dark_mode') === '1') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('dark-mode-icon').textContent = '☀️';
+        document.getElementById('dark-mode-label').textContent = 'Mode clair';
+    }
+
     document.querySelectorAll('.filter-chip').forEach(chip => {
         chip.addEventListener('click', () => {
             document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
@@ -427,43 +752,68 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // Écouter le changement de motif de rejet
-    const reasonSelect = document.getElementById('reject-reason-select');
-    if (reasonSelect) {
-        reasonSelect.addEventListener('change', (e) => {
-            document.getElementById('reject-other-wrap').hidden = e.target.value !== 'Autre';
-        });
-    }
-
-    // Bouton de rejet final
-    const rejectBtn = document.getElementById('reject-final-btn');
-    if (rejectBtn) {
-        rejectBtn.addEventListener('click', submitRejection);
-    }
+    document.getElementById('edit-entreprise-form').addEventListener('submit', saveEntreprise);
+    document.getElementById('reset-password-form').addEventListener('submit', resetPassword);
+    document.getElementById('edit-user-form').addEventListener('submit', saveUser);
 });
 
-async function loadPayments() {
-    const tbody = document.getElementById('payments-tbody');
-    if (!tbody) {
-        console.error('Élément payments-tbody introuvable');
-        return;
+// --- Mode sombre ---
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
+    document.getElementById('dark-mode-icon').textContent = isDark ? '☀️' : '🌙';
+    document.getElementById('dark-mode-label').textContent = isDark ? 'Mode clair' : 'Mode sombre';
+}
+
+// --- Onglets ---
+function showTab(tabName) {
+    currentAdminTab = tabName;
+    
+    document.querySelectorAll('.admin-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.textContent.toLowerCase().includes(
+            tabName === 'paiements' ? 'paiement' : 
+            tabName === 'entreprises' ? 'entreprise' : 'utilisateur'
+        ));
+    });
+    
+    document.getElementById('tab-paiements').style.display = tabName === 'paiements' ? 'block' : 'none';
+    document.getElementById('tab-entreprises').style.display = tabName === 'entreprises' ? 'block' : 'none';
+    document.getElementById('tab-utilisateurs').style.display = tabName === 'utilisateurs' ? 'block' : 'none';
+    
+    filterData();
+}
+
+// --- Recherche ---
+function filterData() {
+    const q = document.getElementById('admin-search').value.trim().toLowerCase();
+    
+    if (currentAdminTab === 'paiements') {
+        renderPayments(q);
+    } else if (currentAdminTab === 'entreprises') {
+        renderEntreprises(q);
+    } else {
+        renderUsers(q);
     }
+}
 
-    tbody.innerHTML = `
-        <tr>
-            <td colspan="9" class="payments-empty">
-                <div class="empty-state">Chargement des paiements...</div>
-            </td>
-        </tr>
-    `;
+// --- Fermer un modal ---
+function closeModal(modalId) {
+    const el = document.getElementById(modalId);
+    if (el) el.classList.remove('open');
+}
 
+// ============================================================================
+// GESTION DES PAIEMENTS
+// ============================================================================
+
+async function loadPayments() {
     try {
         const { data, error } = await supabaseClient
             .from('subscription_payments')
             .select(`
                 *,
-                entreprises(nom, gerant_nom, telephone),
-                profiles!submitted_by(email)
+                entreprises(nom, gerant_nom, telephone)
             `)
             .order('created_at', { ascending: false });
 
@@ -475,12 +825,8 @@ async function loadPayments() {
 
     } catch (error) {
         console.error('Erreur chargement paiements:', error);
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="9" class="payments-empty">
-                    <div class="error-msg">${friendlyError(error)}</div>
-                </td>
-            </tr>
+        document.getElementById('payments-tbody').innerHTML = `
+            <tr><td colspan="8" class="payments-empty">${friendlyError(error)}</td></tr>
         `;
     }
 }
@@ -488,48 +834,46 @@ async function loadPayments() {
 function renderStats() {
     const pending = allPayments.filter(p => p.status === 'pending');
     const confirmed = allPayments.filter(p => p.status === 'confirmed');
-    const rejected = allPayments.filter(p => p.status === 'rejected');
 
     const pendingAmount = pending.reduce((s, p) => s + Number(p.amount), 0);
     const confirmedAmount = confirmed.reduce((s, p) => s + Number(p.amount), 0);
 
-    const statPendingCount = document.getElementById('stat-pending-count');
-    const statPendingAmount = document.getElementById('stat-pending-amount');
-    const statConfirmedCount = document.getElementById('stat-confirmed-count');
-    const statConfirmedAmount = document.getElementById('stat-confirmed-amount');
+    document.getElementById('stat-pending-count').textContent = pending.length;
+    document.getElementById('stat-pending-amount').textContent = fmtMoney(pendingAmount);
+    document.getElementById('stat-confirmed-count').textContent = confirmed.length;
+    document.getElementById('stat-confirmed-amount').textContent = fmtMoney(confirmedAmount);
+
     const notice = document.getElementById('payments-notice');
-
-    if (statPendingCount) statPendingCount.textContent = pending.length;
-    if (statPendingAmount) statPendingAmount.textContent = fmtMoney(pendingAmount);
-    if (statConfirmedCount) statConfirmedCount.textContent = confirmed.length;
-    if (statConfirmedAmount) statConfirmedAmount.textContent = fmtMoney(confirmedAmount);
-
-    if (notice) {
-        if (pending.length > 0) {
-            notice.hidden = false;
-            notice.innerHTML = `⚠️ <strong>${pending.length}</strong> paiement(s) en attente de validation (${fmtMoney(pendingAmount)})`;
-        } else {
-            notice.hidden = true;
-        }
+    if (pending.length > 0) {
+        notice.hidden = false;
+        notice.innerHTML = `⚠️ <strong>${pending.length}</strong> paiement(s) en attente de validation (${fmtMoney(pendingAmount)})`;
+    } else {
+        notice.hidden = true;
     }
 }
 
-function renderPayments() {
+function renderPayments(search = '') {
     const tbody = document.getElementById('payments-tbody');
     if (!tbody) return;
 
     let filtered = allPayments;
     if (currentPaymentFilter !== 'all') {
-        filtered = allPayments.filter(p => p.status === currentPaymentFilter);
+        filtered = filtered.filter(p => p.status === currentPaymentFilter);
+    }
+
+    if (search) {
+        filtered = filtered.filter(p => {
+            const nom = p.entreprises?.nom || '';
+            const gerant = p.entreprises?.gerant_nom || '';
+            const tel = p.entreprises?.telephone || '';
+            return nom.toLowerCase().includes(search) || 
+                   gerant.toLowerCase().includes(search) || 
+                   tel.toLowerCase().includes(search);
+        });
     }
 
     if (filtered.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="9" class="payments-empty">
-                    Aucun paiement ${currentPaymentFilter !== 'all' ? currentPaymentFilter : ''}
-                </td>
-            </tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="payments-empty">Aucun paiement trouvé</td></tr>`;
         return;
     }
 
@@ -546,15 +890,22 @@ function renderPayments() {
             <td>${esc(p.entreprises?.telephone || '—')}</td>
             <td><strong>${fmtMoney(p.amount)}</strong></td>
             <td>${esc(p.payment_type || '—')}</td>
-            <td>${esc(p.payment_method || '—')}</td>
             <td>${fmtDate(p.created_at)}</td>
             <td>${statusBadge[p.status] || p.status}</td>
             <td>
-                ${p.status === 'pending' ? `
-                    <button class="btn btn-sm btn-secondary" onclick="openPaymentDetail('${p.id}')">
-                        Vérifier
-                    </button>
-                ` : ''}
+                <div class="admin-actions">
+                    ${p.status === 'pending' ? `
+                        <button class="admin-btn success" onclick="confirmPayment('${p.id}')">✅ Valider</button>
+                        <button class="admin-btn info" onclick="openPaymentDetail('${p.id}')">👁️ Vérifier</button>
+                        <button class="admin-btn danger" onclick="rejectPayment('${p.id}')">❌ Rejeter</button>
+                    ` : ''}
+                    ${p.status === 'confirmed' ? `
+                        <button class="admin-btn danger" onclick="annulerPaiement('${p.id}')">↩️ Annuler</button>
+                    ` : ''}
+                    ${p.status === 'rejected' ? `
+                        <button class="admin-btn success" onclick="confirmPayment('${p.id}')">✅ Valider</button>
+                    ` : ''}
+                </div>
             </td>
         </tr>
     `).join('');
@@ -567,8 +918,6 @@ function openPaymentDetail(paymentId) {
     currentPaymentDetail = payment;
 
     const content = document.getElementById('payment-detail-content');
-    if (!content) return;
-
     content.innerHTML = `
         <div class="detail-row">
             <span class="k">Entreprise</span>
@@ -602,105 +951,4 @@ function openPaymentDetail(paymentId) {
             <div class="detail-row">
                 <span class="k">Preuve</span>
                 <span class="v">
-                    <a href="${getStorageUrl(payment.proof_path)}" target="_blank" class="btn btn-secondary btn-sm">
-                        Voir la preuve
-                    </a>
-                </span>
-            </div>
-        ` : ''}
-    `;
-
-    // Actions
-    const actions = document.getElementById('payment-detail-actions');
-    if (actions) {
-        actions.innerHTML = `
-            <button class="btn btn-secondary" onclick="closePaymentDetail()">Fermer</button>
-            <button class="btn btn-danger" onclick="rejectPayment('${payment.id}')">Rejeter</button>
-            <button class="btn" onclick="confirmPayment('${payment.id}')">Confirmer</button>
-        `;
-    }
-
-    const backdrop = document.getElementById('payment-detail-backdrop');
-    if (backdrop) backdrop.classList.add('open');
-}
-
-function closePaymentDetail() {
-    const backdrop = document.getElementById('payment-detail-backdrop');
-    if (backdrop) backdrop.classList.remove('open');
-}
-
-async function confirmPayment(paymentId) {
-    const ok = await confirmDialog(
-        'Confirmer ce paiement ? L\'entreprise sera activée immédiatement.',
-        { title: 'Confirmer le paiement', confirmLabel: 'Confirmer', danger: false }
-    );
-    if (!ok) return;
-
-    try {
-        const { error } = await supabaseClient
-            .rpc('confirm_subscription_payment', {
-                p_payment_id: paymentId,
-                p_decision: 'confirmed',
-            });
-
-        if (error) throw error;
-
-        showToast('Paiement confirmé — entreprise activée.', 'success');
-        closePaymentDetail();
-        await loadPayments();
-
-    } catch (error) {
-        showToast(friendlyError(error), 'error');
-    }
-}
-
-function rejectPayment(paymentId) {
-    const backdrop = document.getElementById('reject-backdrop');
-    if (backdrop) backdrop.classList.add('open');
-    
-    const reasonSelect = document.getElementById('reject-reason-select');
-    const otherText = document.getElementById('reject-other-text');
-    const otherWrap = document.getElementById('reject-other-wrap');
-    
-    if (reasonSelect) reasonSelect.value = 'Paiement introuvable';
-    if (otherText) otherText.value = '';
-    if (otherWrap) otherWrap.hidden = true;
-}
-
-async function submitRejection() {
-    const reason = document.getElementById('reject-reason-select').value;
-    const otherReason = document.getElementById('reject-other-text').value.trim();
-    const finalReason = reason === 'Autre' ? otherReason : reason;
-
-    if (!finalReason) {
-        showToast('Un motif est obligatoire pour rejeter.', 'error');
-        return;
-    }
-
-    try {
-        const { error } = await supabaseClient
-            .rpc('confirm_subscription_payment', {
-                p_payment_id: currentPaymentDetail.id,
-                p_decision: 'rejected',
-                p_rejection_reason: finalReason,
-            });
-
-        if (error) throw error;
-
-        showToast('Paiement rejeté.', 'info');
-        closeRejectModal();
-        closePaymentDetail();
-        await loadPayments();
-
-    } catch (error) {
-        showToast(friendlyError(error), 'error');
-    }
-}
-
-function closeRejectModal() {
-    const backdrop = document.getElementById('reject-backdrop');
-    if (backdrop) backdrop.classList.remove('open');
-}
-</script>
-</body>
-</html>
+                   
