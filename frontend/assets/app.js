@@ -30,35 +30,57 @@ function hasStoredSupabaseSession() {
 
 // Redirige vers login.html si aucune session active. A appeler en haut de chaque page protégée.
 async function requireAuth() {
-  let session = null;
-  try {
-    const { data } = await withTimeout(supabaseClient.auth.getSession(), 4000);
-    session = data.session;
-  } catch {
-    // getSession() a levé une erreur (typiquement hors ligne) : on retombe ci-dessous
-    // sur la présence d'une session déjà connue, plutôt que de bloquer l'accès.
-  }
+    let session = null;
+    try {
+        const { data } = await withTimeout(supabaseClient.auth.getSession(), 4000);
+        session = data.session;
+    } catch {
+        // erreur réseau
+    }
 
-  if (!session && !navigator.onLine && hasStoredSupabaseSession()) {
-    // Hors ligne, mais ce poste s'est déjà connecté avec succès auparavant : on laisse
-    // passer. Les lectures retombent sur le cache local ; toute écriture nécessitant
-    // vraiment le réseau échouera proprement (message clair), sans jamais être perdue
-    // silencieusement grâce aux files d'attente hors ligne.
-    session = { offline: true, user: null };
-  }
+    // Session absente : rediriger vers login
+    if (!session) {
+        window.location.href = "login.html";
+        return null;
+    }
 
-  if (!session) {
-    window.location.href = "login.html";
-    return null;
-  }
+    // Récupérer le profil et l'entreprise de l'utilisateur
+    const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('*, entreprises(subscriptions(status))')
+        .eq('id', session.user.id)
+        .single();
 
-  const email = session.user?.email;
-  const el = document.getElementById("current-user-email");
-  // L'email est un identifiant technique généré à partir du code d'accès (ex: "1234@acces.local").
-  // On affiche uniquement la partie code, pour ne pas exposer ce détail à l'utilisateur.
-  if (el) el.textContent = email ? "Code : " + email.split("@")[0] : "Hors ligne";
-  initConnectivity();
-  return session;
+    // Si super-admin, laisser passer sans restriction
+    if (profile?.role === 'super_admin') {
+        return session;
+    }
+
+    // Autoriser l'accès à la page d'abonnement même si l'abonnement est inactif
+    const currentPage = window.location.pathname.split('/').pop();
+    if (currentPage === 'abonnement.html') {
+        return session; // on laisse la page s'afficher
+    }
+
+    // Si l'utilisateur n'a pas encore d'entreprise (ex: en cours d'onboarding), on le laisse passer
+    if (!profile || !profile.entreprises) {
+        return session;
+    }
+
+    // Vérifier que l'abonnement de l'entreprise est actif
+    const subStatus = profile.entreprises.subscriptions?.status;
+    if (subStatus !== 'active') {
+        // Rediriger vers la page d'abonnement
+        window.location.href = "abonnement.html";
+        return null;
+    }
+
+    // Si tout est bon, continuer
+    const email = session.user?.email;
+    const el = document.getElementById("current-user-email");
+    if (el) el.textContent = email ? "Code : " + email.split("@")[0] : "Hors ligne";
+    initConnectivity();
+    return session;
 }
 
 async function logout() {
