@@ -1,130 +1,295 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Recouvra — Recouvrement</title>
-  <link rel="stylesheet" href="assets/style.css">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#4F46E5">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Recouvra">
-  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
-  <script src="assets/config.js"></script>
-  <script src="assets/app.js" defer></script>
-  <script src="assets/recouvra.js" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relancer — Ma Boutique</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4F46E5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ma Boutique">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-  <div class="app">
-    <!-- Navigation latérale -->
-    <nav class="sidebar">
-      <div class="brand">
-        <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
-        <span data-company-name>Entreprise</span>
-      </div>
-      <a class="nav-link" href="index.html">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="7" height="9" rx="1.5"/>
-          <rect x="14" y="3" width="7" height="5" rx="1.5"/>
-          <rect x="14" y="12" width="7" height="9" rx="1.5"/>
-          <rect x="3" y="16" width="7" height="5" rx="1.5"/>
-        </svg>
-        Tableau de bord
-      </a>
-      <a class="nav-link" href="catalogue.html">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 8l-9-5-9 5 9 5 9-5z"/>
-          <path d="M3 8v8l9 5 9-5V8"/>
-          <path d="M12 13v8"/>
-        </svg>
-        Catalogue
-      </a>
-      <a class="nav-link" href="stock.html">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M8 3v18"/>
-          <path d="M4 7l4-4 4 4"/>
-          <path d="M16 21V3"/>
-          <path d="M20 17l-4 4-4-4"/>
-        </svg>
-        Mouvements stock
-      </a>
-      <a class="nav-link" href="rupture-stock.html">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 9v4"/>
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-          <path d="M12 17h.01"/>
-        </svg>
-        Ruptures de stock
-      </a>
-      <a class="nav-link" href="factures.html">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 2h12v19l-3-2-3 2-3-2-3 2V2z"/>
-          <path d="M9 8h6M9 12h6"/>
-        </svg>
-        Factures
-      </a>
-      <a class="nav-link" href="credits.html">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="5" width="20" height="14" rx="2"/>
-          <path d="M2 10h20"/>
-        </svg>
-        Emprunts
-      </a>
-      <a class="nav-link" href="clients.html">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-          <circle cx="9" cy="7" r="4"/>
-          <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-        </svg>
-        Clients
-      </a>
-      <div class="sidebar-footer">
-        <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
-        <button class="btn-logout" onclick="logout()">Déconnexion</button>
-      </div>
-    </nav>
+<div class="app">
+  
+  <!-- ==================== NAVIGATION SIMPLIFIÉE ==================== -->
+  <nav class="sidebar">
+    <div class="brand">
+      <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
+      <span data-company-name>Ma Boutique</span>
+    </div>
 
-    <!-- Contenu principal -->
-    <main class="main">
-      <!-- Bannière Recouvra -->
-      <div class="recouvra-banner">
-        <span class="recouvra-banner-badge">⚡ Espace Recouvrement Actif</span>
-        <a href="index.html" class="btn-back">
-          <span class="arrow">←</span> Retour au tableau de bord
-        </a>
-      </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Quotidien</div>
+      <a href="index.html" class="nav-link">
+        <span class="nav-emoji">🏠</span> Accueil
+      </a>
+      <a href="factures.html" class="nav-link">
+        <span class="nav-emoji">🧾</span> Vendre
+      </a>
+      <a href="clients.html" class="nav-link">
+        <span class="nav-emoji">👥</span> Mes Clients
+      </a>
+    </div>
 
-      <!-- En-tête -->
-      <header class="topbar">
-        <div>
-          <span class="eyebrow">Premium</span>
-          <h1>Recouvra</h1>
-        </div>
-        <nav class="subnav">
-          <a href="recouvra.html" class="active">Recouvra</a>
-          <a href="paiements.html">Paiements</a>
-          <a href="promesses.html">Promesses de règlement</a>
-          <a href="relances.html">Relances</a>
-        </nav>
-      </header>
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Stock</div>
+      <a href="catalogue.html" class="nav-link">
+        <span class="nav-emoji">📦</span> Mes Articles
+      </a>
+      <a href="stock.html" class="nav-link">
+        <span class="nav-emoji">🔄</span> Entrées / Sorties
+      </a>
+    </div>
 
-      <!-- Barre d'outils -->
-      <div class="toolbar">
-        <p>Créances à suivre</p>
-        <button class="button recouvra-cta" onclick="loadDebts()">Actualiser</button>
-      </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Argent</div>
+      <a href="credits.html" class="nav-link">
+        <span class="nav-emoji">💸</span> On me doit
+      </a>
+      <a href="recouvra.html" class="nav-link premium active">
+        <span class="nav-emoji">📣</span> Relancer
+        <span class="badge-premium">PRO</span>
+      </a>
+    </div>
 
-      <!-- Liste des créances -->
-      <div class="card">
-        <div id="debts-content">
-          <div class="empty-state">Chargement des créances...</div>
-        </div>
+    <div class="sidebar-footer">
+      <a href="parametres.html" class="nav-link">
+        <span class="nav-emoji">⚙️</span> Réglages
+      </a>
+      <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </nav>
+
+  <!-- ==================== CONTENU PRINCIPAL ==================== -->
+  <main class="main">
+    
+    <!-- En-tête -->
+    <div class="page-header-simple">
+      <h1>📣 Relancer mes clients</h1>
+      <p>Envoyez un rappel WhatsApp aux clients qui ont des impayés.</p>
+    </div>
+
+    <!-- Statistiques rapides -->
+    <div class="relance-stats">
+      <div class="relance-stat-card danger">
+        <span class="relance-stat-value" id="stat-total">—</span>
+        <span class="relance-stat-label">Total dû</span>
       </div>
-    </main>
-  </div>
+      <div class="relance-stat-card danger">
+        <span class="relance-stat-value" id="stat-retard">—</span>
+        <span class="relance-stat-label">En retard</span>
+      </div>
+      <div class="relance-stat-card">
+        <span class="relance-stat-value" id="stat-clients">—</span>
+        <span class="relance-stat-label">Clients à relancer</span>
+      </div>
+    </div>
+
+    <!-- Liste des clients à relancer -->
+    <div class="relance-list" id="relance-list">
+      <div class="empty-state">Chargement...</div>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script>
+// ============================================================================
+// RELANCER - VERSION SIMPLIFIÉE
+// ============================================================================
+
+let allDebts = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const session = await requireAuth();
+    if (!session) return;
+
+    // Vérifier l'accès Recouvra
+    const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('has_recouvra')
+        .eq('id', session.user.id)
+        .single();
+
+    if (!profile?.has_recouvra) {
+        window.location.href = 'abonnement.html';
+        return;
+    }
+
+    await loadDebts();
+});
+
+async function loadDebts() {
+    const el = document.getElementById('relance-list');
+    el.innerHTML = '<div class="empty-state">Chargement...</div>';
+
+    try {
+        // Vérifier les promesses en retard
+        await supabaseClient.rpc('verifier_promesses');
+
+        const { data, error } = await supabaseClient
+            .from('factures')
+            .select(`
+                *,
+                clients(nom, telephone)
+            `)
+            .eq('statut', 'VALIDEE')
+            .gt('montant_restant', 0)
+            .order('date_echeance', { ascending: true });
+
+        if (error) throw error;
+
+        allDebts = data || [];
+
+        // Mettre à jour les stats
+        const totalDu = allDebts.reduce((s, f) => s + Number(f.montant_restant), 0);
+        const enRetard = allDebts.filter(f => f.date_echeance && new Date(f.date_echeance) < new Date());
+        const clientsAvecDette = new Set(allDebts.map(f => f.client_id)).size;
+
+        document.getElementById('stat-total').textContent = fmtMoney(totalDu);
+        document.getElementById('stat-retard').textContent = enRetard.length;
+        document.getElementById('stat-clients').textContent = clientsAvecDette;
+
+        renderDebts();
+    } catch (error) {
+        console.error('Erreur chargement dettes:', error);
+        el.innerHTML = `<div class="error-msg">${friendlyError(error)}</div>`;
+    }
+}
+
+function renderDebts() {
+    const el = document.getElementById('relance-list');
+
+    if (allDebts.length === 0) {
+        el.innerHTML = `<div class="empty-state">✅ Aucun impayé — tous vos clients sont à jour !</div>`;
+        return;
+    }
+
+    // Regrouper par client
+    const groups = new Map();
+    allDebts.forEach(f => {
+        const key = f.client_id;
+        if (!groups.has(key)) {
+            groups.set(key, {
+                nom: f.clients?.nom || 'Client',
+                telephone: f.clients?.telephone || '',
+                total: 0,
+                factures: []
+            });
+        }
+        const g = groups.get(key);
+        g.total += Number(f.montant_restant);
+        g.factures.push(f);
+    });
+
+    el.innerHTML = [...groups.values()].map(g => {
+        const hasPhone = g.telephone && g.telephone.replace(/\D/g, '').length > 0;
+        
+        return `
+            <div class="relance-client-card">
+                <div class="relance-client-header">
+                    <div class="relance-client-info">
+                        <div class="relance-client-name">${esc(g.nom)}</div>
+                        <div class="relance-client-phone">${g.telephone ? '📞 ' + esc(g.telephone) : '⚠️ Pas de téléphone'}</div>
+                    </div>
+                    <div class="relance-client-total">
+                        <span class="relance-total-label">Doit</span>
+                        <span class="relance-total-amount">${fmtMoney(g.total)}</span>
+                    </div>
+                </div>
+                
+                <div class="relance-invoices">
+                    ${g.factures.map(f => {
+                        const echDate = f.date_echeance ? new Date(f.date_echeance) : null;
+                        const today = new Date();
+                        const isLate = echDate && echDate < today;
+                        
+                        return `
+                            <div class="relance-invoice-row">
+                                <div class="relance-invoice-info">
+                                    <span class="relance-invoice-num">${esc(f.numero_facture || '—')}</span>
+                                    <span class="relance-invoice-date">Échéance: ${fmtDate(f.date_echeance)}</span>
+                                </div>
+                                <div class="relance-invoice-amount">
+                                    <span class="relance-invoice-montant">${fmtMoney(f.montant_restant)}</span>
+                                    ${isLate ? '<span class="badge badge-danger">En retard</span>' : ''}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                
+                <div class="relance-actions">
+                    ${hasPhone ? `
+                        <button class="btn-whatsapp" onclick="relancerWhatsApp(${g.factures[0].id})">
+                            💬 Relancer sur WhatsApp
+                        </button>
+                    ` : `
+                        <button class="btn btn-secondary" onclick="showToast('Ce client n\'a pas de numéro de téléphone enregistré.', 'error')">
+                            ⚠️ Pas de téléphone
+                        </button>
+                    `}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+async function relancerWhatsApp(factureId) {
+    try {
+        const facture = allDebts.find(f => f.id === factureId);
+        if (!facture?.clients?.telephone) {
+            showToast('Ce client n\'a pas de numéro de téléphone.', 'error');
+            return;
+        }
+
+        // Enregistrer la relance
+        await supabaseClient
+            .from('relances')
+            .insert({
+                facture_id: facture.id,
+                client_id: facture.client_id,
+                canal: 'WHATSAPP',
+                message: generateMessage(facture),
+            });
+
+        // Construire le message
+        const message = generateMessage(facture);
+        const phone = facture.clients.telephone.replace(/\D/g, '');
+        const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
+        window.open(url, '_blank');
+        showToast('Relance WhatsApp préparée.', 'success');
+
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
+}
+
+function generateMessage(facture) {
+    const settings = JSON.parse(localStorage.getItem('sylla_company_settings') || '{}');
+    const companyName = settings.nom_commercial || 'Ma Boutique';
+    const montant = fmtMoney(facture.montant_restant);
+    const numero = facture.numero_facture || `#${facture.id}`;
+
+    return `Bonjour ${facture.clients?.nom || ''},
+
+Nous vous rappelons que la facture ${numero} d'un montant de ${montant} est arrivée à échéance.
+
+Merci de bien vouloir procéder au règlement dès que possible.
+
+Cordialement,
+${companyName}`;
+}
+</script>
 </body>
 </html>
