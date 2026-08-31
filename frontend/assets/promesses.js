@@ -1,101 +1,251 @@
-let unpaidInvoices = [];
+// ============================================================================
+// PROMESSES - Gestion des promesses de règlement
+// ============================================================================
 
-const PROMISE_STATUT_LABELS = { EN_ATTENTE: "En attente", RESPECTEE: "Respectée", NON_RESPECTEE: "En retard" };
-const PROMISE_STATUT_BADGES = { EN_ATTENTE: "badge-warn", RESPECTEE: "badge-success", NON_RESPECTEE: "badge-danger" };
+document.addEventListener('DOMContentLoaded', async () => {
+    const session = await requireAuth();
+    if (!session) return;
 
-async function loadUnpaidInvoices() {
-  const { data, error } = await supabaseClient
-    .from("factures")
-    .select("id,numero_facture,montant_restant,client_id,clients(nom)")
-    .neq("statut", "ANNULEE")
-    .gt("montant_restant", 0)
-    .order("date_echeance");
-  unpaidInvoices = error ? [] : (data || []);
-  invoice.innerHTML = `<option value="">Sélectionner une facture...</option>` +
-    unpaidInvoices.map(i => `<option value="${i.id}">${esc(i.numero_facture || `Facture #${i.id}`)} - ${esc(i.clients?.nom || "Client")} (${money(i.montant_restant)})</option>`).join("");
+    const hasRecouvra = await requireRecouvra();
+    if (!hasRecouvra) return;
+
+    await loadInvoices();
+    await loadPromises();
+
+    const form = document.getElementById('promise-form');
+    if (form) form.addEventListener('submit', handlePromiseSubmit);
+
+    const invoiceSelect = document.getElementById('invoice');
+    if (invoiceSelect) invoiceSelect.addEventListener('change', updateClientDisplay);
+});
+
+async function requireAuth() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+        window.location.href = 'login.html';
+        return null;
+    }
+    return session;
 }
 
-function fillClientFromInvoice() {
-  const selected = unpaidInvoices.find(i => i.id === Number(invoice.value));
-  if (!selected) {
-    client.value = "";
-    document.getElementById("client-display").textContent = "—";
-    amount.value = "";
-    return;
-  }
-  client.value = selected.client_id;
-  document.getElementById("client-display").textContent = selected.clients?.nom || "Client";
-  amount.value = selected.montant_restant;
+async function requireRecouvra() {
+    const session = await requireAuth();
+    if (!session) return false;
+
+    const { data: profile, error } = await supabaseClient
+        .from('profiles')
+        .select('has_recouvra')
+        .eq('id', session.user.id)
+        .single();
+
+    if (error || !profile?.has_recouvra) {
+        window.location.href = 'abonnement.html';
+        return false;
+    }
+    return true;
 }
 
-async function relancerPromesse(factureId, phone, factureLabel, montant) {
-  const profile = await currentProfile();
-  const msg = `Bonjour, pour rappel vous vous étiez engagé(e) à régler ${money(montant)} concernant la facture ${factureLabel}. Merci de nous confirmer votre règlement.`;
-  const { data: facture } = await supabaseClient.from("factures").select("client_id").eq("id", factureId).single();
-  await supabaseClient.from("relances").insert({ entreprise_id: profile.entreprise_id, facture_id: factureId, client_id: facture?.client_id, canal: "WHATSAPP", message: msg, created_by: profile.id });
-  const normalized = (phone || "").replace(/[^0-9]/g, "");
-  window.open(`https://wa.me/${normalized}?text=${encodeURIComponent(msg)}`, "_blank");
+async function loadInvoices() {
+    const select = document.getElementById('invoice');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">Chargement...</option>';
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('factures')
+            .select('id, numero_facture, montant_restant, client_id, clients(nom)')
+            .eq('statut', 'VALIDEE')
+            .gt('montant_restant', 0)
+            .order('numero_facture');
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            select.innerHTML = '<option value="">Aucune facture impayée</option>';
+            return;
+        }
+
+        select.innerHTML = `
+            <option value="">Sélectionner une facture...</option>
+            ${data.map(f => `
+                <option value="${f.id}" 
+                        data-client="${f.client_id}" 
+                        data-client-name="${esc(f.clients?.nom || '')}" 
+                        data-montant="${f.montant_restant}">
+                    ${f.numero_facture} — ${f.clients?.nom || 'Client'} — ${fmtMoney(f.montant_restant)}
+                </option>
+            `).join('')}
+        `;
+
+    } catch (error) {
+        console.error('Erreur chargement factures:', error);
+        select.innerHTML = '<option value="">Erreur de chargement</option>';
+    }
+}
+
+function updateClientDisplay() {
+    const select = document.getElementById('invoice');
+    const option = select.selectedOptions[0];
+    const clientDisplay = document.getElementById('client-display');
+    const clientHidden = document.getElementById('client');
+    const amount = document.getElementById('amount');
+
+    if (clientDisplay) clientDisplay.textContent = '—';
+    if (clientHidden) clientHidden.value = '';
+    if (amount) amount.value = '';
+
+    if (option?.dataset.clientName) {
+        if (clientDisplay) clientDisplay.textContent = option.dataset.clientName;
+        if (clientHidden) clientHidden.value = option.dataset.client;
+        if (amount) {
+            amount.max = option.dataset.montant;
+            amount.value = option.dataset.montant;
+        }
+    }
+}
+
+async function handlePromiseSubmit(e) {
+    e.preventDefault();
+
+    const factureId = document.getElementById('invoice').value;
+    const clientId = document.getElementById('client').value;
+    const montant = Number(document.getElementById('amount').value);
+    const datePromise = document.getElementById('due').value;
+
+    if (!factureId || !clientId || !montant || !datePromise) {
+        showToast('Veuillez remplir tous les champs obligatoires.', 'error');
+        return;
+    }
+
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = 'Enregistrement...';
+
+    try {
+        const { error } = await supabaseClient
+            .from('promesses_paiement')
+            .insert({
+                facture_id: Number(factureId),
+                client_id: Number(clientId),
+                montant_promis: montant,
+                date_promise: new Date(datePromise).toISOString(),
+            });
+
+        if (error) throw error;
+
+        showToast('Promesse de règlement enregistrée.', 'success');
+        e.target.reset();
+        updateClientDisplay();
+
+        await loadPromises();
+
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Enregistrer l\'engagement';
+    }
 }
 
 async function loadPromises() {
-  await supabaseClient.rpc("verifier_promesses");
-  const { data, error } = await supabaseClient
-    .from("promesses_paiement")
-    .select("*,factures(numero_facture),clients(nom,telephone)")
-    .order("date_promise");
+    const el = document.getElementById('promises-content');
+    if (!el) return;
 
-  const el = document.getElementById("promises-content");
-  if (error) { el.innerHTML = `<div class="error-msg">${esc(error.message)}</div>`; return; }
-  if (!data || data.length === 0) { el.innerHTML = `<div class="empty-state">Aucune promesse de règlement en cours.</div>`; return; }
+    el.innerHTML = '<div class="empty-state">Chargement...</div>';
 
-  el.innerHTML = `
-    <div class="table-wrapper">
-    <table>
-      <thead><tr><th>Client</th><th>Facture liée</th><th class="num">Montant promis</th><th>Date d'échéance</th><th>Statut</th><th></th></tr></thead>
-      <tbody>
-        ${data.map(p => `
-          <tr>
-            <td>${esc(p.clients?.nom || "Client")}</td>
-            <td class="ref">${esc(p.factures?.numero_facture || `Facture #${p.facture_id}`)}</td>
-            <td class="num">${money(p.montant_promis)}</td>
-            <td>${date(p.date_promise)}</td>
-            <td><span class="badge ${PROMISE_STATUT_BADGES[p.statut] || "badge-muted"}">${esc(PROMISE_STATUT_LABELS[p.statut] || p.statut)}</span></td>
-            <td class="actions-cell">
-              <button type="button" class="button whatsapp btn-sm" onclick="relancerPromesse(${p.facture_id}, '${esc(p.clients?.telephone || "")}', '${esc(p.factures?.numero_facture || p.facture_id)}', ${Number(p.montant_promis)})">💬 Relancer WhatsApp</button>
-            </td>
-          </tr>`).join("")}
-      </tbody>
-    </table>
-    </div>`;
+    try {
+        await supabaseClient.rpc('verifier_promesses');
+
+        const { data, error } = await supabaseClient
+            .from('promesses_paiement')
+            .select('*, clients(nom), factures(numero_facture)')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            el.innerHTML = '<div class="empty-state">Aucune promesse enregistrée.</div>';
+            return;
+        }
+
+        const statusBadge = {
+            'EN_ATTENTE': '<span class="badge badge-warn">En attente</span>',
+            'RESPECTEE': '<span class="badge badge-success">Respectée</span>',
+            'NON_RESPECTEE': '<span class="badge badge-danger">Non respectée</span>',
+            'ANNULEE': '<span class="badge badge-muted">Annulée</span>',
+        };
+
+        el.innerHTML = `
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Facture</th>
+                            <th>Montant promis</th>
+                            <th>Date promise</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(p => `
+                            <tr>
+                                <td>${esc(p.clients?.nom || '—')}</td>
+                                <td class="ref">${esc(p.factures?.numero_facture || '—')}</td>
+                                <td class="num"><strong>${fmtMoney(p.montant_promis)}</strong></td>
+                                <td class="hint">${fmtDate(p.date_promise)}</td>
+                                <td>${statusBadge[p.statut] || p.statut}</td>
+                                <td class="actions-cell">
+                                    ${p.statut === 'EN_ATTENTE' ? `
+                                        <button class="btn btn-sm btn-secondary" onclick="markPromiseRespected('${p.id}')">
+                                            ✓ Respectée
+                                        </button>
+                                        <button class="btn btn-sm btn-secondary" onclick="markPromiseNotRespected('${p.id}')">
+                                            ✗ Non respectée
+                                        </button>
+                                    ` : ''}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+    } catch (error) {
+        console.error('Erreur chargement promesses:', error);
+        el.innerHTML = `<div class="error-msg">${friendlyError(error)}</div>`;
+    }
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const profile = await requireRecouvra();
-  if (!profile) return;
+async function markPromiseRespected(id) {
+    try {
+        const { error } = await supabaseClient
+            .from('promesses_paiement')
+            .update({ statut: 'RESPECTEE', updated_at: new Date().toISOString() })
+            .eq('id', id);
 
-  await loadUnpaidInvoices();
-  await loadPromises();
-  invoice.addEventListener("change", fillClientFromInvoice);
+        if (error) throw error;
+        showToast('Promesse marquée comme respectée.', 'success');
+        await loadPromises();
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
+}
 
-  document.querySelector("#promise-form").onsubmit = async e => {
-    e.preventDefault();
-    const msgEl = document.getElementById("message");
-    clearMsg(msgEl);
-    if (!invoice.value || !client.value) { showMsg(msgEl, "Sélectionnez une facture impayée."); return; }
+async function markPromiseNotRespected(id) {
+    try {
+        const { error } = await supabaseClient
+            .from('promesses_paiement')
+            .update({ statut: 'NON_RESPECTEE', updated_at: new Date().toISOString() })
+            .eq('id', id);
 
-    const { error } = await supabaseClient.from("promesses_paiement").insert({
-      entreprise_id: profile.entreprise_id,
-      facture_id: Number(invoice.value),
-      client_id: Number(client.value),
-      montant_promis: Number(amount.value),
-      date_promise: new Date(due.value).toISOString(),
-      created_by: profile.id,
-    });
-
-    if (error) { showMsg(msgEl, friendlyError(error)); return; }
-    showToast("Promesse de règlement enregistrée.", "success");
-    e.target.reset();
-    document.getElementById("client-display").textContent = "—";
-    await loadPromises();
-  };
-});
+        if (error) throw error;
+        showToast('Promesse marquée comme non respectée.', 'info');
+        await loadPromises();
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
+}

@@ -1,59 +1,197 @@
+// ============================================================================
+// RECOUVRA - Module de recouvrement des créances
+// ============================================================================
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await requireAuth();
+    await requireRecouvra();
+    await loadDebts();
+});
+
+async function requireRecouvra() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+        window.location.href = 'login.html';
+        return false;
+    }
+
+    const { data: profile, error } = await supabaseClient
+        .from('profiles')
+        .select('has_recouvra')
+        .eq('id', session.user.id)
+        .single();
+
+    if (error || !profile?.has_recouvra) {
+        window.location.href = 'abonnement.html';
+        return false;
+    }
+    return true;
+}
+
 async function loadDebts() {
-  const allowed = await requireRecouvra(); if (!allowed) return;
-  const params = new URLSearchParams(location.search);
-  const factureFilter = params.get("facture") ? Number(params.get("facture")) : null;
-  const clientFilter = params.get("client") ? Number(params.get("client")) : null;
-
-  let query = supabaseClient.from("factures").select("id,numero_facture,montant_total,montant_paye,montant_restant,statut_paiement,date_echeance,created_at,client_id,clients(nom,telephone)").neq("statut", "ANNULEE").gt("montant_restant", 0).order("date_echeance");
-  if (factureFilter) query = query.eq("id", factureFilter);
-  else if (clientFilter) query = query.eq("client_id", clientFilter);
-
-  const { data, error } = await query;
-  const el = document.getElementById("debts-content");
-  if (error) { el.innerHTML = `<div class="error-msg">${esc(error.message)}</div>`; return; }
-
-  const filterBanner = (factureFilter || clientFilter)
-    ? `<p class="hint">Filtré ${factureFilter ? `sur la facture #${factureFilter}` : "sur ce client"} — <a href="recouvra.html">voir toutes les créances</a></p>`
-    : "";
-
-  if (!data || data.length === 0) {
-    el.innerHTML = filterBanner + `<div class="empty-state">Aucune créance ouverte.</div>`;
-    return;
-  }
-
-  const today = new Date();
-  el.innerHTML = filterBanner + `
-    <div style="overflow-x:auto;">
-    <table>
-      <thead><tr><th>N° Facture / Date</th><th>Client</th><th class="num col-optional-mobile">Montant total</th><th class="num">Reste à payer</th><th>Statut</th><th></th></tr></thead>
-      <tbody>
-        ${data.map(invoice => {
-          const late = Boolean(invoice.date_echeance && new Date(invoice.date_echeance) < today);
-          return `
-          <tr>
-            <td><span class="ref">${esc(invoice.numero_facture || `Facture #${invoice.id}`)}</span><br><span class="hint">${date(invoice.created_at)}</span></td>
-            <td>${esc(invoice.clients?.nom || "Client")}</td>
-            <td class="num col-optional-mobile">${money(invoice.montant_total)}</td>
-            <td class="num"><strong>${money(invoice.montant_restant)}</strong></td>
-            <td><span class="badge ${late ? "badge-danger" : "badge-warn"}">${late ? "En retard" : "Partielle"}</span></td>
-            <td class="actions-cell">
-              <button type="button" class="button whatsapp btn-sm" onclick="relanceWhatsApp(${invoice.id}, '${esc(invoice.clients?.telephone || "")}', '${esc(invoice.clients?.nom || "Client")}', '${esc(invoice.numero_facture || invoice.id)}', ${Number(invoice.montant_restant)})">💬 Relancer WhatsApp</button>
-              <a class="button secondary btn-sm" href="paiements.html?facture=${invoice.id}">Paiement</a>
-            </td>
-          </tr>`;
-        }).join("")}
-      </tbody>
-    </table>
-    </div>`;
+    const el = document.getElementById('debts-content');
+    el.innerHTML = '<div class="empty-state">Chargement des créances...</div>';
+    
+    try {
+        // Vérifier les promesses en retard
+        await supabaseClient.rpc('verifier_promesses');
+        
+        // Charger les factures impayées
+        const { data, error } = await supabaseClient
+            .from('factures')
+            .select(`
+                *,
+                clients(nom, telephone, email),
+                paiements(montant, methode, date_paiement, reference),
+                promesses_paiement(montant_promis, date_promise, statut)
+            `)
+            .eq('statut', 'VALIDEE')
+            .gt('montant_restant', 0)
+            .order('date_echeance', { ascending: true });
+            
+        if (error) throw error;
+        
+        if (!data || data.length === 0) {
+            el.innerHTML = `
+                <div class="empty-state">
+                    ✅ Aucune créance en cours — tous vos clients sont à jour !
+                </div>`;
+            return;
+        }
+        
+        // Calculer les totaux
+        const totalDu = data.reduce((s, f) => s + Number(f.montant_restant), 0);
+        const enRetard = data.filter(f => f.date_echeance && new Date(f.date_echeance) < new Date());
+        const totalRetard = enRetard.reduce((s, f) => s + Number(f.montant_restant), 0);
+        
+        el.innerHTML = `
+            <div class="grid-stats" style="margin-bottom:20px;">
+                <div class="stat-card danger">
+                    <div class="stat-body">
+                        <div class="label">Total dû</div>
+                        <div class="value">${fmtMoney(totalDu)}</div>
+                    </div>
+                </div>
+                <div class="stat-card warn">
+                    <div class="stat-body">
+                        <div class="label">En retard</div>
+                        <div class="value">${enRetard.length} facture(s)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>N° Facture</th>
+                            <th>Montant</th>
+                            <th>Payé</th>
+                            <th>Reste</th>
+                            <th>Échéance</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(f => {
+                            const today = new Date();
+                            const echDate = f.date_echeance ? new Date(f.date_echeance) : null;
+                            let statut = 'À venir';
+                            let statutClass = 'badge-info';
+                            
+                            if (echDate && echDate < today) {
+                                statut = 'En retard';
+                                statutClass = 'badge-danger';
+                            } else if (f.montant_paye > 0) {
+                                statut = 'Partiel';
+                                statutClass = 'badge-warn';
+                            }
+                            
+                            return `
+                                <tr>
+                                    <td>
+                                        <strong>${esc(f.clients?.nom || '—')}</strong>
+                                        <div class="hint">${esc(f.clients?.telephone || '')}</div>
+                                    </td>
+                                    <td class="ref">${esc(f.numero_facture || '—')}</td>
+                                    <td class="num">${fmtMoney(f.montant_total)}</td>
+                                    <td class="num">${fmtMoney(f.montant_paye)}</td>
+                                    <td class="num"><strong>${fmtMoney(f.montant_restant)}</strong></td>
+                                    <td class="hint">${fmtDate(f.date_echeance)}</td>
+                                    <td><span class="badge ${statutClass}">${statut}</span></td>
+                                    <td class="actions-cell">
+                                        <button class="btn btn-sm" onclick="window.location.href='recouvra-detail.html?id=${f.id}'">
+                                            Gérer
+                                        </button>
+                                        <button class="btn btn-sm btn-secondary" onclick="relancerWhatsApp(${f.id})">
+                                            💬 WhatsApp
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+    } catch (error) {
+        console.error('Erreur chargement créances:', error);
+        el.innerHTML = `<div class="error-msg">${friendlyError(error)}</div>`;
+    }
 }
 
-async function relanceWhatsApp(factureId, phone, nomClient, numero, resteAPayer) {
-  const profile = await currentProfile();
-  const message = `Bonjour ${nomClient}, sauf erreur de notre part, votre facture N°${numero} présente un solde de ${money(resteAPayer)}. Merci de procéder au règlement dans les meilleurs délais.`;
-  const { data: facture } = await supabaseClient.from("factures").select("client_id").eq("id", factureId).single();
-  await supabaseClient.from("relances").insert({ entreprise_id: profile.entreprise_id, facture_id: factureId, client_id: facture?.client_id, canal: "WHATSAPP", message, created_by: profile.id });
-  const normalized = (phone || "").replace(/[^0-9]/g, "");
-  window.open(`https://wa.me/${normalized}?text=${encodeURIComponent(message)}`, "_blank");
+async function relancerWhatsApp(factureId) {
+    try {
+        const { data: facture } = await supabaseClient
+            .from('factures')
+            .select('*, clients(nom, telephone)')
+            .eq('id', factureId)
+            .single();
+            
+        if (!facture?.clients?.telephone) {
+            showToast('Ce client n\'a pas de numéro de téléphone enregistré.', 'error');
+            return;
+        }
+        
+        // Enregistrer la relance
+        await supabaseClient
+            .from('relances')
+            .insert({
+                facture_id: factureId,
+                client_id: facture.client_id,
+                canal: 'WHATSAPP',
+                message: generateRelanceMessage(facture),
+            });
+        
+        // Construire le message WhatsApp
+        const message = generateRelanceMessage(facture);
+        const phone = facture.clients.telephone.replace(/\D/g, '');
+        const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+        
+        window.open(url, '_blank');
+        showToast('Relance WhatsApp préparée.', 'success');
+        
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
 }
 
-document.addEventListener("DOMContentLoaded", loadDebts);
+function generateRelanceMessage(facture) {
+    const settings = JSON.parse(localStorage.getItem('sylla_company_settings') || '{}');
+    const companyName = settings.nom_commercial || 'Notre entreprise';
+    
+    const montant = fmtMoney(facture.montant_restant);
+    const numero = facture.numero_facture || `#${facture.id}`;
+    
+    return `Bonjour ${facture.clients?.nom || ''}, 
+    
+Nous vous rappelons que la facture ${numero} d'un montant de ${montant} est arrivée à échéance.
+
+Merci de bien vouloir procéder au règlement dès que possible.
+
+Cordialement,
+${companyName}`;
+}

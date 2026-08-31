@@ -1,236 +1,310 @@
-document.addEventListener("DOMContentLoaded", async () => {
-  const profile = await currentProfile();
-  if (!profile) return;
-  if (profile?.role !== "super_admin") {
-    document.body.innerHTML = "<main class='shell'><section class='panel access-panel'><h1>Accès refusé</h1></section></main>";
-    return;
-  }
+// ============================================================================
+// SUPER-ADMIN - Gestion des paiements Recouvra
+// ============================================================================
 
-  // ---------------- Ancien système (demandes_abonnement, 15 000 F/mois) — inchangé ----------------
-  const { data, error } = await supabaseClient
-    .from("demandes_abonnement")
-    .select("id,entreprise_id,reference_wave,preuve_paiement_path,montant,status,submitted_by,created_at,entreprises(nom,gerant_nom,telephone)")
-    .eq("status", "en_attente")
-    .order("created_at");
-  if (error) {
-    requests.textContent = error.message;
-  } else {
-    const rows = await Promise.all((data || []).map(async r => {
-      let proofUrl = "";
-      if (r.preuve_paiement_path) {
-        const signed = await supabaseClient.storage.from("payment-proofs").createSignedUrl(r.preuve_paiement_path, 3600);
-        proofUrl = signed.data?.signedUrl || "";
-      }
-      return `<article class="card subscription-request"><header><strong>${esc(r.entreprises?.nom || "Entreprise")}</strong><span>${date(r.created_at)}</span></header><p>Gérant : ${esc(r.entreprises?.gerant_nom || "-")} · ${esc(r.entreprises?.telephone || "-")}</p><p><strong>${money(r.montant)}</strong> · Référence Wave : <span class="mono">${esc(r.reference_wave)}</span></p>${proofUrl ? `<a class="proof-link" href="${esc(proofUrl)}" target="_blank" rel="noopener">Voir la preuve de paiement</a>` : "<p>Aucune preuve jointe.</p>"}<button class="button" onclick="approveSubscription('${r.id}','${r.entreprise_id}')">Valider et activer Recouvra</button></article>`;
-    }));
-    requests.innerHTML = rows.join("") || "<p>Aucun paiement Wave en attente.</p>";
-  }
+let currentPaymentFilter = 'pending';
+let allPayments = [];
+let currentPaymentDetail = null;
 
-  // ---------------- Nouveau système (subscription_payments, Wave lien + validation manuelle) ----------------
-  await loadPayments();
+document.addEventListener('DOMContentLoaded', async () => {
+    // Vérifier l'authentification
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+        window.location.href = 'login.html';
+        return;
+    }
 
-  document.getElementById("payments-filters").addEventListener("click", (e) => {
-    const btn = e.target.closest(".filter-chip");
-    if (!btn) return;
-    document.querySelectorAll(".filter-chip").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    currentFilter = btn.dataset.filter;
-    renderPaymentsTable();
-  });
+    // Vérifier que l'utilisateur est super-admin
+    const { data: profile, error: profileError } = await supabaseClient
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
 
-  document.getElementById("confirm-final-btn").addEventListener("click", handleConfirmPayment);
-  document.getElementById("reject-final-btn").addEventListener("click", handleRejectPayment);
-  document.getElementById("reject-reason-select").addEventListener("change", (e) => {
-    document.getElementById("reject-other-wrap").hidden = e.target.value !== "Autre";
-  });
+    if (profileError || !profile || profile.role !== 'super_admin') {
+        showToast('Accès non autorisé.', 'error');
+        window.location.href = 'index.html';
+        return;
+    }
+
+    // Charger les données
+    await loadPayments();
+
+    // Écouter les filtres
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            currentPaymentFilter = chip.dataset.filter;
+            renderPayments();
+        });
+    });
+
+    // Écouter les boutons du modal de rejet
+    document.getElementById('reject-reason-select')?.addEventListener('change', (e) => {
+        document.getElementById('reject-other-wrap').hidden = e.target.value !== 'Autre';
+    });
+
+    document.getElementById('reject-final-btn')?.addEventListener('click', submitRejection);
 });
 
-async function approveSubscription(requestId, entrepriseId) {
-  const user = (await supabaseClient.auth.getUser()).data.user;
-  const { error: profileError } = await supabaseClient.from("profiles").update({ has_recouvra: true, updated_at: new Date().toISOString() }).eq("entreprise_id", entrepriseId);
-  if (profileError) { alert(profileError.message); return; }
-  const { error } = await supabaseClient.from("demandes_abonnement").update({ status: "validee", reviewed_by: user.id, reviewed_at: new Date().toISOString() }).eq("id", requestId);
-  if (error) alert(error.message); else location.reload();
-}
-
-// ==================== Nouveau système : subscription_payments ====================
-
-let allPayments = [];
-let currentFilter = "pending";
-let activePaymentId = null;
-
-const PAYMENT_TYPE_LABELS = { setup: "Mise en place", subscription: "Abonnement" };
-const PAYMENT_STATUS_BADGE = {
-  pending: '<span class="badge badge-warn">En attente</span>',
-  confirmed: '<span class="badge badge-success">Confirmé</span>',
-  rejected: '<span class="badge badge-danger">Rejeté</span>',
-};
-
 async function loadPayments() {
-  const { data, error } = await supabaseClient
-    .from("subscription_payments")
-    .select("id,entreprise_id,payment_type,amount,currency,provider,payment_method,payment_reference,proof_path,status,rejection_reason,submitted_by,validated_at,created_at,entreprises(nom,gerant_nom,telephone)")
-    .order("created_at", { ascending: false });
-  if (error) {
-    document.getElementById("payments-tbody").innerHTML = `<tr><td colspan="9" class="payments-empty">${esc(error.message)}</td></tr>`;
-    return;
-  }
-  allPayments = data || [];
-  renderPaymentsStats();
-  renderPaymentsNotice();
-  renderPaymentsTable();
+    const tbody = document.getElementById('payments-tbody');
+    if (!tbody) {
+        console.error('Élément payments-tbody introuvable');
+        return;
+    }
+
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="9" class="payments-empty">
+                <div class="loading-spinner">Chargement des paiements...</div>
+            </td>
+        </tr>
+    `;
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('subscription_payments')
+            .select(`
+                *,
+                entreprises(nom, gerant_nom, telephone),
+                profiles!submitted_by(email)
+            `)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        allPayments = data || [];
+        renderStats();
+        renderPayments();
+
+    } catch (error) {
+        console.error('Erreur chargement paiements:', error);
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="9" class="payments-empty">
+                    <div class="error-msg">${friendlyError(error)}</div>
+                </td>
+            </tr>
+        `;
+    }
 }
 
-function renderPaymentsStats() {
-  const pending = allPayments.filter(p => p.status === "pending");
-  const confirmed = allPayments.filter(p => p.status === "confirmed");
-  document.getElementById("stat-pending-count").textContent = pending.length;
-  document.getElementById("stat-pending-amount").textContent = money(pending.reduce((s, p) => s + Number(p.amount || 0), 0));
-  document.getElementById("stat-confirmed-count").textContent = confirmed.length;
-  document.getElementById("stat-confirmed-amount").textContent = money(confirmed.reduce((s, p) => s + Number(p.amount || 0), 0));
+function renderStats() {
+    const pending = allPayments.filter(p => p.status === 'pending');
+    const confirmed = allPayments.filter(p => p.status === 'confirmed');
+    const rejected = allPayments.filter(p => p.status === 'rejected');
+
+    const pendingAmount = pending.reduce((s, p) => s + Number(p.amount), 0);
+    const confirmedAmount = confirmed.reduce((s, p) => s + Number(p.amount), 0);
+
+    const statPendingCount = document.getElementById('stat-pending-count');
+    const statPendingAmount = document.getElementById('stat-pending-amount');
+    const statConfirmedCount = document.getElementById('stat-confirmed-count');
+    const statConfirmedAmount = document.getElementById('stat-confirmed-amount');
+    const notice = document.getElementById('payments-notice');
+
+    if (statPendingCount) statPendingCount.textContent = pending.length;
+    if (statPendingAmount) statPendingAmount.textContent = fmtMoney(pendingAmount);
+    if (statConfirmedCount) statConfirmedCount.textContent = confirmed.length;
+    if (statConfirmedAmount) statConfirmedAmount.textContent = fmtMoney(confirmedAmount);
+
+    if (notice) {
+        if (pending.length > 0) {
+            notice.hidden = false;
+            notice.innerHTML = `⚠️ <strong>${pending.length}</strong> paiement(s) en attente de validation (${fmtMoney(pendingAmount)})`;
+        } else {
+            notice.hidden = true;
+        }
+    }
 }
 
-function renderPaymentsNotice() {
-  const pendingCount = allPayments.filter(p => p.status === "pending").length;
-  const notice = document.getElementById("payments-notice");
-  if (pendingCount === 0) { notice.hidden = true; return; }
-  notice.hidden = false;
-  notice.innerHTML = `🔔 <span>${pendingCount} paiement${pendingCount > 1 ? "s" : ""} à vérifier</span>`;
+function renderPayments() {
+    const tbody = document.getElementById('payments-tbody');
+    if (!tbody) return;
+
+    let filtered = allPayments;
+    if (currentPaymentFilter !== 'all') {
+        filtered = allPayments.filter(p => p.status === currentPaymentFilter);
+    }
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="9" class="payments-empty">
+                    Aucun paiement ${currentPaymentFilter !== 'all' ? currentPaymentFilter : ''}
+                </td>
+            </tr>`;
+        return;
+    }
+
+    const statusBadge = {
+        pending: '<span class="badge badge-warn">En attente</span>',
+        confirmed: '<span class="badge badge-success">Confirmé</span>',
+        rejected: '<span class="badge badge-danger">Rejeté</span>',
+    };
+
+    tbody.innerHTML = filtered.map(p => `
+        <tr>
+            <td><strong>${esc(p.entreprises?.nom || '—')}</strong></td>
+            <td>${esc(p.entreprises?.gerant_nom || '—')}</td>
+            <td>${esc(p.entreprises?.telephone || '—')}</td>
+            <td><strong>${fmtMoney(p.amount)}</strong></td>
+            <td>${esc(p.payment_type || '—')}</td>
+            <td>${esc(p.payment_method || '—')}</td>
+            <td>${fmtDate(p.created_at)}</td>
+            <td>${statusBadge[p.status] || p.status}</td>
+            <td>
+                ${p.status === 'pending' ? `
+                    <button class="btn btn-sm btn-secondary" onclick="openPaymentDetail('${p.id}')">
+                        Vérifier
+                    </button>
+                ` : ''}
+            </td>
+        </tr>
+    `).join('');
 }
 
-function renderPaymentsTable() {
-  const rows = currentFilter === "all" ? allPayments : allPayments.filter(p => p.status === currentFilter);
-  const tbody = document.getElementById("payments-tbody");
-  if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="9" class="payments-empty">Aucun paiement dans cette catégorie.</td></tr>`;
-    return;
-  }
-  tbody.innerHTML = rows.map(p => `
-    <tr>
-      <td>${esc(p.entreprises?.nom || "-")}</td>
-      <td>${esc(p.entreprises?.gerant_nom || "-")}</td>
-      <td>${esc(p.entreprises?.telephone || "-")}</td>
-      <td>${money(p.amount)}</td>
-      <td>${esc(PAYMENT_TYPE_LABELS[p.payment_type] || p.payment_type)}</td>
-      <td>Wave</td>
-      <td>${date(p.created_at)}</td>
-      <td>${PAYMENT_STATUS_BADGE[p.status] || esc(p.status)}</td>
-      <td><button type="button" class="btn btn-secondary" onclick="openPaymentDetail('${p.id}')">Vérifier</button></td>
-    </tr>
-  `).join("");
-}
+function openPaymentDetail(paymentId) {
+    const payment = allPayments.find(p => p.id === paymentId);
+    if (!payment) return;
 
-function openPaymentDetail(id) {
-  const p = allPayments.find(x => x.id === id);
-  if (!p) return;
-  activePaymentId = id;
+    currentPaymentDetail = payment;
 
-  const content = document.getElementById("payment-detail-content");
-  content.innerHTML = `
-    <div class="detail-row"><span class="k">Client</span><span class="v">${esc(p.entreprises?.gerant_nom || "-")}</span></div>
-    <div class="detail-row"><span class="k">Entreprise</span><span class="v">${esc(p.entreprises?.nom || "-")}</span></div>
-    <div class="detail-row"><span class="k">Téléphone</span><span class="v">${esc(p.entreprises?.telephone || "-")}</span></div>
-    <div class="detail-row"><span class="k">Montant</span><span class="v">${money(p.amount)}</span></div>
-    <div class="detail-row"><span class="k">Type</span><span class="v">${esc(PAYMENT_TYPE_LABELS[p.payment_type] || p.payment_type)}</span></div>
-    <div class="detail-row"><span class="k">Méthode</span><span class="v">Wave</span></div>
-    <div class="detail-row"><span class="k">Date</span><span class="v">${date(p.created_at)}</span></div>
-    <div class="detail-row"><span class="k">Référence déclarée</span><span class="v">${esc(p.payment_reference || "-")}</span></div>
-    ${p.status === "rejected" ? `<div class="detail-row"><span class="k">Motif de rejet</span><span class="v">${esc(p.rejection_reason || "-")}</span></div>` : ""}
-    <div id="proof-line"></div>
-  `;
+    const content = document.getElementById('payment-detail-content');
+    if (!content) return;
 
-  const proofLine = document.getElementById("proof-line");
-  if (p.proof_path) {
-    supabaseClient.storage.from("payment-proofs").createSignedUrl(p.proof_path, 3600).then(({ data: signed }) => {
-      proofLine.innerHTML = signed?.signedUrl
-        ? `<p style="margin-top:12px;"><a class="proof-link" href="${esc(signed.signedUrl)}" target="_blank" rel="noopener">Voir la preuve de paiement</a></p>`
-        : "";
-    });
-  } else {
-    proofLine.innerHTML = `<p style="margin-top:12px; color:var(--text-muted);">Aucune capture jointe.</p>`;
-  }
+    content.innerHTML = `
+        <div class="detail-row">
+            <span class="k">Entreprise</span>
+            <span class="v">${esc(payment.entreprises?.nom || '—')}</span>
+        </div>
+        <div class="detail-row">
+            <span class="k">Gérant</span>
+            <span class="v">${esc(payment.entreprises?.gerant_nom || '—')}</span>
+        </div>
+        <div class="detail-row">
+            <span class="k">Téléphone</span>
+            <span class="v">${esc(payment.entreprises?.telephone || '—')}</span>
+        </div>
+        <div class="detail-row">
+            <span class="k">Type</span>
+            <span class="v">${esc(payment.payment_type)}</span>
+        </div>
+        <div class="detail-row">
+            <span class="k">Montant</span>
+            <span class="v">${fmtMoney(payment.amount)} ${esc(payment.currency)}</span>
+        </div>
+        <div class="detail-row">
+            <span class="k">Référence</span>
+            <span class="v">${esc(payment.payment_reference || '—')}</span>
+        </div>
+        <div class="detail-row">
+            <span class="k">Date</span>
+            <span class="v">${fmtDateTime(payment.created_at)}</span>
+        </div>
+        ${payment.proof_path ? `
+            <div class="detail-row">
+                <span class="k">Preuve</span>
+                <span class="v">
+                    <a href="${getStorageUrl(payment.proof_path)}" target="_blank" class="btn btn-secondary btn-sm">
+                        Voir la preuve
+                    </a>
+                </span>
+            </div>
+        ` : ''}
+    `;
 
-  const actions = document.getElementById("payment-detail-actions");
-  actions.innerHTML = p.status === "pending"
-    ? `<button type="button" class="btn btn-danger" onclick="openRejectModal()">✕ Rejeter</button>
-       <button type="button" class="btn" onclick="openConfirmModal()">✓ Confirmer le paiement</button>`
-    : "";
+    // Actions
+    const actions = document.getElementById('payment-detail-actions');
+    if (actions) {
+        actions.innerHTML = `
+            <button class="btn btn-secondary" onclick="closePaymentDetail()">Fermer</button>
+            <button class="btn btn-danger" onclick="rejectPayment('${payment.id}')">Rejeter</button>
+            <button class="btn" onclick="confirmPayment('${payment.id}')">Confirmer</button>
+        `;
+    }
 
-  document.getElementById("payment-detail-backdrop").classList.add("open");
+    const backdrop = document.getElementById('payment-detail-backdrop');
+    if (backdrop) backdrop.classList.add('open');
 }
 
 function closePaymentDetail() {
-  document.getElementById("payment-detail-backdrop").classList.remove("open");
+    const backdrop = document.getElementById('payment-detail-backdrop');
+    if (backdrop) backdrop.classList.remove('open');
 }
 
-function openConfirmModal() {
-  const p = allPayments.find(x => x.id === activePaymentId);
-  if (!p) return;
-  document.getElementById("confirm-text").textContent =
-    `Confirmer la réception de ${money(p.amount)} pour ${p.entreprises?.nom || "cette entreprise"} ? Cette action activera le compte et l'abonnement du client.`;
-  document.getElementById("confirm-msg").textContent = "";
-  document.getElementById("confirm-backdrop").classList.add("open");
+async function confirmPayment(paymentId) {
+    const ok = await confirmDialog(
+        'Confirmer ce paiement ? L\'entreprise sera activée immédiatement.',
+        { title: 'Confirmer le paiement', confirmLabel: 'Confirmer', danger: false }
+    );
+    if (!ok) return;
+
+    try {
+        const { error } = await supabaseClient
+            .rpc('confirm_subscription_payment', {
+                p_payment_id: paymentId,
+                p_decision: 'confirmed',
+            });
+
+        if (error) throw error;
+
+        showToast('Paiement confirmé — entreprise activée.', 'success');
+        closePaymentDetail();
+        await loadPayments();
+
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
 }
 
-function closeConfirmModal() {
-  document.getElementById("confirm-backdrop").classList.remove("open");
+function rejectPayment(paymentId) {
+    // Ouvrir modal de rejet
+    const backdrop = document.getElementById('reject-backdrop');
+    if (backdrop) backdrop.classList.add('open');
+    
+    const reasonSelect = document.getElementById('reject-reason-select');
+    const otherText = document.getElementById('reject-other-text');
+    const otherWrap = document.getElementById('reject-other-wrap');
+    
+    if (reasonSelect) reasonSelect.value = 'Paiement introuvable';
+    if (otherText) otherText.value = '';
+    if (otherWrap) otherWrap.hidden = true;
 }
 
-async function handleConfirmPayment() {
-  const btn = document.getElementById("confirm-final-btn");
-  const msgEl = document.getElementById("confirm-msg");
-  btn.disabled = true; btn.textContent = "Confirmation...";
+async function submitRejection() {
+    const reason = document.getElementById('reject-reason-select').value;
+    const otherReason = document.getElementById('reject-other-text').value.trim();
+    const finalReason = reason === 'Autre' ? otherReason : reason;
 
-  const { error } = await supabaseClient.rpc("confirm_subscription_payment", {
-    p_payment_id: activePaymentId,
-    p_decision: "confirmed",
-  });
+    if (!finalReason) {
+        showToast('Un motif est obligatoire pour rejeter.', 'error');
+        return;
+    }
 
-  btn.disabled = false; btn.textContent = "Confirmer définitivement";
+    try {
+        const { error } = await supabaseClient
+            .rpc('confirm_subscription_payment', {
+                p_payment_id: currentPaymentDetail.id,
+                p_decision: 'rejected',
+                p_rejection_reason: finalReason,
+            });
 
-  if (error) { msgEl.textContent = friendlyError(error); return; }
+        if (error) throw error;
 
-  closeConfirmModal();
-  closePaymentDetail();
-  showToast("Compte activé avec succès.", "success");
-  await loadPayments();
-}
+        showToast('Paiement rejeté.', 'info');
+        closeRejectModal();
+        closePaymentDetail();
+        await loadPayments();
 
-function openRejectModal() {
-  document.getElementById("reject-reason-select").value = "Paiement introuvable";
-  document.getElementById("reject-other-wrap").hidden = true;
-  document.getElementById("reject-other-text").value = "";
-  document.getElementById("reject-msg").textContent = "";
-  document.getElementById("reject-backdrop").classList.add("open");
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
 }
 
 function closeRejectModal() {
-  document.getElementById("reject-backdrop").classList.remove("open");
-}
-
-async function handleRejectPayment() {
-  const select = document.getElementById("reject-reason-select");
-  const otherText = document.getElementById("reject-other-text").value.trim();
-  const msgEl = document.getElementById("reject-msg");
-  const reason = select.value === "Autre" ? otherText : select.value;
-
-  if (!reason) { msgEl.textContent = "Merci de préciser un motif."; return; }
-
-  const btn = document.getElementById("reject-final-btn");
-  btn.disabled = true; btn.textContent = "Rejet...";
-
-  const { error } = await supabaseClient.rpc("confirm_subscription_payment", {
-    p_payment_id: activePaymentId,
-    p_decision: "rejected",
-    p_rejection_reason: reason,
-  });
-
-  btn.disabled = false; btn.textContent = "Rejeter";
-
-  if (error) { msgEl.textContent = friendlyError(error); return; }
-
-  closeRejectModal();
-  closePaymentDetail();
-  showToast("Paiement rejeté.", "info");
-  await loadPayments();
+    const backdrop = document.getElementById('reject-backdrop');
+    if (backdrop) backdrop.classList.remove('open');
 }

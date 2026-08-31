@@ -1,38 +1,104 @@
-const CANAL_LABELS = { WHATSAPP: "WhatsApp", EMAIL: "Email", TELEPHONE: "Téléphone", MANUEL: "Manuel" };
-const CANAL_ICONS = { WHATSAPP: "💬", EMAIL: "✉️", TELEPHONE: "📞", MANUEL: "📝" };
+// ============================================================================
+// RELANCES - Historique des relances envoyées
+// ============================================================================
 
-async function loadRelances() {
-  const el = document.getElementById("relances-content");
-  const { data, error } = await supabaseClient
-    .from("relances")
-    .select("*,factures(numero_facture),clients(nom,telephone)")
-    .order("created_at", { ascending: false })
-    .limit(200);
+document.addEventListener('DOMContentLoaded', async () => {
+    const session = await requireAuth();
+    if (!session) return;
 
-  if (error) { el.innerHTML = `<div class="error-msg">${esc(error.message)}</div>`; return; }
-  if (!data || data.length === 0) { el.innerHTML = `<div class="empty-state">Aucune relance envoyée pour le moment.</div>`; return; }
+    const hasRecouvra = await requireRecouvra();
+    if (!hasRecouvra) return;
 
-  el.innerHTML = `
-    <div class="table-wrapper">
-    <table>
-      <thead><tr><th>Date</th><th>Client</th><th>Facture</th><th>Canal</th><th>Message</th><th></th></tr></thead>
-      <tbody>
-        ${data.map(r => `
-          <tr>
-            <td class="hint">${fmtDateTime(r.created_at)}</td>
-            <td>${esc(r.clients?.nom || "Client")}</td>
-            <td class="ref">${esc(r.factures?.numero_facture || `Facture #${r.facture_id}`)}</td>
-            <td><span class="badge badge-info">${CANAL_ICONS[r.canal] || ""} ${esc(CANAL_LABELS[r.canal] || r.canal)}</span></td>
-            <td class="hint" style="max-width:320px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${esc(r.message || "")}">${esc(r.message || "—")}</td>
-            <td class="actions-cell"><a class="button secondary btn-sm" href="paiements.html?facture=${r.facture_id}" style="white-space:nowrap;">Voir</a></td>
-          </tr>`).join("")}
-      </tbody>
-    </table>
-    </div>`;
+    await loadRelances();
+});
+
+async function requireAuth() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+        window.location.href = 'login.html';
+        return null;
+    }
+    return session;
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const profile = await requireRecouvra();
-  if (!profile) return;
-  await loadRelances();
-});
+async function requireRecouvra() {
+    const session = await requireAuth();
+    if (!session) return false;
+
+    const { data: profile, error } = await supabaseClient
+        .from('profiles')
+        .select('has_recouvra')
+        .eq('id', session.user.id)
+        .single();
+
+    if (error || !profile?.has_recouvra) {
+        window.location.href = 'abonnement.html';
+        return false;
+    }
+    return true;
+}
+
+async function loadRelances() {
+    const el = document.getElementById('relances-content');
+    if (!el) return;
+
+    el.innerHTML = '<div class="empty-state">Chargement...</div>';
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('relances')
+            .select('*, clients(nom, telephone), factures(numero_facture)')
+            .order('created_at', { ascending: false })
+            .limit(100);
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            el.innerHTML = '<div class="empty-state">Aucune relance envoyée.</div>';
+            return;
+        }
+
+        const canalBadge = {
+            'WHATSAPP': '<span class="badge badge-success">💬 WhatsApp</span>',
+            'EMAIL': '<span class="badge badge-info">📧 Email</span>',
+            'TELEPHONE': '<span class="badge badge-warn">📞 Téléphone</span>',
+            'MANUEL': '<span class="badge badge-muted">✍️ Manuel</span>',
+        };
+
+        el.innerHTML = `
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Client</th>
+                            <th>Facture</th>
+                            <th>Canal</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(r => `
+                            <tr>
+                                <td class="hint">${fmtDateTime(r.created_at)}</td>
+                                <td>
+                                    <strong>${esc(r.clients?.nom || '—')}</strong>
+                                    <div class="hint">${esc(r.clients?.telephone || '')}</div>
+                                </td>
+                                <td class="ref">${esc(r.factures?.numero_facture || '—')}</td>
+                                <td>${canalBadge[r.canal] || r.canal}</td>
+                                <td class="hint" style="max-width:400px; word-break:break-word;">
+                                    ${esc(r.message || '—')}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+    } catch (error) {
+        console.error('Erreur chargement relances:', error);
+        el.innerHTML = `<div class="error-msg">${friendlyError(error)}</div>`;
+    }
+}

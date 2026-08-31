@@ -1,1 +1,130 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Recouvra</title><link rel="stylesheet" href="assets/style.css"><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#4F46E5"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Recouvra"><link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/app.js" defer></script><script src="assets/recouvra.js" defer></script></head><body><div class="app"><nav class="sidebar"></nav><main class="main"><div class="recouvra-banner"><span class="recouvra-banner-badge">⚡ Espace Recouvrement Actif</span><a href="index.html" class="btn-back"><span class="arrow">←</span> Retour au tableau de bord</a></div><header class="topbar"><div><span class="eyebrow">Premium</span><h1>Recouvra</h1></div><nav class="subnav"><a href="recouvra.html" class="active">Recouvra</a><a href="paiements.html">Paiements</a><a href="promesses.html">Promesses de règlement</a><a href="relances.html">Relances</a></nav></header><div class="toolbar"><p>Créances à suivre</p><button class="button recouvra-cta" onclick="loadDebts()">Actualiser</button></div><div class="card"><div id="debts-content">Chargement...</div></div></main></div></body></html>
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recouvra — Recouvrement</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4F46E5">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Recouvra">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/app.js" defer></script>
+  <script src="assets/recouvra.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <!-- Navigation latérale -->
+    <nav class="sidebar">
+      <div class="brand">
+        <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
+        <span data-company-name>Entreprise</span>
+      </div>
+      <a class="nav-link" href="index.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="9" rx="1.5"/>
+          <rect x="14" y="3" width="7" height="5" rx="1.5"/>
+          <rect x="14" y="12" width="7" height="9" rx="1.5"/>
+          <rect x="3" y="16" width="7" height="5" rx="1.5"/>
+        </svg>
+        Tableau de bord
+      </a>
+      <a class="nav-link" href="catalogue.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 8l-9-5-9 5 9 5 9-5z"/>
+          <path d="M3 8v8l9 5 9-5V8"/>
+          <path d="M12 13v8"/>
+        </svg>
+        Catalogue
+      </a>
+      <a class="nav-link" href="stock.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3v18"/>
+          <path d="M4 7l4-4 4 4"/>
+          <path d="M16 21V3"/>
+          <path d="M20 17l-4 4-4-4"/>
+        </svg>
+        Mouvements stock
+      </a>
+      <a class="nav-link" href="rupture-stock.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 9v4"/>
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <path d="M12 17h.01"/>
+        </svg>
+        Ruptures de stock
+      </a>
+      <a class="nav-link" href="factures.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2h12v19l-3-2-3 2-3-2-3 2V2z"/>
+          <path d="M9 8h6M9 12h6"/>
+        </svg>
+        Factures
+      </a>
+      <a class="nav-link" href="credits.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="20" height="14" rx="2"/>
+          <path d="M2 10h20"/>
+        </svg>
+        Emprunts
+      </a>
+      <a class="nav-link" href="clients.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        Clients
+      </a>
+      <div class="sidebar-footer">
+        <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
+        <button class="btn-logout" onclick="logout()">Déconnexion</button>
+      </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="main">
+      <!-- Bannière Recouvra -->
+      <div class="recouvra-banner">
+        <span class="recouvra-banner-badge">⚡ Espace Recouvrement Actif</span>
+        <a href="index.html" class="btn-back">
+          <span class="arrow">←</span> Retour au tableau de bord
+        </a>
+      </div>
+
+      <!-- En-tête -->
+      <header class="topbar">
+        <div>
+          <span class="eyebrow">Premium</span>
+          <h1>Recouvra</h1>
+        </div>
+        <nav class="subnav">
+          <a href="recouvra.html" class="active">Recouvra</a>
+          <a href="paiements.html">Paiements</a>
+          <a href="promesses.html">Promesses de règlement</a>
+          <a href="relances.html">Relances</a>
+        </nav>
+      </header>
+
+      <!-- Barre d'outils -->
+      <div class="toolbar">
+        <p>Créances à suivre</p>
+        <button class="button recouvra-cta" onclick="loadDebts()">Actualiser</button>
+      </div>
+
+      <!-- Liste des créances -->
+      <div class="card">
+        <div id="debts-content">
+          <div class="empty-state">Chargement des créances...</div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
