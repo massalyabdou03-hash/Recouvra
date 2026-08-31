@@ -139,6 +139,33 @@ body.dark-mode .hint {
     color: #9CA3AF;
 }
 
+/* ============================================================================
+   CORRECTIONS MOBILE GLOBALES (AJOUTÉES)
+   ============================================================================ */
+@media (max-width: 768px) {
+    body { overflow-x: hidden; }
+}
+
+body.menu-open .mobile-menu-btn { display: none; }
+
+@media (max-width: 600px) {
+    .modal-backdrop { padding: 16px 10px; }
+    .modal { margin: 0 auto; width: calc(100% - 32px); max-height: calc(100vh - 32px); }
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+    width: 100%;
+}
+
+.table-wrapper > table { min-width: 720px; }
+
+@media (max-width: 480px) {
+    .table-wrapper > table { min-width: 100%; }
+}
+
 /* Nouveau tableau de bord simplifié */
 .welcome-header {
     margin-bottom: 24px;
@@ -157,7 +184,7 @@ body.dark-mode .hint {
 
 .dashboard-big-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* ← modifié de 280px à 250px */
     gap: 16px;
     margin-bottom: 32px;
 }
@@ -427,8 +454,8 @@ body.dark-mode .section-title {
 
   <main class="main">
     <div class="welcome-header">
-      <h1>Bonjour 👋</h1>
-      <p>Voici ce qui se passe aujourd'hui dans votre boutique.</p>
+    <h1 id="welcome-name">Bonjour 👋</h1>
+    <p id="welcome-company">Voici ce qui se passe dans votre boutique.</p>
     </div>
 
     <div class="dashboard-big-cards">
@@ -530,6 +557,7 @@ function toggleSidebar() {
     const overlay = document.querySelector('.sidebar-overlay');
     if (sidebar) sidebar.classList.toggle('open');
     if (overlay) overlay.classList.toggle('active');
+    document.body.classList.toggle('menu-open', sidebar?.classList.contains('open'));
 }
 
 document.addEventListener('click', (e) => {
@@ -538,6 +566,7 @@ document.addEventListener('click', (e) => {
         const overlay = document.querySelector('.sidebar-overlay');
         if (sidebar) sidebar.classList.remove('open');
         if (overlay) overlay.classList.remove('active');
+        document.body.classList.remove('menu-open');
     }
 });
 
@@ -562,7 +591,7 @@ function initDarkMode() {
 }
 
 // ============================================================================
-// LOGIQUE DU TABLEAU DE BORD
+// LOGIQUE DU TABLEAU DE BORD + MESSAGE D'ACCUEIL
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -571,9 +600,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     const session = await requireAuth();
     if (!session) return;
 
-    await loadDashboardData();
+    await loadWelcomeMessage();   // Charger le message personnalisé
+    await loadDashboardData();    // Charger les statistiques
 });
 
+// Message d'accueil personnalisé
+async function loadWelcomeMessage() {
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) return;
+
+        const { data: profile } = await supabaseClient
+            .from('profiles')
+            .select('*, entreprises(nom, gerant_nom)')
+            .eq('id', session.user.id)
+            .single();
+
+        if (!profile) return;
+
+        const gerantNom = profile.entreprises?.gerant_nom || 'Gérant';
+        const boutiqueNom = profile.entreprises?.nom || 'votre boutique';
+        const prenom = gerantNom.split(' ')[0] || 'Gérant';
+
+        const welcomeTitle = document.getElementById('welcome-name');
+        const welcomeCompany = document.getElementById('welcome-company');
+
+        if (welcomeTitle) welcomeTitle.textContent = `Bonjour ${prenom} 👋`;
+        if (welcomeCompany) welcomeCompany.textContent = `Voici ce qui se passe dans votre boutique ${boutiqueNom}.`;
+    } catch (error) {
+        console.error('Erreur chargement message accueil:', error);
+    }
+}
+
+// Charger les données du tableau de bord
 async function loadDashboardData() {
     const { items: pieces, offline, savedAt } = await loadWithCache('pieces', () =>
         fetchAllRows(() => supabaseClient.from('pieces').select('*').eq('actif', true).order('id'))
@@ -655,6 +714,7 @@ async function loadActiviteCommerciale() {
         document.getElementById('stat-creances').textContent = '—';
     }
 }
+</script>
 </script>
 </body>
 </html>
