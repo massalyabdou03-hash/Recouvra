@@ -1793,3 +1793,127 @@ button{ font-family:var(--font-body); cursor:pointer; }
         display: none;
     }
 }
+/* ============================================================================
+   PAGE MES ARTICLES - GRILLE DE PRODUITS
+   ============================================================================ */
+
+.catalogue-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.catalogue-stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    border: 1px solid #eee;
+}
+
+.catalogue-stat-card.warning {
+    background: #FEF3C7;
+    border-color: #F59E0B;
+}
+
+.catalogue-stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.catalogue-stat-label {
+    font-size: 12px;
+    color: #888;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+}
+
+.product-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid #eee;
+    text-align: center;
+}
+
+.product-card:hover {
+    border-color: #4F46E5;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+}
+
+.product-image {
+    font-size: 40px;
+    margin-bottom: 8px;
+}
+
+.product-details {
+    width: 100%;
+}
+
+.product-name {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.product-ref {
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 8px;
+}
+
+.product-price {
+    font-size: 18px;
+    font-weight: 800;
+    color: #4F46E5;
+    margin-bottom: 8px;
+}
+
+.product-stock-badge {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.product-stock-badge.success {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.product-stock-badge.warning {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.product-stock-badge.danger {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 10px;
+    }
+}
