@@ -2937,10 +2937,9 @@ body.dark-mode .admin-search input {
     }
 }
 /* ============================================================================
-   MENU MOBILE - STYLES
+   MENU MOBILE - CSS GLOBAL
    ============================================================================ */
 
-/* Bouton hamburger (visible uniquement sur mobile) */
 .mobile-menu-btn {
     display: none;
     position: fixed;
@@ -2960,7 +2959,6 @@ body.dark-mode .admin-search input {
     box-shadow: 0 4px 12px rgba(79,70,229,0.3);
 }
 
-/* Overlay pour fermer le menu */
 .sidebar-overlay {
     display: none;
     position: fixed;
@@ -2976,7 +2974,6 @@ body.dark-mode .admin-search input {
     display: block;
 }
 
-/* Sidebar masquée sur mobile */
 @media (max-width: 768px) {
     .mobile-menu-btn {
         display: flex;
@@ -2997,35 +2994,9 @@ body.dark-mode .admin-search input {
         left: 0;
     }
 
-    /* Ajuster le contenu principal */
     .main {
         padding-left: 16px;
         padding-right: 16px;
         padding-top: 60px;
     }
-}
-/* Tendances */
-.big-card-trend {
-    font-size: 12px;
-    font-weight: 700;
-    margin-top: 4px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.big-card-trend.up {
-    color: #10B981;
-}
-
-.big-card-trend.down {
-    color: #EF4444;
-}
-
-body.dark-mode .big-card-trend.up {
-    color: #34D399;
-}
-
-body.dark-mode .big-card-trend.down {
-    color: #F87171;
 }

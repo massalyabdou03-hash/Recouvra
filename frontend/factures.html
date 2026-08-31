@@ -841,14 +841,15 @@ let selectedClientId = null;
 let isPassingClient = true;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    initDarkMode();
-    
     const session = await requireAuth();
     if (!session) return;
 
-    await loadProducts();
-    await loadClients();
-    await loadTodaySales();
+    // Charger en parallèle (plus rapide)
+    await Promise.all([
+        loadProducts(),
+        loadClients(),
+        loadTodaySales()
+    ]);
 
     document.getElementById('quick-client-form').addEventListener('submit', saveQuickClient);
 });
@@ -1157,4 +1158,94 @@ async function completeSale(modePaiement) {
             
         if (errValidation) throw errValidation;
         
-        showToast(`✅ V
+        showToast(`✅ Vente de ${fmtMoney(total)} enregistrée !`, 'success');
+        
+        cart = [];
+        renderCart();
+        selectedClientId = null;
+        isPassingClient = true;
+        document.getElementById('client-select').value = '';
+        document.querySelector('.client-passing')?.classList.add('active');
+        
+        await loadProducts();
+        await loadTodaySales();
+        
+    } catch (error) {
+        console.error('Erreur vente:', error);
+        showToast(friendlyError(error), 'error');
+    } finally {
+        const btn = document.querySelector(`.pay-button.${modePaiement.toLowerCase()}`);
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = btn.dataset.originalText || btn.textContent;
+        }
+    }
+}
+
+// --- Ventes du jour ---
+async function loadTodaySales() {
+    const el = document.getElementById('today-sales');
+    
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const { data, error } = await supabaseClient
+            .from('factures')
+            .select('id, numero_facture, montant_total, mode_paiement, created_at, clients(nom)')
+            .eq('statut', 'VALIDEE')
+            .gte('validated_at', today.toISOString())
+            .order('created_at', { ascending: false });
+            
+        if (error) throw error;
+        
+        if (!data || data.length === 0) {
+            el.innerHTML = '<div class="empty-state">Aucune vente aujourd\'hui pour le moment.</div>';
+            return;
+        }
+        
+        const modeLabels = {
+            ESPECES: '💵 Espèces',
+            WAVE: '📱 Wave',
+            OM: '🟠 Orange Money',
+            CREDIT: '📝 Crédit',
+            CARTE: '💳 Carte',
+            VIREMENT: '🏦 Virement',
+            CHEQUE: '📄 Chèque',
+        };
+        
+        el.innerHTML = `
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>N° Facture</th>
+                            <th>Client</th>
+                            <th>Montant</th>
+                            <th>Paiement</th>
+                            <th>Heure</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(f => `
+                            <tr>
+                                <td class="ref">${esc(f.numero_facture || '—')}</td>
+                                <td>${esc(f.clients?.nom || '—')}</td>
+                                <td class="num"><strong>${fmtMoney(f.montant_total)}</strong></td>
+                                <td>${modeLabels[f.mode_paiement] || f.mode_paiement}</td>
+                                <td class="hint">${new Date(f.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+    } catch (error) {
+        console.error('Erreur chargement ventes du jour:', error);
+        el.innerHTML = `<div class="error-msg">${friendlyError(error)}</div>`;
+    }
+}
+</script>
+</body>
+</html>
