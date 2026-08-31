@@ -16,6 +16,158 @@
 
 <style>
 /* ============================================================================
+   MENU MOBILE + MODE SOMBRE GLOBAL
+   ============================================================================ */
+
+.mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 1001;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: #4F46E5;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex;
+    }
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 280px;
+        height: 100vh;
+        transition: left 0.3s ease;
+        z-index: 1000;
+        overflow-y: auto;
+    }
+    .sidebar.open {
+        left: 0;
+    }
+    .main {
+        padding-left: 16px;
+        padding-right: 16px;
+        padding-top: 60px;
+    }
+}
+
+/* ============================================================================
+   CORRECTIONS MOBILE GLOBALES (AJOUTÉES)
+   ============================================================================ */
+@media (max-width: 768px) {
+    body { overflow-x: hidden; }
+}
+
+body.menu-open .mobile-menu-btn { display: none; }
+
+@media (max-width: 600px) {
+    .modal-backdrop { padding: 16px 10px; }
+    .modal { margin: 0 auto; width: calc(100% - 32px); max-height: calc(100vh - 32px); }
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+    width: 100%;
+}
+
+.table-wrapper > table { min-width: 720px; }
+
+@media (max-width: 480px) {
+    .table-wrapper > table { min-width: 100%; }
+}
+
+body.dark-mode {
+    --surface: #1F2937;
+    --surface-2: #374151;
+    --surface-3: #4B5563;
+    --border: #4B5563;
+    --border-soft: #374151;
+    --text: #F9FAFB;
+    --text-muted: #9CA3AF;
+    --text-light: #6B7280;
+    background: #111827;
+    color: #F9FAFB;
+}
+
+body.dark-mode .card,
+body.dark-mode .sidebar {
+    background: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode .nav-link {
+    color: #9CA3AF;
+}
+
+body.dark-mode .nav-link.active {
+    background: #4F46E5;
+    color: white;
+}
+
+body.dark-mode table {
+    background: #1F2937;
+}
+
+body.dark-mode th {
+    background: #374151;
+    color: #9CA3AF;
+}
+
+body.dark-mode td {
+    border-color: #374151;
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+    background: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+body.dark-mode .btn-secondary {
+    background: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+body.dark-mode .empty-state {
+    color: #9CA3AF;
+}
+
+body.dark-mode .hint {
+    color: #9CA3AF;
+}
+
+/* ============================================================================
    STYLES SPÉCIFIQUES SUPER ADMIN
    ============================================================================ */
 
@@ -956,8 +1108,46 @@ body.dark-mode .admin-reminder {
 <script src="assets/app.js"></script>
 <script>
 // ============================================================================
-// MENU MOBILE + MODE SOMBRE (via app.js)
+// MENU MOBILE + MODE SOMBRE
 // ============================================================================
+
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    if (sidebar) sidebar.classList.toggle('open');
+    if (overlay) overlay.classList.toggle('active');
+    document.body.classList.toggle('menu-open', sidebar?.classList.contains('open'));
+}
+
+document.addEventListener('click', (e) => {
+    if (e.target.closest('.nav-link')) {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+        document.body.classList.remove('menu-open');
+    }
+});
+
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
+    const icon = document.getElementById('dark-mode-icon');
+    const label = document.getElementById('dark-mode-label');
+    if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+    if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre';
+}
+
+function initDarkMode() {
+    if (localStorage.getItem('recouvra_dark_mode') === '1') {
+        document.body.classList.add('dark-mode');
+        const icon = document.getElementById('dark-mode-icon');
+        const label = document.getElementById('dark-mode-label');
+        if (icon) icon.textContent = '☀️';
+        if (label) label.textContent = 'Mode clair';
+    }
+}
 
 // ============================================================================
 // SUPER ADMIN - GESTION COMPLÈTE
@@ -1237,6 +1427,7 @@ async function confirmPayment(paymentId) {
     if (!ok) return;
 
     try {
+        // 1. Appeler la RPC qui met à jour le statut de l'abonnement
         const { error } = await supabaseClient
             .rpc('confirm_subscription_payment', {
                 p_payment_id: paymentId,
@@ -1244,6 +1435,23 @@ async function confirmPayment(paymentId) {
             });
 
         if (error) throw error;
+
+        // 2. Récupérer l'entreprise associée à ce paiement
+        const { data: payment } = await supabaseClient
+            .from('subscription_payments')
+            .select('entreprise_id')
+            .eq('id', paymentId)
+            .single();
+
+        if (payment) {
+            // 3. Activer l'accès Recouvra pour tous les utilisateurs de cette entreprise
+            const { error: updateError } = await supabaseClient
+                .from('profiles')
+                .update({ has_recouvra: true })
+                .eq('entreprise_id', payment.entreprise_id);
+
+            if (updateError) throw updateError;
+        }
 
         showToast('Paiement confirmé — entreprise activée.', 'success');
         closeModal('payment-detail-backdrop');
@@ -1479,16 +1687,22 @@ async function desactiverEntreprise(id) {
     if (!ok) return;
 
     try {
-        const { error } = await supabaseClient
+        // 1. Mettre à jour le statut de l'abonnement
+        const { error: err1 } = await supabaseClient
             .from('subscriptions')
             .update({ status: 'cancelled', updated_at: new Date().toISOString() })
             .eq('entreprise_id', id);
+        if (err1) throw err1;
 
-        if (error) throw error;
+        // 2. Désactiver l'accès Recouvra pour tous les profils liés
+        const { error: err2 } = await supabaseClient
+            .from('profiles')
+            .update({ has_recouvra: false, updated_at: new Date().toISOString() })
+            .eq('entreprise_id', id);
+        if (err2) throw err2;
 
-        showToast('Entreprise désactivée.', 'info');
-        await loadEntreprises();
-
+        showToast('Entreprise désactivée. Elle ne peut plus se connecter.', 'success');
+        await loadEntreprises(); // ou reload les données
     } catch (error) {
         showToast(friendlyError(error), 'error');
     }
