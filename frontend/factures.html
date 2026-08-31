@@ -13,11 +13,608 @@
 <meta name="apple-mobile-web-app-title" content="Ma Boutique">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="stylesheet" href="assets/style.css">
+
+<style>
+/* ============================================================================
+   MENU MOBILE + MODE SOMBRE GLOBAL
+   ============================================================================ */
+
+.mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 1001;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: #4F46E5;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex;
+    }
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 280px;
+        height: 100vh;
+        transition: left 0.3s ease;
+        z-index: 1000;
+        overflow-y: auto;
+    }
+    .sidebar.open {
+        left: 0;
+    }
+    .main {
+        padding-left: 16px;
+        padding-right: 16px;
+        padding-top: 60px;
+    }
+}
+
+body.dark-mode {
+    --surface: #1F2937;
+    --surface-2: #374151;
+    --surface-3: #4B5563;
+    --border: #4B5563;
+    --border-soft: #374151;
+    --text: #F9FAFB;
+    --text-muted: #9CA3AF;
+    --text-light: #6B7280;
+    background: #111827;
+    color: #F9FAFB;
+}
+
+body.dark-mode .card,
+body.dark-mode .sidebar {
+    background: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode .nav-link {
+    color: #9CA3AF;
+}
+
+body.dark-mode .nav-link.active {
+    background: #4F46E5;
+    color: white;
+}
+
+body.dark-mode table {
+    background: #1F2937;
+}
+
+body.dark-mode th {
+    background: #374151;
+    color: #9CA3AF;
+}
+
+body.dark-mode td {
+    border-color: #374151;
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+    background: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+body.dark-mode .btn-secondary {
+    background: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+body.dark-mode .empty-state {
+    color: #9CA3AF;
+}
+
+body.dark-mode .hint {
+    color: #9CA3AF;
+}
+
+/* ============================================================================
+   PAGE VENDRE - SIMPLIFIÉE
+   ============================================================================ */
+
+.page-header-simple {
+    margin-bottom: 24px;
+}
+
+.page-header-simple h1 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.page-header-simple p {
+    color: #888;
+    font-size: 15px;
+}
+
+.sell-step-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    border: 1px solid #eee;
+}
+
+.sell-step-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.step-number {
+    width: 32px;
+    height: 32px;
+    background: #4F46E5;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.sell-step-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.client-quick-select {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.client-passing {
+    padding: 12px 20px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.client-passing.active {
+    border-color: #4F46E5;
+    background: #EEF2FF;
+    color: #4F46E5;
+}
+
+.client-passing-icon {
+    font-size: 24px;
+}
+
+.client-select-wrap {
+    flex: 1;
+}
+
+.client-select-wrap select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 15px;
+    background: white;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: #4F46E5;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.btn-link:hover {
+    text-decoration: underline;
+}
+
+.sell-search-bar {
+    margin-bottom: 16px;
+}
+
+.sell-search-bar input {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.sell-search-bar input:focus {
+    border-color: #4F46E5;
+}
+
+.sell-products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+.product-button {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.product-button:hover:not(.disabled) {
+    border-color: #4F46E5;
+    background: #EEF2FF;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79,70,229,0.1);
+}
+
+.product-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.product-emoji {
+    font-size: 32px;
+}
+
+.product-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+}
+
+.product-price {
+    font-size: 16px;
+    font-weight: 800;
+    color: #4F46E5;
+}
+
+.product-stock {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.product-stock.success {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.product-stock.warning {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.product-stock.danger {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+#cart-section {
+    border: 2px solid #4F46E5;
+    background: #F8F7FF;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.cart-item-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-item-name {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.cart-item-price {
+    font-size: 12px;
+    color: #888;
+}
+
+.cart-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.qty-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.qty-btn:hover {
+    background: #f3f4f6;
+}
+
+.qty-value {
+    font-weight: 700;
+    font-size: 16px;
+    min-width: 24px;
+    text-align: center;
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.remove-btn:hover {
+    background: #FEE2E2;
+}
+
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-top: 2px solid #eee;
+    margin-top: 16px;
+    font-size: 18px;
+}
+
+.cart-total strong {
+    font-size: 28px;
+    color: #4F46E5;
+}
+
+.payment-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.pay-button {
+    padding: 16px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    transition: all 0.2s;
+}
+
+.pay-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.pay-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.pay-icon {
+    font-size: 28px;
+}
+
+.pay-button.cash {
+    background: #10B981;
+    color: white;
+}
+
+.pay-button.wave {
+    background: #1D4ED8;
+    color: white;
+}
+
+.pay-button.om {
+    background: #FF7900;
+    color: white;
+}
+
+.pay-button.credit {
+    background: #F59E0B;
+    color: white;
+}
+
+.sales-history {
+    margin-top: 32px;
+}
+
+.sales-history .section-title {
+    margin-bottom: 16px;
+}
+
+body.dark-mode .sell-step-card,
+body.dark-mode .cart-item,
+body.dark-mode .product-button {
+    background: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode .product-name {
+    color: #F9FAFB;
+}
+
+body.dark-mode .cart-item {
+    background: #374151;
+}
+
+body.dark-mode .cart-total {
+    border-color: #374151;
+}
+
+/* Modal rapide client */
+.modal-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-backdrop.open {
+    display: flex;
+}
+
+.modal {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-sm {
+    max-width: 400px;
+}
+
+.modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.modal-head h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.close-x {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #888;
+    padding: 4px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #4F46E5;
+}
+
+body.dark-mode .modal {
+    background: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode label {
+    color: #F9FAFB;
+}
+</style>
 </head>
 <body>
+
+<!-- ========== MENU MOBILE ========== -->
+<button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
 <div class="app">
-  
-  <!-- ==================== NAVIGATION SIMPLIFIÉE ==================== -->
   <nav class="sidebar">
     <div class="brand">
       <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
@@ -43,7 +640,7 @@
         <span class="nav-emoji">📦</span> Mes Articles
       </a>
       <a href="stock.html" class="nav-link">
-        <span class="nav-emoji">🔄</span> Entrées / Sorties
+        <span class="nav-emoji">📊</span> Stock & Produits
       </a>
     </div>
 
@@ -59,17 +656,19 @@
     </div>
 
     <div class="sidebar-footer">
-      <a href="parametres.html" class="nav-link">
-        <span class="nav-emoji">⚙️</span> Réglages
-      </a>
+      <!-- ========== MODE SOMBRE ========== -->
+      <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;">
+        <span id="dark-mode-icon">🌙</span>
+        <span id="dark-mode-label">Mode sombre</span>
+      </button>
+      
+      <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
       <button class="btn-logout" onclick="logout()">Déconnexion</button>
     </div>
   </nav>
 
-  <!-- ==================== CONTENU PRINCIPAL ==================== -->
   <main class="main">
     
-    <!-- En-tête -->
     <div class="page-header-simple">
       <a href="index.html" class="btn-back">
         <span class="arrow">←</span> Accueil
@@ -93,7 +692,6 @@
         <div class="client-select-wrap">
           <select id="client-select" onchange="onClientChange(this.value)">
             <option value="">Choisir un client...</option>
-            <!-- Clients chargés dynamiquement -->
           </select>
         </div>
       </div>
@@ -115,7 +713,6 @@
       </div>
 
       <div class="sell-products-grid" id="products-grid">
-        <!-- Articles chargés dynamiquement -->
         <div class="empty-state">Chargement des articles...</div>
       </div>
     </div>
@@ -134,7 +731,6 @@
         <strong id="cart-total">0 F</strong>
       </div>
 
-      <!-- GROS BOUTONS DE PAIEMENT -->
       <div class="payment-buttons">
         <button class="pay-button cash" onclick="completeSale('ESPECES')">
           <span class="pay-icon">💵</span>
@@ -196,6 +792,46 @@
 <script src="assets/app.js"></script>
 <script>
 // ============================================================================
+// MENU MOBILE + MODE SOMBRE
+// ============================================================================
+
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    if (sidebar) sidebar.classList.toggle('open');
+    if (overlay) overlay.classList.toggle('active');
+}
+
+document.addEventListener('click', (e) => {
+    if (e.target.closest('.nav-link')) {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+    }
+});
+
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
+    const icon = document.getElementById('dark-mode-icon');
+    const label = document.getElementById('dark-mode-label');
+    if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+    if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre';
+}
+
+function initDarkMode() {
+    if (localStorage.getItem('recouvra_dark_mode') === '1') {
+        document.body.classList.add('dark-mode');
+        const icon = document.getElementById('dark-mode-icon');
+        const label = document.getElementById('dark-mode-label');
+        if (icon) icon.textContent = '☀️';
+        if (label) label.textContent = 'Mode clair';
+    }
+}
+
+// ============================================================================
 // VENDRE - LOGIQUE SIMPLIFIÉE EN 3 ÉTAPES
 // ============================================================================
 
@@ -205,12 +841,16 @@ let selectedClientId = null;
 let isPassingClient = true;
 
 document.addEventListener('DOMContentLoaded', async () => {
+    initDarkMode();
+    
     const session = await requireAuth();
     if (!session) return;
 
     await loadProducts();
     await loadClients();
     await loadTodaySales();
+
+    document.getElementById('quick-client-form').addEventListener('submit', saveQuickClient);
 });
 
 // --- Chargement des produits ---
@@ -373,7 +1013,6 @@ function selectClient(type, btn) {
         document.getElementById('client-select').value = '';
     }
     
-    // UI : mettre en évidence le bouton sélectionné
     document.querySelectorAll('.client-passing').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
 }
@@ -402,7 +1041,7 @@ function closeQuickClient() {
     document.getElementById('quick-client-backdrop').classList.remove('open');
 }
 
-document.getElementById('quick-client-form').addEventListener('submit', async (e) => {
+async function saveQuickClient(e) {
     e.preventDefault();
     const msgEl = document.getElementById('quick-client-msg');
     clearMsg(msgEl);
@@ -425,7 +1064,6 @@ document.getElementById('quick-client-form').addEventListener('submit', async (e
     
     if (error) { showMsg(msgEl, friendlyError(error)); return; }
     
-    // Ajouter au select
     const select = document.getElementById('client-select');
     const opt = document.createElement('option');
     opt.value = data.id;
@@ -436,7 +1074,7 @@ document.getElementById('quick-client-form').addEventListener('submit', async (e
     
     closeQuickClient();
     showToast('Client créé avec succès.', 'success');
-});
+}
 
 // --- Vente complète ---
 async function completeSale(modePaiement) {
@@ -445,13 +1083,11 @@ async function completeSale(modePaiement) {
         return;
     }
     
-    // Vérifier le client
     if (!isPassingClient && !selectedClientId) {
         showToast('Sélectionnez un client ou utilisez "Client de passage".', 'error');
         return;
     }
     
-    // Vérifier le stock
     for (const item of cart) {
         const product = allProducts.find(p => p.id === item.id);
         if (product && item.quantity > product.quantite_stock) {
@@ -469,11 +1105,9 @@ async function completeSale(modePaiement) {
     }
     
     try {
-        // Si vente comptoir, trouver ou créer le client de passage
         let clientId = selectedClientId;
         
         if (isPassingClient) {
-            // Chercher le client de passage
             const { data: existing } = await supabaseClient
                 .from('clients')
                 .select('id')
@@ -492,7 +1126,6 @@ async function completeSale(modePaiement) {
             }
         }
         
-        // 1. Créer la facture
         const { data: facture, error: errFacture } = await supabaseClient
             .from('factures')
             .insert({ client_id: clientId, montant_total: total })
@@ -501,7 +1134,6 @@ async function completeSale(modePaiement) {
             
         if (errFacture) throw errFacture;
         
-        // 2. Ajouter les lignes
         const lignesPayload = cart.map(item => ({
             facture_id: facture.id,
             piece_id: item.id,
@@ -517,7 +1149,6 @@ async function completeSale(modePaiement) {
             
         if (errLignes) throw errLignes;
         
-        // 3. Valider la facture
         const { error: errValidation } = await supabaseClient
             .rpc('valider_facture', {
                 p_facture_id: facture.id,
@@ -526,97 +1157,4 @@ async function completeSale(modePaiement) {
             
         if (errValidation) throw errValidation;
         
-        // 4. Succès !
-        showToast(`✅ Vente de ${fmtMoney(total)} enregistrée !`, 'success');
-        
-        // Réinitialiser
-        cart = [];
-        renderCart();
-        selectedClientId = null;
-        isPassingClient = true;
-        document.getElementById('client-select').value = '';
-        document.querySelector('.client-passing')?.classList.add('active');
-        
-        // Recharger
-        await loadProducts();
-        await loadTodaySales();
-        
-    } catch (error) {
-        console.error('Erreur vente:', error);
-        showToast(friendlyError(error), 'error');
-    } finally {
-        const btn = document.querySelector(`.pay-button.${modePaiement.toLowerCase()}`);
-        if (btn) {
-            btn.disabled = false;
-            btn.textContent = btn.dataset.originalText || btn.textContent;
-        }
-    }
-}
-
-// --- Ventes du jour ---
-async function loadTodaySales() {
-    const el = document.getElementById('today-sales');
-    
-    try {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        const { data, error } = await supabaseClient
-            .from('factures')
-            .select('id, numero_facture, montant_total, mode_paiement, created_at, clients(nom)')
-            .eq('statut', 'VALIDEE')
-            .gte('validated_at', today.toISOString())
-            .order('created_at', { ascending: false });
-            
-        if (error) throw error;
-        
-        if (!data || data.length === 0) {
-            el.innerHTML = '<div class="empty-state">Aucune vente aujourd\'hui pour le moment.</div>';
-            return;
-        }
-        
-        const modeLabels = {
-            ESPECES: '💵 Espèces',
-            WAVE: '📱 Wave',
-            OM: '🟠 Orange Money',
-            CREDIT: '📝 Crédit',
-            CARTE: '💳 Carte',
-            VIREMENT: '🏦 Virement',
-            CHEQUE: '📄 Chèque',
-        };
-        
-        el.innerHTML = `
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>N° Facture</th>
-                            <th>Client</th>
-                            <th>Montant</th>
-                            <th>Paiement</th>
-                            <th>Heure</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${data.map(f => `
-                            <tr>
-                                <td class="ref">${esc(f.numero_facture || '—')}</td>
-                                <td>${esc(f.clients?.nom || '—')}</td>
-                                <td class="num"><strong>${fmtMoney(f.montant_total)}</strong></td>
-                                <td>${modeLabels[f.mode_paiement] || f.mode_paiement}</td>
-                                <td class="hint">${new Date(f.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </div>
-        `;
-        
-    } catch (error) {
-        console.error('Erreur chargement ventes du jour:', error);
-        el.innerHTML = `<div class="error-msg">${friendlyError(error)}</div>`;
-    }
-}
-</script>
-</body>
-</html>
+        showToast(`✅ V

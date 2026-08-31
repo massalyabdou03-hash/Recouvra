@@ -1,38 +1,695 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Activation Recouvra</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abonnement — Ma Boutique</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4F46E5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ma Boutique">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="stylesheet" href="assets/style.css">
-<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#4F46E5"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Recouvra"><link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
-<script src="assets/config.js"></script>
-<script src="assets/app.js" defer></script>
-<script src="assets/abonnement.js" defer></script>
+
+<style>
+/* ============================================================================
+   MENU MOBILE + MODE SOMBRE GLOBAL
+   ============================================================================ */
+
+.mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 1001;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: #4F46E5;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex;
+    }
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 280px;
+        height: 100vh;
+        transition: left 0.3s ease;
+        z-index: 1000;
+        overflow-y: auto;
+    }
+    .sidebar.open {
+        left: 0;
+    }
+    .main {
+        padding-left: 16px;
+        padding-right: 16px;
+        padding-top: 60px;
+    }
+}
+
+body.dark-mode {
+    --surface: #1F2937;
+    --surface-2: #374151;
+    --surface-3: #4B5563;
+    --border: #4B5563;
+    --border-soft: #374151;
+    --text: #F9FAFB;
+    --text-muted: #9CA3AF;
+    --text-light: #6B7280;
+    background: #111827;
+    color: #F9FAFB;
+}
+
+body.dark-mode .card,
+body.dark-mode .sidebar,
+body.dark-mode .modal {
+    background: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode .nav-link {
+    color: #9CA3AF;
+}
+
+body.dark-mode .nav-link.active {
+    background: #4F46E5;
+    color: white;
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+    background: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+body.dark-mode label {
+    color: #F9FAFB;
+}
+
+body.dark-mode .btn-secondary {
+    background: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+body.dark-mode .empty-state {
+    color: #9CA3AF;
+}
+
+body.dark-mode .hint {
+    color: #9CA3AF;
+}
+
+/* ============================================================================
+   PAGE ABONNEMENT
+   ============================================================================ */
+
+.page-header-simple {
+    margin-bottom: 24px;
+}
+
+.page-header-simple h1 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.page-header-simple p {
+    color: #888;
+    font-size: 15px;
+}
+
+.subscription-page {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.subscription-heading {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.subscription-heading h1 {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.subscription-heading p {
+    color: #888;
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+.eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #4F46E5;
+    background: #EEF2FF;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+}
+
+.subscription-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid #eee;
+    margin-bottom: 20px;
+}
+
+.subscription-benefits {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px;
+}
+
+.subscription-benefits li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.subscription-benefits li:last-child {
+    border-bottom: none;
+}
+
+.subscription-benefits li strong {
+    display: block;
+    font-size: 15px;
+    margin-bottom: 2px;
+}
+
+.subscription-benefits li span {
+    font-size: 13px;
+    color: #888;
+}
+
+.subscription-price {
+    text-align: center;
+    padding: 20px;
+    background: #EEF2FF;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.subscription-price strong {
+    font-size: 32px;
+    color: #4F46E5;
+    display: block;
+}
+
+.subscription-price span {
+    font-size: 14px;
+    color: #888;
+}
+
+.wave-instructions {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #F0FDF4;
+    border-radius: 12px;
+    border: 1px solid #10B981;
+}
+
+.wave-instructions p {
+    margin: 8px 0 0;
+    font-size: 15px;
+    color: #065F46;
+}
+
+.subscription-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.subscription-form label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.subscription-form input[type="file"],
+.subscription-form input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    background: white;
+    color: #333;
+}
+
+.subscription-form input:focus {
+    border-color: #4F46E5;
+}
+
+.subscription-form small {
+    display: block;
+    font-size: 12px;
+    color: #888;
+    margin-top: 4px;
+}
+
+.terms-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+}
+
+.terms-check input[type="checkbox"] {
+    width: auto;
+    margin-top: 3px;
+}
+
+.subscription-message {
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 12px;
+}
+
+.subscription-message.success {
+    color: #059669;
+}
+
+.subscription-message.error {
+    color: #DC2626;
+}
+
+.btn {
+    padding: 14px 24px;
+    border-radius: 12px;
+    border: none;
+    background: #4F46E5;
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.btn:hover {
+    background: #4338CA;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    color: #333;
+    border: 1px solid #e5e7eb;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #888;
+    text-decoration: none;
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.btn-back:hover {
+    color: #4F46E5;
+}
+
+body.dark-mode .subscription-card {
+    background: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode .subscription-benefits li {
+    border-color: #374151;
+}
+
+body.dark-mode .subscription-benefits li span {
+    color: #9CA3AF;
+}
+
+body.dark-mode .subscription-price {
+    background: #312E81;
+}
+
+body.dark-mode .subscription-price strong {
+    color: #A5B4FC;
+}
+
+body.dark-mode .wave-instructions {
+    background: #064E3B;
+    border-color: #10B981;
+}
+
+body.dark-mode .wave-instructions p {
+    color: #A7F3D0;
+}
+
+body.dark-mode .subscription-form input[type="file"],
+body.dark-mode .subscription-form input[type="text"] {
+    background: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+body.dark-mode .terms-check {
+    color: #F9FAFB;
+}
+
+body.dark-mode .eyebrow {
+    background: #312E81;
+    color: #A5B4FC;
+}
+</style>
 </head>
 <body>
+
+<!-- ========== MENU MOBILE ========== -->
+<button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
 <div class="app">
-<nav class="sidebar"></nav>
-<main class="main">
-  <a href="index.html" class="btn-back" style="margin-bottom:16px;"><span class="arrow">←</span> Retour au tableau de bord</a>
-  <section class="subscription-page">
-    <div class="subscription-heading"><span class="eyebrow">Module Premium</span><h1>⚡ Récupérez vos impayés 3x plus vite sur WhatsApp</h1><p>Activez la relance WhatsApp automatique pour vos factures d'impayés.</p><a href="#subscription-form" class="button recouvra-cta subscription-hero-cta">Activer Recouvra pour 15 000 FCFA / mois</a><p class="hint">Paiement direct et sécurisé via Wave Sénégal (77 033 80 30)</p></div>
-    <section class="subscription-card">
-      <div class="subscription-benefits-block"><h2>Tout ce qu'il vous faut pour être payé plus vite</h2><ul class="subscription-benefits subscription-benefits-emoji"><li><strong>💬 Relances WhatsApp en 1 Clic</strong><span>Messages pré-remplis avec le montant exact et l'échéance. Plus besoin de rédiger à la main.</span></li><li><strong>📈 Trésorerie Maximisée</strong><span>Réduisez vos retards de paiement et améliorez le fond de roulement de votre boutique.</span></li><li><strong>🤝 Suivi des Promesses &amp; Acomptes</strong><span>Enregistrez les règlements partiels et planifiez les dates d'engagements de vos clients.</span></li><li><strong>💡 Outil 100% Rentable</strong><span>À 15 000 FCFA/mois, une seule facture recouvrée rembourse largement votre abonnement.</span></li></ul></div>
-      <div class="subscription-price"><strong>15 000 FCFA</strong><span>/ mois, sans engagement</span></div>
-      <div class="wave-instructions"><span class="eyebrow">Paiement Wave Sénégal</span><p>Effectuez votre transfert Wave de <strong>15 000 FCFA au numéro : +221 77 033 80 30</strong></p></div>
-      <form id="subscription-form" class="subscription-form">
-        <label>Importer la capture d'écran du reçu de paiement Wave<input id="payment-proof" type="file" accept="image/jpeg,image/png,application/pdf" required><small>Formats acceptés : JPG, PNG, PDF. Taille maximale : 5 Mo.</small></label>
-        <label>Référence / ID Transaction Wave<input id="wave-reference" type="text" maxlength="120" required placeholder="Ex : TXN-123456"></label>
-        <label class="terms-check"><input id="terms" type="checkbox" required><span>J'accepte les <button type="button" class="text-button" id="terms-link">Conditions Générales d'Utilisation</button> du service Recouvra.</span></label>
-        <button class="button recouvra-cta" type="submit" id="subscription-submit">Envoyer ma preuve de paiement</button>
-        <p id="subscription-message" class="subscription-message" aria-live="polite"></p>
-      </form>
-    </section>
-  </section>
-</main>
+  <nav class="sidebar">
+    <div class="brand">
+      <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
+      <span data-company-name>Ma Boutique</span>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Quotidien</div>
+      <a href="index.html" class="nav-link">
+        <span class="nav-emoji">🏠</span> Accueil
+      </a>
+      <a href="factures.html" class="nav-link">
+        <span class="nav-emoji">🧾</span> Vendre
+      </a>
+      <a href="clients.html" class="nav-link">
+        <span class="nav-emoji">👥</span> Mes Clients
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Stock</div>
+      <a href="catalogue.html" class="nav-link">
+        <span class="nav-emoji">📦</span> Mes Articles
+      </a>
+      <a href="stock.html" class="nav-link">
+        <span class="nav-emoji">📊</span> Stock & Produits
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Argent</div>
+      <a href="credits.html" class="nav-link">
+        <span class="nav-emoji">💸</span> On me doit
+      </a>
+      <a href="recouvra.html" class="nav-link premium">
+        <span class="nav-emoji">📣</span> Relancer
+        <span class="badge-premium">PRO</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <!-- ========== MODE SOMBRE ========== -->
+      <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;">
+        <span id="dark-mode-icon">🌙</span>
+        <span id="dark-mode-label">Mode sombre</span>
+      </button>
+      
+      <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
+      <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="main">
+    
+    <a href="index.html" class="btn-back">
+      <span class="arrow">←</span> Retour au tableau de bord
+    </a>
+
+    <div class="subscription-page">
+      
+      <div class="subscription-heading">
+        <span class="eyebrow">Module Premium</span>
+        <h1>⚡ Récupérez vos impayés 3x plus vite sur WhatsApp</h1>
+        <p>Activez la relance WhatsApp automatique pour vos factures d'impayés.</p>
+      </div>
+
+      <div class="subscription-card">
+        <h2>Tout ce qu'il vous faut pour être payé plus vite</h2>
+        <ul class="subscription-benefits">
+          <li>
+            <strong>💬 Relances WhatsApp en 1 Clic</strong>
+            <span>Messages pré-remplis avec le montant exact et l'échéance. Plus besoin de rédiger à la main.</span>
+          </li>
+          <li>
+            <strong>📈 Trésorerie Maximisée</strong>
+            <span>Réduisez vos retards de paiement et améliorez le fond de roulement de votre boutique.</span>
+          </li>
+          <li>
+            <strong>🤝 Suivi des Promesses & Acomptes</strong>
+            <span>Enregistrez les règlements partiels et planifiez les dates d'engagements de vos clients.</span>
+          </li>
+          <li>
+            <strong>💡 Outil 100% Rentable</strong>
+            <span>À 15 000 FCFA/mois, une seule facture recouvrée rembourse largement votre abonnement.</span>
+          </li>
+        </ul>
+
+        <div class="subscription-price">
+          <strong>15 000 FCFA</strong>
+          <span>/ mois, sans engagement</span>
+        </div>
+
+        <div class="wave-instructions">
+          <strong>Paiement Wave Sénégal</strong>
+          <p>Effectuez votre transfert Wave de <strong>15 000 FCFA au numéro : +221 77 033 80 30</strong></p>
+        </div>
+
+        <form id="subscription-form" class="subscription-form">
+          <label>
+            Importer la capture d'écran du reçu de paiement Wave
+            <input id="payment-proof" type="file" accept="image/jpeg,image/png,application/pdf" required>
+            <small>Formats acceptés : JPG, PNG, PDF. Taille maximale : 5 Mo.</small>
+          </label>
+          
+          <label>
+            Référence / ID Transaction Wave
+            <input id="wave-reference" type="text" maxlength="120" required placeholder="Ex : TXN-123456">
+          </label>
+          
+          <label class="terms-check">
+            <input id="terms" type="checkbox" required>
+            <span>J'accepte les <button type="button" class="text-button" id="terms-link">Conditions Générales d'Utilisation</button> du service Recouvra.</span>
+          </label>
+          
+          <button class="btn" type="submit" id="subscription-submit">
+            Envoyer ma preuve de paiement
+          </button>
+          
+          <p id="subscription-message" class="subscription-message" aria-live="polite"></p>
+        </form>
+      </div>
+
+    </div>
+
+  </main>
 </div>
-<div id="terms-modal" class="terms-modal" hidden><section class="terms-dialog" role="dialog" aria-modal="true" aria-labelledby="terms-title"><button type="button" class="terms-close" aria-label="Fermer">×</button><span class="eyebrow">Recouvra</span><h2 id="terms-title">Conditions Générales d'Utilisation</h2><div class="terms-content"><p>Recouvra est un service d'aide au recouvrement et de gestion des créances.</p><p>L'abonnement mensuel est de 15 000 FCFA, payable d'avance par Wave au +221 77 033 80 30.</p><p>L'activation est réalisée après vérification de la preuve de paiement par l'administrateur.</p><p>L'utilisateur est responsable de l'exactitude des numéros de téléphone des clients et des montants réclamés via WhatsApp.</p><p>Les données clients doivent être utilisées de manière confidentielle et protégées conformément à la réglementation applicable.</p></div></section></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script>
+// ============================================================================
+// MENU MOBILE + MODE SOMBRE
+// ============================================================================
+
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    if (sidebar) sidebar.classList.toggle('open');
+    if (overlay) overlay.classList.toggle('active');
+}
+
+document.addEventListener('click', (e) => {
+    if (e.target.closest('.nav-link')) {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+    }
+});
+
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
+    const icon = document.getElementById('dark-mode-icon');
+    const label = document.getElementById('dark-mode-label');
+    if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+    if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre';
+}
+
+function initDarkMode() {
+    if (localStorage.getItem('recouvra_dark_mode') === '1') {
+        document.body.classList.add('dark-mode');
+        const icon = document.getElementById('dark-mode-icon');
+        const label = document.getElementById('dark-mode-label');
+        if (icon) icon.textContent = '☀️';
+        if (label) label.textContent = 'Mode clair';
+    }
+}
+
+// ============================================================================
+// ABONNEMENT - LOGIQUE
+// ============================================================================
+
+document.addEventListener('DOMContentLoaded', async () => {
+    initDarkMode();
+    
+    const session = await requireAuth();
+    if (!session) return;
+
+    document.getElementById('subscription-form').addEventListener('submit', submitSubscription);
+});
+
+async function submitSubscription(e) {
+    e.preventDefault();
+    
+    const msgEl = document.getElementById('subscription-message');
+    clearMsg(msgEl);
+    
+    const fileInput = document.getElementById('payment-proof');
+    const reference = document.getElementById('wave-reference').value.trim();
+    const termsChecked = document.getElementById('terms').checked;
+    
+    if (!fileInput.files.length) {
+        showMsg(msgEl, 'Veuillez importer la capture du paiement.', 'error');
+        return;
+    }
+    
+    if (!reference) {
+        showMsg(msgEl, 'Veuillez indiquer la référence de la transaction.', 'error');
+        return;
+    }
+    
+    if (!termsChecked) {
+        showMsg(msgEl, 'Veuillez accepter les conditions générales.', 'error');
+        return;
+    }
+    
+    const btn = document.getElementById('subscription-submit');
+    btn.disabled = true;
+    btn.textContent = 'Envoi...';
+    
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) throw new Error('Session expirée');
+        
+        // Récupérer l'entreprise
+        const { data: profile } = await supabaseClient
+            .from('profiles')
+            .select('entreprise_id')
+            .eq('id', session.user.id)
+            .single();
+            
+        if (!profile?.entreprise_id) throw new Error('Entreprise non trouvée');
+        
+        // Upload de la preuve
+        const file = fileInput.files[0];
+        const filePath = `${profile.entreprise_id}/preuve-${Date.now()}.${file.name.split('.').pop()}`;
+        
+        const { error: uploadError } = await supabaseClient.storage
+            .from('payment-proofs')
+            .upload(filePath, file, {
+                cacheControl: '3600',
+                upsert: true,
+            });
+            
+        if (uploadError) throw uploadError;
+        
+        // Soumettre la demande d'abonnement
+        const { error: dbError } = await supabaseClient
+            .from('demandes_abonnement')
+            .insert({
+                entreprise_id: profile.entreprise_id,
+                reference_wave: reference,
+                preuve_paiement_path: filePath,
+                submitted_by: session.user.id,
+            });
+            
+        if (dbError) throw dbError;
+        
+        showMsg(msgEl, '✅ Demande envoyée ! Notre équipe vérifiera votre paiement et activera votre abonnement.', 'success');
+        
+    } catch (error) {
+        console.error('Erreur soumission abonnement:', error);
+        showMsg(msgEl, friendlyError(error), 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Envoyer ma preuve de paiement';
+    }
+}
+
+function showMsg(el, msg, type = 'info') {
+    el.textContent = msg;
+    el.className = `subscription-message ${type}`;
+}
+
+function clearMsg(el) {
+    el.textContent = '';
+    el.className = 'subscription-message';
+}
+</script>
 </body>
 </html>

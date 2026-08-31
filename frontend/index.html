@@ -13,11 +13,366 @@
 <meta name="apple-mobile-web-app-title" content="Ma Boutique">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="stylesheet" href="assets/style.css">
+
+<style>
+/* ============================================================================
+   MENU MOBILE + MODE SOMBRE GLOBAL
+   ============================================================================ */
+
+.mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 1001;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: #4F46E5;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex;
+    }
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 280px;
+        height: 100vh;
+        transition: left 0.3s ease;
+        z-index: 1000;
+        overflow-y: auto;
+    }
+    .sidebar.open {
+        left: 0;
+    }
+    .main {
+        padding-left: 16px;
+        padding-right: 16px;
+        padding-top: 60px;
+    }
+}
+
+body.dark-mode {
+    --surface: #1F2937;
+    --surface-2: #374151;
+    --surface-3: #4B5563;
+    --border: #4B5563;
+    --border-soft: #374151;
+    --text: #F9FAFB;
+    --text-muted: #9CA3AF;
+    --text-light: #6B7280;
+    background: #111827;
+    color: #F9FAFB;
+}
+
+body.dark-mode .card,
+body.dark-mode .sidebar {
+    background: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode .nav-link {
+    color: #9CA3AF;
+}
+
+body.dark-mode .nav-link.active {
+    background: #4F46E5;
+    color: white;
+}
+
+body.dark-mode table {
+    background: #1F2937;
+}
+
+body.dark-mode th {
+    background: #374151;
+    color: #9CA3AF;
+}
+
+body.dark-mode td {
+    border-color: #374151;
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+    background: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+body.dark-mode .stat-card {
+    background: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode .empty-state {
+    color: #9CA3AF;
+}
+
+body.dark-mode .hint {
+    color: #9CA3AF;
+}
+
+/* Nouveau tableau de bord simplifié */
+.welcome-header {
+    margin-bottom: 24px;
+}
+
+.welcome-header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.welcome-header p {
+    color: #888;
+    font-size: 15px;
+}
+
+.dashboard-big-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.big-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid #eee;
+}
+
+.big-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.big-card.primary {
+    background: linear-gradient(135deg, #4F46E5, #6366F1);
+    color: white;
+    border: none;
+}
+
+.big-card.warning {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    color: white;
+    border: none;
+}
+
+.big-card.info {
+    background: white;
+    border: 1px solid #e0e7ff;
+}
+
+.big-card-icon {
+    font-size: 40px;
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.2);
+}
+
+.big-card.info .big-card-icon {
+    background: #eef2ff;
+}
+
+.big-card-content {
+    flex: 1;
+}
+
+.big-card-label {
+    font-size: 13px;
+    opacity: 0.9;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.big-card-value {
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.big-card-hint {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-top: 4px;
+}
+
+.big-card-arrow {
+    font-size: 24px;
+    opacity: 0.7;
+}
+
+.dashboard-actions {
+    margin-top: 24px;
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 16px;
+}
+
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+.action-button {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.action-button:hover {
+    border-color: #4F46E5;
+    background: #f8f7ff;
+    transform: translateY(-2px);
+}
+
+.action-button.primary {
+    background: #4F46E5;
+    color: white;
+    border: none;
+}
+
+.action-button.primary:hover {
+    background: #4338CA;
+}
+
+.action-emoji {
+    font-size: 36px;
+}
+
+.action-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: inherit;
+}
+
+.dashboard-recap {
+    margin-top: 32px;
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid #eee;
+}
+
+.recap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+}
+
+.recap-item {
+    text-align: center;
+    padding: 16px;
+    background: #fafafa;
+    border-radius: 12px;
+}
+
+.recap-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.recap-label {
+    font-size: 12px;
+    color: #888;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.recap-value {
+    font-size: 24px;
+    font-weight: 800;
+    color: #333;
+}
+
+.recap-hint {
+    font-size: 11px;
+    color: #999;
+    margin-top: 4px;
+}
+
+body.dark-mode .big-card.info,
+body.dark-mode .dashboard-recap,
+body.dark-mode .action-button {
+    background: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode .action-button.primary {
+    background: #4F46E5;
+}
+
+body.dark-mode .recap-item {
+    background: #374151;
+}
+
+body.dark-mode .recap-value {
+    color: #F9FAFB;
+}
+
+body.dark-mode .section-title {
+    color: #F9FAFB;
+}
+</style>
 </head>
 <body>
+
+<!-- ========== MENU MOBILE ========== -->
+<button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
 <div class="app">
-  
-  <!-- ==================== NAVIGATION SIMPLIFIÉE ==================== -->
   <nav class="sidebar">
     <div class="brand">
       <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
@@ -43,7 +398,7 @@
         <span class="nav-emoji">📦</span> Mes Articles
       </a>
       <a href="stock.html" class="nav-link">
-        <span class="nav-emoji">🔄</span> Entrées / Sorties
+        <span class="nav-emoji">📊</span> Stock & Produits
       </a>
     </div>
 
@@ -59,26 +414,24 @@
     </div>
 
     <div class="sidebar-footer">
-      <a href="parametres.html" class="nav-link">
-        <span class="nav-emoji">⚙️</span> Réglages
-      </a>
+      <!-- ========== MODE SOMBRE ========== -->
+      <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;">
+        <span id="dark-mode-icon">🌙</span>
+        <span id="dark-mode-label">Mode sombre</span>
+      </button>
+      
+      <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
       <button class="btn-logout" onclick="logout()">Déconnexion</button>
     </div>
   </nav>
 
-  <!-- ==================== CONTENU PRINCIPAL ==================== -->
   <main class="main">
-    
-    <!-- En-tête de bienvenue -->
     <div class="welcome-header">
       <h1>Bonjour 👋</h1>
       <p>Voici ce qui se passe aujourd'hui dans votre boutique.</p>
     </div>
 
-    <!-- 3 GROSSES CARTES ESSENTIELLES -->
     <div class="dashboard-big-cards">
-      
-      <!-- Carte 1 : Argent encaissé aujourd'hui -->
       <div class="big-card primary" onclick="window.location.href='factures.html'">
         <div class="big-card-icon">💰</div>
         <div class="big-card-content">
@@ -89,7 +442,6 @@
         <div class="big-card-arrow">→</div>
       </div>
 
-      <!-- Carte 2 : Argent qu'on me doit -->
       <div class="big-card warning" onclick="window.location.href='credits.html'">
         <div class="big-card-icon">⚠️</div>
         <div class="big-card-content">
@@ -100,7 +452,6 @@
         <div class="big-card-arrow">→</div>
       </div>
 
-      <!-- Carte 3 : Stock faible -->
       <div class="big-card info" onclick="window.location.href='rupture-stock.html'">
         <div class="big-card-icon">📦</div>
         <div class="big-card-content">
@@ -112,7 +463,6 @@
       </div>
     </div>
 
-    <!-- GROS BOUTONS D'ACTION RAPIDE -->
     <div class="dashboard-actions">
       <div class="section-title">Que voulez-vous faire ?</div>
       <div class="action-grid">
@@ -135,7 +485,6 @@
       </div>
     </div>
 
-    <!-- RÉCAPITULATIF DE LA SEMAINE -->
     <div class="dashboard-recap">
       <div class="section-title">Ma semaine en un coup d'œil</div>
       <div class="recap-grid">
@@ -153,19 +502,18 @@
         </div>
         <div class="recap-item">
           <div class="recap-icon">📦</div>
-          <div class="recap-label">Articles en catalogue</div>
+          <div class="recap-label">Articles</div>
           <div class="recap-value" id="stat-pieces">—</div>
-          <div class="recap-hint">Articles disponibles</div>
+          <div class="recap-hint">En catalogue</div>
         </div>
         <div class="recap-item">
           <div class="recap-icon">💰</div>
-          <div class="recap-label">Valeur du stock</div>
+          <div class="recap-label">Valeur stock</div>
           <div class="recap-value" id="stat-valeur">—</div>
           <div class="recap-hint">Prix d'achat</div>
         </div>
       </div>
     </div>
-
   </main>
 </div>
 
@@ -174,10 +522,52 @@
 <script src="assets/app.js"></script>
 <script>
 // ============================================================================
-// LOGIQUE DU TABLEAU DE BORD SIMPLIFIÉ
+// MENU MOBILE + MODE SOMBRE
+// ============================================================================
+
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    if (sidebar) sidebar.classList.toggle('open');
+    if (overlay) overlay.classList.toggle('active');
+}
+
+document.addEventListener('click', (e) => {
+    if (e.target.closest('.nav-link')) {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+    }
+});
+
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
+    const icon = document.getElementById('dark-mode-icon');
+    const label = document.getElementById('dark-mode-label');
+    if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+    if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre';
+}
+
+function initDarkMode() {
+    if (localStorage.getItem('recouvra_dark_mode') === '1') {
+        document.body.classList.add('dark-mode');
+        const icon = document.getElementById('dark-mode-icon');
+        const label = document.getElementById('dark-mode-label');
+        if (icon) icon.textContent = '☀️';
+        if (label) label.textContent = 'Mode clair';
+    }
+}
+
+// ============================================================================
+// LOGIQUE DU TABLEAU DE BORD
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', async () => {
+    initDarkMode();
+    
     const session = await requireAuth();
     if (!session) return;
 
@@ -185,18 +575,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadDashboardData() {
-    // 1. Charger les articles (pour stock et valeur)
     const { items: pieces, offline, savedAt } = await loadWithCache('pieces', () =>
         fetchAllRows(() => supabaseClient.from('pieces').select('*').eq('actif', true).order('id'))
     );
 
-    // Mettre à jour les cartes
     document.getElementById('stat-pieces').textContent = pieces.length;
     
     const valeur = pieces.reduce((sum, p) => sum + (p.quantite_stock * Number(p.prix_achat)), 0);
     document.getElementById('stat-valeur').textContent = fmtMoney(valeur);
 
-    // Alertes stock
     const alertes = pieces.filter(p => p.quantite_stock <= p.seuil_alerte);
     document.getElementById('stat-alertes').textContent = alertes.length;
 
@@ -204,7 +591,6 @@ async function loadDashboardData() {
         showToast(`Hors ligne : données du ${fmtDateTime(savedAt)}.`, 'info');
     }
 
-    // 2. Charger l'activité commerciale
     await loadActiviteCommerciale();
 }
 
@@ -233,12 +619,10 @@ async function loadActiviteCommerciale() {
         const ventesSemaine = (ventes || []).filter(f => new Date(f.validated_at) >= debutSemaine);
         const ventesJour = (ventes || []).filter(f => new Date(f.validated_at) >= today);
 
-        // Cartes principales
         const caJour = ventesJour.reduce((s, f) => s + Number(f.montant_total), 0);
         document.getElementById('stat-ca-jour').textContent = fmtMoney(caJour);
         document.getElementById('stat-nb-jour').textContent = `${ventesJour.length} vente${ventesJour.length > 1 ? 's' : ''} faite${ventesJour.length > 1 ? 's' : ''}`;
 
-        // Récapitulatif
         const caSemaine = ventesSemaine.reduce((s, f) => s + Number(f.montant_total), 0);
         document.getElementById('stat-ca-semaine').textContent = fmtMoney(caSemaine);
         document.getElementById('stat-nb-semaine').textContent = `${ventesSemaine.length} vente${ventesSemaine.length > 1 ? 's' : ''}`;
@@ -254,7 +638,6 @@ async function loadActiviteCommerciale() {
         document.getElementById('stat-ca-mois').textContent = '—';
     }
 
-    // 3. Charger les créances
     try {
         const { data: creances, error } = await supabaseClient
             .from('factures')

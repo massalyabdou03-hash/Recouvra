@@ -16,7 +16,167 @@
 
 <style>
 /* ============================================================================
-   STYLES SPÉCIFIQUES SUPER ADMIN
+   MENU MOBILE + MODE SOMBRE GLOBAL
+   ============================================================================ */
+
+.mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 1001;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: #4F46E5;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex;
+    }
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 280px;
+        height: 100vh;
+        transition: left 0.3s ease;
+        z-index: 1000;
+        overflow-y: auto;
+    }
+    .sidebar.open {
+        left: 0;
+    }
+    .main {
+        padding-left: 16px;
+        padding-right: 16px;
+        padding-top: 60px;
+    }
+}
+
+body.dark-mode {
+    --surface: #1F2937;
+    --surface-2: #374151;
+    --surface-3: #4B5563;
+    --border: #4B5563;
+    --border-soft: #374151;
+    --text: #F9FAFB;
+    --text-muted: #9CA3AF;
+    --text-light: #6B7280;
+    background: #111827;
+    color: #F9FAFB;
+}
+
+body.dark-mode .card,
+body.dark-mode .sidebar,
+body.dark-mode .modal {
+    background: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode .nav-link {
+    color: #9CA3AF;
+}
+
+body.dark-mode .nav-link.active {
+    background: #4F46E5;
+    color: white;
+}
+
+body.dark-mode table {
+    background: #1F2937;
+}
+
+body.dark-mode th {
+    background: #374151;
+    color: #9CA3AF;
+}
+
+body.dark-mode td {
+    border-color: #374151;
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+    background: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+body.dark-mode .btn-secondary {
+    background: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+body.dark-mode .empty-state {
+    color: #9CA3AF;
+}
+
+body.dark-mode .hint {
+    color: #9CA3AF;
+}
+
+body.dark-mode .admin-btn {
+    background: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+body.dark-mode .filter-chip {
+    background: #374151;
+    border-color: #4B5563;
+    color: #9CA3AF;
+}
+
+body.dark-mode .filter-chip.active {
+    background: #4F46E5;
+    color: white;
+}
+
+body.dark-mode .admin-tab {
+    background: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+body.dark-mode .admin-tab.active {
+    background: #4F46E5;
+    color: white;
+}
+
+body.dark-mode .admin-search input {
+    background: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+/* ============================================================================
+   PAGE SUPER ADMIN
    ============================================================================ */
 
 .admin-shell {
@@ -74,7 +234,6 @@
     align-items: center;
 }
 
-/* Mode sombre toggle */
 .dark-mode-toggle {
     display: flex;
     align-items: center;
@@ -93,7 +252,6 @@
     background: #f3f4f6;
 }
 
-/* Notifications */
 .payments-notice {
     display: flex;
     align-items: center;
@@ -108,7 +266,6 @@
     font-size: 0.92rem;
 }
 
-/* Filtres */
 .payments-filters {
     display: flex;
     gap: 8px;
@@ -138,7 +295,6 @@
     background: #f3f4f6;
 }
 
-/* Tableau */
 .payments-table-wrap {
     overflow-x: auto;
     border: 1px solid #e5e7eb;
@@ -184,7 +340,6 @@ table.payments-table tr:hover {
     color: #6B7280;
 }
 
-/* Actions dans le tableau */
 .admin-actions {
     display: flex;
     gap: 4px;
@@ -240,7 +395,6 @@ table.payments-table tr:hover {
     background: #BFDBFE;
 }
 
-/* Détail paiement */
 .detail-row {
     display: flex;
     justify-content: space-between;
@@ -290,7 +444,6 @@ table.payments-table tr:hover {
     font-weight: 700;
 }
 
-/* Barre de recherche admin */
 .admin-search {
     margin-bottom: 16px;
 }
@@ -309,7 +462,6 @@ table.payments-table tr:hover {
     border-color: #4F46E5;
 }
 
-/* Onglets admin */
 .admin-tabs {
     display: flex;
     gap: 8px;
@@ -338,365 +490,598 @@ table.payments-table tr:hover {
     background: #f3f4f6;
 }
 
-/* Mode sombre */
-body.dark-mode {
-    --surface: #1F2937;
-    --surface-2: #374151;
-    --surface-3: #4B5563;
-    --border: #4B5563;
-    --border-soft: #374151;
-    --text: #F9FAFB;
-    --text-muted: #9CA3AF;
-    --text-light: #6B7280;
-    background: #111827;
-    color: #F9FAFB;
+.grid-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
-body.dark-mode .card {
-    background: #1F2937;
-    border-color: #374151;
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #eee;
 }
 
-body.dark-mode .admin-header {
-    background: #1F2937;
-    border-color: #374151;
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #4F46E5;
+    background: #EEF2FF;
 }
 
+.stat-card.warning .stat-icon {
+    background: #FEF3C7;
+    color: #F59E0B;
+}
+
+.stat-body {
+    flex: 1;
+}
+
+.stat-body .label {
+    font-size: 12px;
+    color: #888;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.stat-body .value {
+    font-size: 24px;
+    font-weight: 800;
+    color: #333;
+}
+
+body.dark-mode .admin-header,
+body.dark-mode .stat-card,
 body.dark-mode .payments-table-wrap {
     background: #1F2937;
     border-color: #374151;
 }
 
-body.dark-mode table.payments-table th {
-    background: #374151;
+body.dark-mode .admin-header p,
+body.dark-mode .stat-body .label {
     color: #9CA3AF;
 }
 
-body.dark-mode table.payments-table td {
+body.dark-mode .stat-body .value {
+    color: #F9FAFB;
+}
+
+body.dark-mode .detail-row .k {
+    color: #9CA3AF;
+}
+
+body.dark-mode .admin-reminder {
+    background: #451A03;
+    border-color: #F59E0B;
+    color: #FEF3C7;
+}
+
+/* --- Modal --- */
+.modal-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-backdrop.open {
+    display: flex;
+}
+
+.modal {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-lg {
+    max-width: 700px;
+}
+
+.modal-sm {
+    max-width: 400px;
+}
+
+.modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.modal-head h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.close-x {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #888;
+    padding: 4px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #4F46E5;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    background: #4F46E5;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    background: #4338CA;
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    color: #333;
+    border: 1px solid #e5e7eb;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+.btn-danger {
+    background: #EF4444;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #DC2626;
+}
+
+body.dark-mode .modal {
+    background: #1F2937;
     border-color: #374151;
 }
 
-body.dark-mode table.payments-table tr:hover {
-    background: #374151;
+body.dark-mode label {
+    color: #F9FAFB;
 }
 
-body.dark-mode .admin-btn {
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
     background: #374151;
     border-color: #4B5563;
     color: #F9FAFB;
 }
 
-body.dark-mode .filter-chip {
+body.dark-mode .btn-secondary {
     background: #374151;
     border-color: #4B5563;
-    color: #9CA3AF;
+    color: #F9FAFB;
 }
 
-body.dark-mode .filter-chip.active {
-    background: #4F46E5;
-    color: white;
-}
-
-/* Responsive */
+/* --- Responsive --- */
 @media (max-width: 768px) {
     .admin-shell {
         padding: 16px;
     }
-
+    
     .admin-header {
         flex-direction: column;
         align-items: flex-start;
     }
-
+    
     .admin-header-actions {
         width: 100%;
         justify-content: space-between;
+    }
+    
+    .grid-stats {
+        grid-template-columns: 1fr 1fr;
     }
 }
 </style>
 </head>
 <body>
-<main class="admin-shell">
+
+<!-- ========== MENU MOBILE ========== -->
+<button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<div class="app">
+  <nav class="sidebar">
+    <div class="brand">
+      <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
+      <span data-company-name>Recouvra</span>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Quotidien</div>
+      <a href="index.html" class="nav-link">
+        <span class="nav-emoji">🏠</span> Accueil
+      </a>
+      <a href="factures.html" class="nav-link">
+        <span class="nav-emoji">🧾</span> Vendre
+      </a>
+      <a href="clients.html" class="nav-link">
+        <span class="nav-emoji">👥</span> Mes Clients
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Stock</div>
+      <a href="catalogue.html" class="nav-link">
+        <span class="nav-emoji">📦</span> Mes Articles
+      </a>
+      <a href="stock.html" class="nav-link">
+        <span class="nav-emoji">📊</span> Stock & Produits
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Argent</div>
+      <a href="credits.html" class="nav-link">
+        <span class="nav-emoji">💸</span> On me doit
+      </a>
+      <a href="recouvra.html" class="nav-link premium">
+        <span class="nav-emoji">📣</span> Relancer
+        <span class="badge-premium">PRO</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <!-- ========== MODE SOMBRE ========== -->
+      <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;">
+        <span id="dark-mode-icon">🌙</span>
+        <span id="dark-mode-label">Mode sombre</span>
+      </button>
+      
+      <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
+      <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="main">
     
-    <!-- En-tête admin -->
-    <div class="admin-header">
+    <div class="admin-shell">
+      
+      <!-- En-tête admin -->
+      <div class="admin-header">
         <div class="admin-header-left">
-            <div class="admin-icon">🔐</div>
-            <div>
-                <h1>Administration</h1>
-                <p>Gestion complète des paiements, entreprises et utilisateurs</p>
-            </div>
+          <div class="admin-icon">🔐</div>
+          <div>
+            <h1>Administration</h1>
+            <p>Gestion complète des paiements, entreprises et utilisateurs</p>
+          </div>
         </div>
         <div class="admin-header-actions">
-            <!-- Toggle mode sombre -->
-            <button class="dark-mode-toggle" onclick="toggleDarkMode()">
-                <span id="dark-mode-icon">🌙</span>
-                <span id="dark-mode-label">Mode sombre</span>
-            </button>
-            <a href="index.html" class="btn-back">
-                <span class="arrow">←</span> Retour
-            </a>
+          <button class="dark-mode-toggle" onclick="toggleDarkMode()">
+            <span id="dark-mode-icon">🌙</span>
+            <span id="dark-mode-label">Mode sombre</span>
+          </button>
+          <a href="index.html" class="btn-back">
+            <span class="arrow">←</span> Retour
+          </a>
         </div>
-    </div>
+      </div>
 
-    <!-- Notification paiements en attente -->
-    <div id="payments-notice" class="payments-notice" hidden></div>
+      <!-- Notification -->
+      <div id="payments-notice" class="payments-notice" hidden></div>
 
-    <!-- Statistiques -->
-    <div class="grid-stats">
+      <!-- Statistiques -->
+      <div class="grid-stats">
         <div class="stat-card warning">
-            <div class="stat-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 8v4l3 3"/>
-                    <circle cx="12" cy="12" r="9"/>
-                </svg>
-            </div>
-            <div class="stat-body">
-                <div class="label">Paiements en attente</div>
-                <div class="value" id="stat-pending-count">—</div>
-            </div>
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 8v4l3 3"/>
+              <circle cx="12" cy="12" r="9"/>
+            </svg>
+          </div>
+          <div class="stat-body">
+            <div class="label">Paiements en attente</div>
+            <div class="value" id="stat-pending-count">—</div>
+          </div>
         </div>
         <div class="stat-card warning">
-            <div class="stat-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="5" width="20" height="14" rx="2"/>
-                    <path d="M2 10h20"/>
-                </svg>
-            </div>
-            <div class="stat-body">
-                <div class="label">Montant en attente</div>
-                <div class="value" id="stat-pending-amount">—</div>
-            </div>
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="5" width="20" height="14" rx="2"/>
+              <path d="M2 10h20"/>
+            </svg>
+          </div>
+          <div class="stat-body">
+            <div class="label">Montant en attente</div>
+            <div class="value" id="stat-pending-amount">—</div>
+          </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 6L9 17l-5-5"/>
-                </svg>
-            </div>
-            <div class="stat-body">
-                <div class="label">Paiements confirmés</div>
-                <div class="value" id="stat-confirmed-count">—</div>
-            </div>
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+          </div>
+          <div class="stat-body">
+            <div class="label">Paiements confirmés</div>
+            <div class="value" id="stat-confirmed-count">—</div>
+          </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 1v22"/>
-                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                </svg>
-            </div>
-            <div class="stat-body">
-                <div class="label">Revenus confirmés</div>
-                <div class="value" id="stat-confirmed-amount">—</div>
-            </div>
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 1v22"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <div class="stat-body">
+            <div class="label">Revenus confirmés</div>
+            <div class="value" id="stat-confirmed-amount">—</div>
+          </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                </svg>
-            </div>
-            <div class="stat-body">
-                <div class="label">Entreprises actives</div>
-                <div class="value" id="stat-entreprises">—</div>
-            </div>
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <div class="stat-body">
+            <div class="label">Entreprises actives</div>
+            <div class="value" id="stat-entreprises">—</div>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <!-- Onglets -->
-    <div class="admin-tabs">
+      <!-- Onglets -->
+      <div class="admin-tabs">
         <button class="admin-tab active" onclick="showTab('paiements')">💳 Paiements</button>
         <button class="admin-tab" onclick="showTab('entreprises')">🏢 Entreprises</button>
         <button class="admin-tab" onclick="showTab('utilisateurs')">👤 Utilisateurs</button>
-    </div>
+      </div>
 
-    <!-- Barre de recherche -->
-    <div class="admin-search">
+      <!-- Recherche -->
+      <div class="admin-search">
         <input type="text" id="admin-search" placeholder="🔍 Rechercher (entreprise, client, email, téléphone)..." oninput="filterData()">
-    </div>
+      </div>
 
-    <!-- ========== ONGLET PAIEMENTS ========== -->
-    <div id="tab-paiements">
-        <!-- Filtres -->
-        <div class="payments-filters" id="payments-filters">
-            <button type="button" class="filter-chip active" data-filter="pending">🕐 En attente</button>
-            <button type="button" class="filter-chip" data-filter="confirmed">✅ Confirmés</button>
-            <button type="button" class="filter-chip" data-filter="rejected">❌ Rejetés</button>
-            <button type="button" class="filter-chip" data-filter="all">📋 Tous</button>
+      <!-- ========== ONGLET PAIEMENTS ========== -->
+      <div id="tab-paiements">
+        <div class="payments-filters">
+          <button type="button" class="filter-chip active" data-filter="pending">🕐 En attente</button>
+          <button type="button" class="filter-chip" data-filter="confirmed">✅ Confirmés</button>
+          <button type="button" class="filter-chip" data-filter="rejected">❌ Rejetés</button>
+          <button type="button" class="filter-chip" data-filter="all">📋 Tous</button>
         </div>
 
-        <!-- Tableau des paiements -->
         <div class="payments-table-wrap">
-            <table class="payments-table">
-                <thead>
-                    <tr>
-                        <th>Entreprise</th>
-                        <th>Client</th>
-                        <th>Téléphone</th>
-                        <th>Montant</th>
-                        <th>Type</th>
-                        <th>Date</th>
-                        <th>Statut</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="payments-tbody">
-                    <tr>
-                        <td colspan="8" class="payments-empty">Chargement...</td>
-                    </tr>
-                </tbody>
-            </table>
+          <table class="payments-table">
+            <thead>
+              <tr>
+                <th>Entreprise</th>
+                <th>Client</th>
+                <th>Téléphone</th>
+                <th>Montant</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="payments-tbody">
+              <tr>
+                <td colspan="8" class="payments-empty">Chargement...</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-    </div>
+      </div>
 
-    <!-- ========== ONGLET ENTREPRISES ========== -->
-    <div id="tab-entreprises" style="display:none;">
+      <!-- ========== ONGLET ENTREPRISES ========== -->
+      <div id="tab-entreprises" style="display:none;">
         <div class="payments-table-wrap">
-            <table class="payments-table">
-                <thead>
-                    <tr>
-                        <th>Entreprise</th>
-                        <th>Gérant</th>
-                        <th>Téléphone</th>
-                        <th>Abonnement</th>
-                        <th>Statut</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="entreprises-tbody">
-                    <tr>
-                        <td colspan="6" class="payments-empty">Chargement...</td>
-                    </tr>
-                </tbody>
-            </table>
+          <table class="payments-table">
+            <thead>
+              <tr>
+                <th>Entreprise</th>
+                <th>Gérant</th>
+                <th>Téléphone</th>
+                <th>Abonnement</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="entreprises-tbody">
+              <tr>
+                <td colspan="6" class="payments-empty">Chargement...</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-    </div>
+      </div>
 
-    <!-- ========== ONGLET UTILISATEURS ========== -->
-    <div id="tab-utilisateurs" style="display:none;">
+      <!-- ========== ONGLET UTILISATEURS ========== -->
+      <div id="tab-utilisateurs" style="display:none;">
         <div class="payments-table-wrap">
-            <table class="payments-table">
-                <thead>
-                    <tr>
-                        <th>Email</th>
-                        <th>Entreprise</th>
-                        <th>Rôle</th>
-                        <th>Recouvra</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="utilisateurs-tbody">
-                    <tr>
-                        <td colspan="5" class="payments-empty">Chargement...</td>
-                    </tr>
-                </tbody>
-            </table>
+          <table class="payments-table">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Entreprise</th>
+                <th>Rôle</th>
+                <th>Recouvra</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="utilisateurs-tbody">
+              <tr>
+                <td colspan="5" class="payments-empty">Chargement...</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-    </div>
+      </div>
 
-</main>
+    </div>
+  </main>
+</div>
 
 <!-- ========== MODAL DÉTAIL PAIEMENT ========== -->
 <div class="modal-backdrop" id="payment-detail-backdrop">
-    <div class="modal modal-lg">
-        <div class="modal-head">
-            <h3>Paiement à vérifier</h3>
-            <button class="close-x" onclick="closeModal('payment-detail-backdrop')">×</button>
-        </div>
-        <div id="payment-detail-content"></div>
-        <div class="admin-reminder">
-            <span>⚠️</span>
-            <span>Vérifiez d'abord votre compte Wave Business afin de confirmer que le paiement a bien été reçu.</span>
-        </div>
-        <div class="modal-actions" id="payment-detail-actions"></div>
+  <div class="modal modal-lg">
+    <div class="modal-head">
+      <h3>Paiement à vérifier</h3>
+      <button class="close-x" onclick="closeModal('payment-detail-backdrop')">×</button>
     </div>
+    <div id="payment-detail-content"></div>
+    <div class="admin-reminder">
+      <span>⚠️</span>
+      <span>Vérifiez d'abord votre compte Wave Business afin de confirmer que le paiement a bien été reçu.</span>
+    </div>
+    <div class="modal-actions" id="payment-detail-actions"></div>
+  </div>
 </div>
 
 <!-- ========== MODAL MODIFIER ENTREPRISE ========== -->
 <div class="modal-backdrop" id="edit-entreprise-backdrop">
-    <div class="modal modal-lg">
-        <div class="modal-head">
-            <h3>Modifier l'entreprise</h3>
-            <button class="close-x" onclick="closeModal('edit-entreprise-backdrop')">×</button>
-        </div>
-        <form id="edit-entreprise-form">
-            <input type="hidden" id="edit-entreprise-id">
-            <label>Nom de l'entreprise</label>
-            <input id="edit-entreprise-nom" required>
-            <label>Gérant</label>
-            <input id="edit-entreprise-gerant">
-            <label>Téléphone</label>
-            <input id="edit-entreprise-telephone">
-            <label>Email</label>
-            <input id="edit-entreprise-email" type="email">
-            <label>Statut abonnement</label>
-            <select id="edit-entreprise-statut">
-                <option value="active">✅ Actif</option>
-                <option value="pending">🕐 En attente</option>
-                <option value="expired">❌ Expiré</option>
-                <option value="cancelled">🚫 Annulé</option>
-            </select>
-            <div id="edit-entreprise-msg"></div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('edit-entreprise-backdrop')">Annuler</button>
-                <button type="submit" class="btn">Enregistrer</button>
-            </div>
-        </form>
+  <div class="modal modal-lg">
+    <div class="modal-head">
+      <h3>Modifier l'entreprise</h3>
+      <button class="close-x" onclick="closeModal('edit-entreprise-backdrop')">×</button>
     </div>
+    <form id="edit-entreprise-form">
+      <input type="hidden" id="edit-entreprise-id">
+      <label>Nom de l'entreprise</label>
+      <input id="edit-entreprise-nom" required>
+      <label>Gérant</label>
+      <input id="edit-entreprise-gerant">
+      <label>Téléphone</label>
+      <input id="edit-entreprise-telephone">
+      <label>Email</label>
+      <input id="edit-entreprise-email" type="email">
+      <label>Statut abonnement</label>
+      <select id="edit-entreprise-statut">
+        <option value="active">✅ Actif</option>
+        <option value="pending">🕐 En attente</option>
+        <option value="expired">❌ Expiré</option>
+        <option value="cancelled">🚫 Annulé</option>
+      </select>
+      <div id="edit-entreprise-msg"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('edit-entreprise-backdrop')">Annuler</button>
+        <button type="submit" class="btn">Enregistrer</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <!-- ========== MODAL RÉINITIALISER MOT DE PASSE ========== -->
 <div class="modal-backdrop" id="reset-password-backdrop">
-    <div class="modal modal-sm">
-        <div class="modal-head">
-            <h3>Réinitialiser le mot de passe</h3>
-            <button class="close-x" onclick="closeModal('reset-password-backdrop')">×</button>
-        </div>
-        <form id="reset-password-form">
-            <input type="hidden" id="reset-password-user-id">
-            <label>Email de l'utilisateur</label>
-            <input id="reset-password-email" type="email" readonly>
-            <label>Nouveau mot de passe</label>
-            <input id="reset-password-new" type="password" required minlength="8">
-            <div id="reset-password-msg"></div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('reset-password-backdrop')">Annuler</button>
-                <button type="submit" class="btn">Réinitialiser</button>
-            </div>
-        </form>
+  <div class="modal modal-sm">
+    <div class="modal-head">
+      <h3>Réinitialiser le mot de passe</h3>
+      <button class="close-x" onclick="closeModal('reset-password-backdrop')">×</button>
     </div>
+    <form id="reset-password-form">
+      <input type="hidden" id="reset-password-user-id">
+      <label>Email de l'utilisateur</label>
+      <input id="reset-password-email" type="email" readonly>
+      <label>Nouveau mot de passe</label>
+      <input id="reset-password-new" type="password" required minlength="8">
+      <div id="reset-password-msg"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('reset-password-backdrop')">Annuler</button>
+        <button type="submit" class="btn">Réinitialiser</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <!-- ========== MODAL MODIFIER UTILISATEUR ========== -->
 <div class="modal-backdrop" id="edit-user-backdrop">
-    <div class="modal modal-sm">
-        <div class="modal-head">
-            <h3>Modifier l'utilisateur</h3>
-            <button class="close-x" onclick="closeModal('edit-user-backdrop')">×</button>
-        </div>
-        <form id="edit-user-form">
-            <input type="hidden" id="edit-user-id">
-            <label>Rôle</label>
-            <select id="edit-user-role">
-                <option value="super_admin">🔐 Super Admin</option>
-                <option value="admin">👑 Admin</option>
-                <option value="vendeur">🛒 Vendeur</option>
-                <option value="magasinier">📦 Magasinier</option>
-            </select>
-            <label>
-                <input type="checkbox" id="edit-user-recouvra"> Accès Recouvra (PRO)
-            </label>
-            <div id="edit-user-msg"></div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('edit-user-backdrop')">Annuler</button>
-                <button type="submit" class="btn">Enregistrer</button>
-            </div>
-        </form>
+  <div class="modal modal-sm">
+    <div class="modal-head">
+      <h3>Modifier l'utilisateur</h3>
+      <button class="close-x" onclick="closeModal('edit-user-backdrop')">×</button>
     </div>
+    <form id="edit-user-form">
+      <input type="hidden" id="edit-user-id">
+      <label>Rôle</label>
+      <select id="edit-user-role">
+        <option value="super_admin">🔐 Super Admin</option>
+        <option value="admin">👑 Admin</option>
+        <option value="vendeur">🛒 Vendeur</option>
+        <option value="magasinier">📦 Magasinier</option>
+      </select>
+      <label>
+        <input type="checkbox" id="edit-user-recouvra"> Accès Recouvra (PRO)
+      </label>
+      <div id="edit-user-msg"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('edit-user-backdrop')">Annuler</button>
+        <button type="submit" class="btn">Enregistrer</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
@@ -704,7 +1089,47 @@ body.dark-mode .filter-chip.active {
 <script src="assets/app.js"></script>
 <script>
 // ============================================================================
-// SUPER ADMIN - GESTION COMPLÈTE
+// MENU MOBILE + MODE SOMBRE
+// ============================================================================
+
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    if (sidebar) sidebar.classList.toggle('open');
+    if (overlay) overlay.classList.toggle('active');
+}
+
+document.addEventListener('click', (e) => {
+    if (e.target.closest('.nav-link')) {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+    }
+});
+
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
+    const icon = document.getElementById('dark-mode-icon');
+    const label = document.getElementById('dark-mode-label');
+    if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+    if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre';
+}
+
+function initDarkMode() {
+    if (localStorage.getItem('recouvra_dark_mode') === '1') {
+        document.body.classList.add('dark-mode');
+        const icon = document.getElementById('dark-mode-icon');
+        const label = document.getElementById('dark-mode-label');
+        if (icon) icon.textContent = '☀️';
+        if (label) label.textContent = 'Mode clair';
+    }
+}
+
+// ============================================================================
+// SUPER ADMIN - LOGIQUE
 // ============================================================================
 
 let currentPaymentFilter = 'pending';
@@ -715,6 +1140,8 @@ let currentPaymentDetail = null;
 let currentAdminTab = 'paiements';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    initDarkMode();
+    
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session) {
         window.location.href = 'login.html';
@@ -737,12 +1164,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadEntreprises();
     await loadUsers();
 
-    if (localStorage.getItem('recouvra_dark_mode') === '1') {
-        document.body.classList.add('dark-mode');
-        document.getElementById('dark-mode-icon').textContent = '☀️';
-        document.getElementById('dark-mode-label').textContent = 'Mode clair';
-    }
-
     document.querySelectorAll('.filter-chip').forEach(chip => {
         chip.addEventListener('click', () => {
             document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
@@ -757,16 +1178,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('edit-user-form').addEventListener('submit', saveUser);
 });
 
-// --- Mode sombre ---
-function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
-    document.getElementById('dark-mode-icon').textContent = isDark ? '☀️' : '🌙';
-    document.getElementById('dark-mode-label').textContent = isDark ? 'Mode clair' : 'Mode sombre';
-}
-
-// --- Onglets ---
 function showTab(tabName) {
     currentAdminTab = tabName;
     
@@ -784,7 +1195,6 @@ function showTab(tabName) {
     filterData();
 }
 
-// --- Recherche ---
 function filterData() {
     const q = document.getElementById('admin-search').value.trim().toLowerCase();
     
@@ -797,16 +1207,12 @@ function filterData() {
     }
 }
 
-// --- Fermer un modal ---
 function closeModal(modalId) {
     const el = document.getElementById(modalId);
     if (el) el.classList.remove('open');
 }
 
-// ============================================================================
-// GESTION DES PAIEMENTS
-// ============================================================================
-
+// --- Paiements ---
 async function loadPayments() {
     try {
         const { data, error } = await supabaseClient
@@ -951,4 +1357,356 @@ function openPaymentDetail(paymentId) {
             <div class="detail-row">
                 <span class="k">Preuve</span>
                 <span class="v">
-                   
+                    <a href="${getStorageUrl(payment.proof_path)}" target="_blank" class="btn btn-secondary btn-sm">
+                        Voir la preuve
+                    </a>
+                </span>
+            </div>
+        ` : ''}
+    `;
+
+    const actions = document.getElementById('payment-detail-actions');
+    if (actions) {
+        actions.innerHTML = `
+            <button class="btn btn-secondary" onclick="closeModal('payment-detail-backdrop')">Fermer</button>
+            <button class="btn btn-danger" onclick="rejectPayment('${payment.id}')">Rejeter</button>
+            <button class="btn" onclick="confirmPayment('${payment.id}')">Confirmer</button>
+        `;
+    }
+
+    document.getElementById('payment-detail-backdrop').classList.add('open');
+}
+
+async function confirmPayment(paymentId) {
+    const ok = await confirmDialog(
+        'Confirmer ce paiement ? L\'entreprise sera activée immédiatement.',
+        { title: 'Confirmer le paiement', confirmLabel: 'Confirmer', danger: false }
+    );
+    if (!ok) return;
+
+    try {
+        const { error } = await supabaseClient
+            .rpc('confirm_subscription_payment', {
+                p_payment_id: paymentId,
+                p_decision: 'confirmed',
+            });
+
+        if (error) throw error;
+
+        showToast('Paiement confirmé — entreprise activée.', 'success');
+        closeModal('payment-detail-backdrop');
+        await loadPayments();
+
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
+}
+
+function rejectPayment(paymentId) {
+    const backdrop = document.getElementById('reject-backdrop');
+    if (backdrop) backdrop.classList.add('open');
+}
+
+async function annulerPaiement(paymentId) {
+    const ok = await confirmDialog(
+        'Annuler ce paiement confirmé ? L\'entreprise sera désactivée.',
+        { title: 'Annuler le paiement', confirmLabel: 'Annuler', danger: true }
+    );
+    if (!ok) return;
+
+    try {
+        const { error } = await supabaseClient
+            .rpc('annuler_paiement_admin', {
+                p_payment_id: paymentId,
+            });
+
+        if (error) throw error;
+
+        showToast('Paiement annulé — entreprise désactivée.', 'info');
+        await loadPayments();
+
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
+}
+
+// --- Entreprises ---
+async function loadEntreprises() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('entreprises')
+            .select(`
+                *,
+                subscriptions(status, current_period_end),
+                profiles(role, has_recouvra)
+            `)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        allEntreprises = data || [];
+        renderEntreprises();
+
+        const actives = allEntreprises.filter(e => 
+            e.subscriptions?.status === 'active'
+        ).length;
+        document.getElementById('stat-entreprises').textContent = actives;
+
+    } catch (error) {
+        console.error('Erreur chargement entreprises:', error);
+        document.getElementById('entreprises-tbody').innerHTML = `
+            <tr><td colspan="6" class="payments-empty">${friendlyError(error)}</td></tr>
+        `;
+    }
+}
+
+function renderEntreprises(search = '') {
+    const tbody = document.getElementById('entreprises-tbody');
+    if (!tbody) return;
+
+    let filtered = allEntreprises;
+
+    if (search) {
+        filtered = filtered.filter(e =>
+            (e.nom || '').toLowerCase().includes(search) ||
+            (e.gerant_nom || '').toLowerCase().includes(search) ||
+            (e.telephone || '').toLowerCase().includes(search)
+        );
+    }
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="payments-empty">Aucune entreprise trouvée</td></tr>`;
+        return;
+    }
+
+    const statusBadge = {
+        active: '<span class="badge badge-success">✅ Active</span>',
+        pending: '<span class="badge badge-warning">🕐 En attente</span>',
+        expired: '<span class="badge badge-danger">❌ Expirée</span>',
+        cancelled: '<span class="badge badge-muted">🚫 Annulée</span>',
+    };
+
+    tbody.innerHTML = filtered.map(e => `
+        <tr>
+            <td><strong>${esc(e.nom || '—')}</strong></td>
+            <td>${esc(e.gerant_nom || '—')}</td>
+            <td>${esc(e.telephone || '—')}</td>
+            <td>${e.subscriptions?.status ? statusBadge[e.subscriptions.status] : '—'}</td>
+            <td>${e.subscriptions?.current_period_end ? fmtDate(e.subscriptions.current_period_end) : '—'}</td>
+            <td>
+                <div class="admin-actions">
+                    <button class="admin-btn info" onclick="openEditEntreprise('${e.id}')">✏️ Modifier</button>
+                    <button class="admin-btn danger" onclick="desactiverEntreprise('${e.id}')">🚫 Désactiver</button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function openEditEntreprise(id) {
+    const entreprise = allEntreprises.find(e => e.id === id);
+    if (!entreprise) return;
+
+    document.getElementById('edit-entreprise-id').value = entreprise.id;
+    document.getElementById('edit-entreprise-nom').value = entreprise.nom || '';
+    document.getElementById('edit-entreprise-gerant').value = entreprise.gerant_nom || '';
+    document.getElementById('edit-entreprise-telephone').value = entreprise.telephone || '';
+    document.getElementById('edit-entreprise-email').value = entreprise.email || '';
+    document.getElementById('edit-entreprise-statut').value = entreprise.subscriptions?.status || 'pending';
+
+    document.getElementById('edit-entreprise-backdrop').classList.add('open');
+}
+
+async function saveEntreprise(e) {
+    e.preventDefault();
+
+    const id = document.getElementById('edit-entreprise-id').value;
+    const nom = document.getElementById('edit-entreprise-nom').value.trim();
+    const gerant = document.getElementById('edit-entreprise-gerant').value.trim();
+    const telephone = document.getElementById('edit-entreprise-telephone').value.trim();
+    const statut = document.getElementById('edit-entreprise-statut').value;
+
+    try {
+        const { error: err1 } = await supabaseClient
+            .from('entreprises')
+            .update({ nom, gerant_nom: gerant, telephone })
+            .eq('id', id);
+
+        if (err1) throw err1;
+
+        const { error: err2 } = await supabaseClient
+            .from('subscriptions')
+            .update({ status: statut, updated_at: new Date().toISOString() })
+            .eq('entreprise_id', id);
+
+        if (err2) throw err2;
+
+        if (statut === 'active') {
+            await supabaseClient
+                .from('profiles')
+                .update({ has_recouvra: true, updated_at: new Date().toISOString() })
+                .eq('entreprise_id', id);
+        } else {
+            await supabaseClient
+                .from('profiles')
+                .update({ has_recouvra: false, updated_at: new Date().toISOString() })
+                .eq('entreprise_id', id);
+        }
+
+        showToast('Entreprise modifiée avec succès.', 'success');
+        closeModal('edit-entreprise-backdrop');
+        await loadEntreprises();
+
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
+}
+
+async function desactiverEntreprise(id) {
+    const ok = await confirmDialog(
+        'Désactiver cette entreprise ? Elle ne pourra plus se connecter.',
+        { title: 'Désactiver l\'entreprise', confirmLabel: 'Désactiver', danger: true }
+    );
+    if (!ok) return;
+
+    try {
+        const { error } = await supabaseClient
+            .from('subscriptions')
+            .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+            .eq('entreprise_id', id);
+
+        if (error) throw error;
+
+        showToast('Entreprise désactivée.', 'info');
+        await loadEntreprises();
+
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
+}
+
+// --- Utilisateurs ---
+async function loadUsers() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('profiles')
+            .select(`
+                *,
+                entreprises(nom),
+                auth_users!inner(email)
+            `)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        allUsers = data || [];
+        renderUsers();
+
+    } catch (error) {
+        console.error('Erreur chargement utilisateurs:', error);
+        document.getElementById('utilisateurs-tbody').innerHTML = `
+            <tr><td colspan="5" class="payments-empty">${friendlyError(error)}</td></tr>
+        `;
+    }
+}
+
+function renderUsers(search = '') {
+    const tbody = document.getElementById('utilisateurs-tbody');
+    if (!tbody) return;
+
+    let filtered = allUsers;
+
+    if (search) {
+        filtered = filtered.filter(u =>
+            (u.email || '').toLowerCase().includes(search) ||
+            (u.entreprises?.nom || '').toLowerCase().includes(search)
+        );
+    }
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="payments-empty">Aucun utilisateur trouvé</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = filtered.map(u => `
+        <tr>
+            <td>${esc(u.email || '—')}</td>
+            <td>${esc(u.entreprises?.nom || '—')}</td>
+            <td>${esc(u.role || '—')}</td>
+            <td>${u.has_recouvra ? '<span class="badge badge-success">✅ PRO</span>' : '<span class="badge badge-muted">—</span>'}</td>
+            <td>
+                <div class="admin-actions">
+                    <button class="admin-btn info" onclick="openEditUser('${u.id}')">✏️ Modifier</button>
+                    <button class="admin-btn danger" onclick="resetPassword('${u.id}')">🔑 MDP</button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function openEditUser(id) {
+    const user = allUsers.find(u => u.id === id);
+    if (!user) return;
+
+    document.getElementById('edit-user-id').value = user.id;
+    document.getElementById('edit-user-role').value = user.role || 'vendeur';
+    document.getElementById('edit-user-recouvra').checked = user.has_recouvra || false;
+
+    document.getElementById('edit-user-backdrop').classList.add('open');
+}
+
+async function saveUser(e) {
+    e.preventDefault();
+
+    const id = document.getElementById('edit-user-id').value;
+    const role = document.getElementById('edit-user-role').value;
+    const hasRecouvra = document.getElementById('edit-user-recouvra').checked;
+
+    try {
+        const { error } = await supabaseClient
+            .from('profiles')
+            .update({ 
+                role, 
+                has_recouvra: hasRecouvra,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', id);
+
+        if (error) throw error;
+
+        showToast('Utilisateur modifié avec succès.', 'success');
+        closeModal('edit-user-backdrop');
+        await loadUsers();
+
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
+}
+
+async function resetPassword(userId) {
+    const user = allUsers.find(u => u.id === userId);
+    if (!user) return;
+
+    const newPassword = prompt(`Nouveau mot de passe pour ${user.email} :`);
+    if (!newPassword || newPassword.length < 8) {
+        showToast('Le mot de passe doit contenir au moins 8 caractères.', 'error');
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient.auth.admin.updateUserById(
+            userId,
+            { password: newPassword }
+        );
+
+        if (error) throw error;
+
+        showToast('Mot de passe réinitialisé avec succès.', 'success');
+
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
+}
+</script>
+</body>
+</html>

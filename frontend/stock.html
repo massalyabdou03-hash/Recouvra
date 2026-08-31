@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Entrées / Sorties — Ma Boutique</title>
+<title>Stock & Produits — Ma Boutique</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#4F46E5">
@@ -13,11 +13,425 @@
 <meta name="apple-mobile-web-app-title" content="Ma Boutique">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="stylesheet" href="assets/style.css">
+
+<style>
+/* ============================================================================
+   MENU MOBILE + MODE SOMBRE GLOBAL
+   ============================================================================ */
+
+.mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 1001;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: #4F46E5;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex;
+    }
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 280px;
+        height: 100vh;
+        transition: left 0.3s ease;
+        z-index: 1000;
+        overflow-y: auto;
+    }
+    .sidebar.open {
+        left: 0;
+    }
+    .main {
+        padding-left: 16px;
+        padding-right: 16px;
+        padding-top: 60px;
+    }
+}
+
+body.dark-mode {
+    --surface: #1F2937;
+    --surface-2: #374151;
+    --surface-3: #4B5563;
+    --border: #4B5563;
+    --border-soft: #374151;
+    --text: #F9FAFB;
+    --text-muted: #9CA3AF;
+    --text-light: #6B7280;
+    background: #111827;
+    color: #F9FAFB;
+}
+
+body.dark-mode .card,
+body.dark-mode .sidebar {
+    background: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode .nav-link {
+    color: #9CA3AF;
+}
+
+body.dark-mode .nav-link.active {
+    background: #4F46E5;
+    color: white;
+}
+
+body.dark-mode table {
+    background: #1F2937;
+}
+
+body.dark-mode th {
+    background: #374151;
+    color: #9CA3AF;
+}
+
+body.dark-mode td {
+    border-color: #374151;
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+    background: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+body.dark-mode .btn-secondary {
+    background: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+body.dark-mode .empty-state {
+    color: #9CA3AF;
+}
+
+body.dark-mode .hint {
+    color: #9CA3AF;
+}
+
+/* ============================================================================
+   PAGE STOCK & PRODUITS - SIMPLIFIÉE
+   ============================================================================ */
+
+.stock-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.stock-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.stock-header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 0;
+}
+
+.stock-header p {
+    color: #888;
+    font-size: 14px;
+    margin: 4px 0 0;
+}
+
+.stock-header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.stock-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.stock-stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    border: 1px solid #eee;
+}
+
+.stock-stat-card.warning {
+    background: #FEF3C7;
+    border-color: #F59E0B;
+}
+
+.stock-stat-card.danger {
+    background: #FEE2E2;
+    border-color: #EF4444;
+}
+
+.stock-stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.stock-stat-label {
+    font-size: 12px;
+    color: #888;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.stock-search {
+    margin-bottom: 20px;
+}
+
+.stock-search input {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 15px;
+    outline: none;
+}
+
+.stock-search input:focus {
+    border-color: #4F46E5;
+}
+
+/* Onglets */
+.stock-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.stock-tab {
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.stock-tab.active {
+    background: #4F46E5;
+    color: white;
+    border-color: #4F46E5;
+}
+
+.stock-tab:hover:not(.active) {
+    background: #f3f4f6;
+}
+
+/* Liste des produits */
+.products-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.product-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid #eee;
+    position: relative;
+}
+
+.product-card:hover {
+    border-color: #4F46E5;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+}
+
+.product-card.rupture {
+    border-color: #EF4444;
+    background: #FEF2F2;
+}
+
+.product-card.faible {
+    border-color: #F59E0B;
+    background: #FFFBEB;
+}
+
+.product-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.product-emoji {
+    font-size: 32px;
+}
+
+.product-stock-badge {
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.product-stock-badge.ok {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.product-stock-badge.warning {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.product-stock-badge.danger {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.product-name {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.product-ref {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 8px;
+}
+
+.product-price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+
+.product-price {
+    font-size: 16px;
+    font-weight: 800;
+    color: #4F46E5;
+}
+
+.product-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.icon-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.icon-btn:hover {
+    background: #f3f4f6;
+}
+
+.icon-btn.edit:hover {
+    background: #DBEAFE;
+    color: #1E40AF;
+}
+
+.icon-btn.delete:hover {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+body.dark-mode .product-card {
+    background: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode .product-card.rupture {
+    background: #450A0A;
+    border-color: #EF4444;
+}
+
+body.dark-mode .product-card.faible {
+    background: #451A03;
+    border-color: #F59E0B;
+}
+
+body.dark-mode .product-name {
+    color: #F9FAFB;
+}
+
+body.dark-mode .stock-stat-card {
+    background: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode .icon-btn {
+    background: #374151;
+    border-color: #4B5563;
+    color: #F9FAFB;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .products-list {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+    }
+}
+</style>
 </head>
 <body>
+
+<!-- ========== MENU MOBILE ========== -->
+<button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
 <div class="app">
-  
-  <!-- ==================== NAVIGATION SIMPLIFIÉE ==================== -->
   <nav class="sidebar">
     <div class="brand">
       <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
@@ -43,7 +457,7 @@
         <span class="nav-emoji">📦</span> Mes Articles
       </a>
       <a href="stock.html" class="nav-link active">
-        <span class="nav-emoji">🔄</span> Entrées / Sorties
+        <span class="nav-emoji">📊</span> Stock & Produits
       </a>
     </div>
 
@@ -59,86 +473,67 @@
     </div>
 
     <div class="sidebar-footer">
-      <a href="parametres.html" class="nav-link">
-        <span class="nav-emoji">⚙️</span> Réglages
-      </a>
+      <!-- ========== MODE SOMBRE ========== -->
+      <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;">
+        <span id="dark-mode-icon">🌙</span>
+        <span id="dark-mode-label">Mode sombre</span>
+      </button>
+      
+      <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
       <button class="btn-logout" onclick="logout()">Déconnexion</button>
     </div>
   </nav>
 
-  <!-- ==================== CONTENU PRINCIPAL ==================== -->
   <main class="main">
     
     <!-- En-tête -->
-    <div class="page-header-simple">
-      <h1>🔄 Entrées / Sorties</h1>
-      <p>Enregistrez les mouvements de votre stock.</p>
+    <div class="stock-header">
+      <div>
+        <h1>📊 Stock & Produits</h1>
+        <p>Vue d'ensemble de votre stock et de vos produits.</p>
+      </div>
+      <div class="stock-header-actions">
+        <a href="rupture-stock.html" class="btn btn-secondary">⚠️ Ruptures</a>
+        <a href="catalogue.html" class="btn">➕ Ajouter un article</a>
+      </div>
     </div>
 
-    <!-- Formulaire de mouvement -->
-    <div class="card">
-      <h3>Nouveau mouvement</h3>
-      
-      <!-- Type de mouvement (GROS BOUTONS) -->
-      <div class="mvt-type-selector">
-        <button type="button" class="mvt-type-btn entree active" onclick="setType('ENTREE', this)">
-          <span class="mvt-type-icon">📥</span>
-          <span class="mvt-type-label">Entrée</span>
-          <span class="mvt-type-desc">Réception fournisseur</span>
-        </button>
-        <button type="button" class="mvt-type-btn sortie" onclick="setType('SORTIE', this)">
-          <span class="mvt-type-icon">📤</span>
-          <span class="mvt-type-label">Sortie</span>
-          <span class="mvt-type-desc">Casse, prêt, usage</span>
-        </button>
-        <button type="button" class="mvt-type-btn ajustement" onclick="setType('AJUSTEMENT', this)">
-          <span class="mvt-type-icon">⚖️</span>
-          <span class="mvt-type-label">Ajustement</span>
-          <span class="mvt-type-desc">Inventaire physique</span>
-        </button>
+    <!-- Statistiques -->
+    <div class="stock-stats">
+      <div class="stock-stat-card">
+        <span class="stock-stat-value" id="stat-total">—</span>
+        <span class="stock-stat-label">Articles</span>
       </div>
-
-      <!-- Recherche article -->
-      <div class="mvt-form-group">
-        <label>Article *</label>
-        <div class="search-bar-big">
-          <input type="text" id="piece-search-input" placeholder="🔍 Rechercher un article..." autocomplete="off">
-        </div>
-        <div id="piece-search-results" class="search-results"></div>
-        <div id="selected-piece" class="selected-piece"></div>
+      <div class="stock-stat-card warning">
+        <span class="stock-stat-value" id="stat-faible">—</span>
+        <span class="stock-stat-label">Stock faible</span>
       </div>
-
-      <!-- Quantité -->
-      <div class="mvt-form-group">
-        <label id="qty-label">Quantité *</label>
-        <div class="quantity-input-wrap">
-          <input type="number" id="quantite" min="1" step="1" placeholder="Ex: 10">
-          <span class="qty-unit" id="qty-unite"></span>
-        </div>
+      <div class="stock-stat-card danger">
+        <span class="stock-stat-value" id="stat-rupture">—</span>
+        <span class="stock-stat-label">En rupture</span>
       </div>
-
-      <!-- Motif -->
-      <div class="mvt-form-group">
-        <label>Motif (optionnel)</label>
-        <input type="text" id="motif" placeholder="Ex: Réception BL-4521">
+      <div class="stock-stat-card">
+        <span class="stock-stat-value" id="stat-valeur">—</span>
+        <span class="stock-stat-label">Valeur stock</span>
       </div>
-
-      <!-- Bouton enregistrer -->
-      <button type="button" class="btn-primary-big" onclick="submitMovement()">
-        ✅ Enregistrer le mouvement
-      </button>
-      
-      <div id="form-msg" class="form-msg"></div>
     </div>
 
-    <!-- Historique récent -->
-    <div class="card">
-      <div class="card-head">
-        <h3>Historique récent</h3>
-      </div>
-      <div id="historique-content">
-        <div class="empty-state">Chargement...</div>
-      </div>
+    <!-- Recherche -->
+    <div class="stock-search">
+      <input type="text" id="search" placeholder="🔍 Rechercher un article..." oninput="filterProducts()">
+    </div>
+
+    <!-- Onglets -->
+    <div class="stock-tabs">
+      <button class="stock-tab active" onclick="filterByStatus('all', this)">📋 Tous</button>
+      <button class="stock-tab" onclick="filterByStatus('faible', this)">⚠️ Stock faible</button>
+      <button class="stock-tab" onclick="filterByStatus('rupture', this)">❌ Ruptures</button>
+      <button class="stock-tab" onclick="filterByStatus('ok', this)">✅ En stock</button>
+    </div>
+
+    <!-- Liste des produits -->
+    <div class="products-list" id="products-list">
+      <div class="empty-state">Chargement...</div>
     </div>
 
   </main>
@@ -149,279 +544,182 @@
 <script src="assets/app.js"></script>
 <script>
 // ============================================================================
-// ENTRÉES / SORTIES - VERSION SIMPLIFIÉE
+// MENU MOBILE + MODE SOMBRE
+// ============================================================================
+
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    if (sidebar) sidebar.classList.toggle('open');
+    if (overlay) overlay.classList.toggle('active');
+}
+
+document.addEventListener('click', (e) => {
+    if (e.target.closest('.nav-link')) {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+    }
+});
+
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
+    const icon = document.getElementById('dark-mode-icon');
+    const label = document.getElementById('dark-mode-label');
+    if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+    if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre';
+}
+
+function initDarkMode() {
+    if (localStorage.getItem('recouvra_dark_mode') === '1') {
+        document.body.classList.add('dark-mode');
+        const icon = document.getElementById('dark-mode-icon');
+        const label = document.getElementById('dark-mode-label');
+        if (icon) icon.textContent = '☀️';
+        if (label) label.textContent = 'Mode clair';
+    }
+}
+
+// ============================================================================
+// STOCK & PRODUITS - LOGIQUE
 // ============================================================================
 
 let allProducts = [];
-let selectedProduct = null;
-let currentType = 'ENTREE';
+let currentFilter = 'all';
+let currentSearch = '';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    initDarkMode();
+    
     const session = await requireAuth();
     if (!session) return;
 
     await loadProducts();
-    loadHistorique();
-
-    // Recherche article
-    const searchInput = document.getElementById('piece-search-input');
-    searchInput.addEventListener('input', searchProducts);
-    searchInput.addEventListener('focus', () => {
-        if (searchInput.value) searchProducts();
-    });
 });
 
 async function loadProducts() {
     const { items, offline, savedAt } = await loadWithCache('pieces', () =>
         fetchAllRows(() => supabaseClient.from('pieces').select('*').eq('actif', true).order('designation'))
     );
+
     allProducts = items;
+
     if (offline && savedAt) {
         showToast(`Hors ligne : données du ${fmtDateTime(savedAt)}.`, 'info');
     }
+
+    updateStats();
+    renderProducts();
 }
 
-// --- Sélection du type ---
-function setType(type, btn) {
-    currentType = type;
+function updateStats() {
+    const total = allProducts.length;
+    const faible = allProducts.filter(p => p.quantite_stock > 0 && p.quantite_stock <= p.seuil_alerte).length;
+    const rupture = allProducts.filter(p => p.quantite_stock === 0).length;
+    const valeur = allProducts.reduce((s, p) => s + (p.quantite_stock * Number(p.prix_achat)), 0);
+
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-faible').textContent = faible;
+    document.getElementById('stat-rupture').textContent = rupture;
+    document.getElementById('stat-valeur').textContent = fmtMoney(valeur);
+}
+
+function filterByStatus(status, btn) {
+    currentFilter = status;
     
-    document.querySelectorAll('.mvt-type-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.stock-tab').forEach(tab => tab.classList.remove('active'));
     btn.classList.add('active');
     
-    const qtyLabel = document.getElementById('qty-label');
-    qtyLabel.textContent = type === 'AJUSTEMENT' ? 'Nouvelle quantité réelle *' : 'Quantité *';
-    
-    updateSelectedProductInfo();
+    renderProducts();
 }
 
-// --- Recherche produit ---
-function searchProducts() {
-    const q = document.getElementById('piece-search-input').value.trim().toLowerCase();
-    const resultsEl = document.getElementById('piece-search-results');
-    
-    if (!q) {
-        resultsEl.innerHTML = '';
-        resultsEl.style.display = 'none';
-        return;
-    }
-    
-    const results = allProducts.filter(p =>
-        (p.designation || '').toLowerCase().includes(q) ||
-        (p.reference_oem || '').toLowerCase().includes(q) ||
-        (p.marque || '').toLowerCase().includes(q)
-    ).slice(0, 8);
-    
-    if (results.length === 0) {
-        resultsEl.innerHTML = `<div class="search-result-empty">Aucun article trouvé</div>`;
-        resultsEl.style.display = 'block';
-        return;
-    }
-    
-    resultsEl.innerHTML = results.map(p => `
-        <div class="search-result-item" onclick="selectProduct(${p.id})">
-            <span class="search-result-name">${esc(p.designation)}</span>
-            <span class="search-result-stock">Stock: ${p.quantite_stock}</span>
-        </div>
-    `).join('');
-    
-    resultsEl.style.display = 'block';
+function filterProducts() {
+    currentSearch = document.getElementById('search').value.trim().toLowerCase();
+    renderProducts();
 }
 
-function selectProduct(id) {
-    const product = allProducts.find(p => p.id === id);
-    if (!product) return;
+function renderProducts() {
+    const el = document.getElementById('products-list');
     
-    selectedProduct = product;
+    let filtered = allProducts;
     
-    // Mettre à jour l'interface
-    document.getElementById('piece-search-input').value = product.designation;
-    document.getElementById('piece-search-results').style.display = 'none';
+    if (currentFilter === 'faible') {
+        filtered = filtered.filter(p => p.quantite_stock > 0 && p.quantite_stock <= p.seuil_alerte);
+    } else if (currentFilter === 'rupture') {
+        filtered = filtered.filter(p => p.quantite_stock === 0);
+    } else if (currentFilter === 'ok') {
+        filtered = filtered.filter(p => p.quantite_stock > p.seuil_alerte);
+    }
     
-    const selectedEl = document.getElementById('selected-piece');
-    selectedEl.innerHTML = `
-        <div class="selected-product-info">
-            <span class="selected-product-name">${esc(product.designation)}</span>
-            <span class="selected-product-ref">${esc(product.reference_oem || '')}</span>
-            <span class="selected-product-price">${fmtMoney(product.prix_vente)}</span>
-        </div>
-        <span class="selected-product-stock">Stock: ${product.quantite_stock} ${MEASURE_UNIT_LABELS[product.unite_mesure] || 'pcs'}</span>
-    `;
+    if (currentSearch) {
+        filtered = filtered.filter(p =>
+            (p.designation || '').toLowerCase().includes(currentSearch) ||
+            (p.reference_oem || '').toLowerCase().includes(currentSearch) ||
+            (p.marque || '').toLowerCase().includes(currentSearch)
+        );
+    }
     
-    // Mettre à jour l'unité
-    const qtyInput = document.getElementById('quantite');
-    const qtyUnite = document.getElementById('qty-unite');
-    
-    qtyInput.step = product.permettre_fractionnement ? '0.01' : '1';
-    qtyInput.min = product.permettre_fractionnement ? '0.01' : '1';
-    qtyUnite.textContent = MEASURE_UNIT_LABELS[product.unite_mesure] || 'pcs';
-    
-    updateSelectedProductInfo();
-    qtyInput.focus();
-}
+    if (filtered.length === 0) {
+        el.innerHTML = `<div class="empty-state">Aucun article trouvé.</div>`;
+        return;
+    }
 
-function updateSelectedProductInfo() {
-    // Si on change le type, on pourrait avoir besoin de changer le hint
-    if (selectedProduct) {
-        // rien de spécial pour l'instant
-    }
-}
-
-// --- Enregistrer le mouvement ---
-async function submitMovement() {
-    const msgEl = document.getElementById('form-msg');
-    clearMsg(msgEl);
-    
-    if (!selectedProduct) {
-        showMsg(msgEl, 'Sélectionnez un article.');
-        return;
-    }
-    
-    const quantite = Number(document.getElementById('quantite').value);
-    const motif = document.getElementById('motif').value.trim() || null;
-    
-    if (!quantite || quantite <= 0) {
-        showMsg(msgEl, 'Quantité invalide.');
-        return;
-    }
-    
-    // Vérifier stock pour sortie
-    if (currentType === 'SORTIE' && quantite > selectedProduct.quantite_stock) {
-        showMsg(msgEl, `Stock insuffisant. Disponible: ${selectedProduct.quantite_stock}`);
-        return;
-    }
-    
-    const btn = document.querySelector('.btn-primary-big');
-    btn.disabled = true;
-    btn.textContent = 'Enregistrement...';
-    
-    try {
-        if (!appIsOnline) {
-            queuePendingMovement({
-                piece_id: selectedProduct.id,
-                piece_designation: selectedProduct.designation,
-                type_mouvement: currentType,
-                quantite: quantite,
-                motif: motif,
-            });
-            showToast('Mouvement enregistré hors ligne — synchronisé automatiquement.', 'info');
-            resetForm();
-            loadHistorique();
-            return;
-        }
+    el.innerHTML = filtered.map(p => {
+        const stockClass = p.quantite_stock === 0 ? 'danger' : (p.quantite_stock <= p.seuil_alerte ? 'warning' : 'ok');
+        const stockLabel = p.quantite_stock === 0 ? '❌ Rupture' : (p.quantite_stock <= p.seuil_alerte ? `⚠️ ${p.quantite_stock} restant(s)` : `${p.quantite_stock} en stock`);
+        const cardClass = p.quantite_stock === 0 ? 'rupture' : (p.quantite_stock <= p.seuil_alerte ? 'faible' : '');
         
-        const { error } = await supabaseClient.rpc('enregistrer_mouvement_stock', {
-            p_piece_id: selectedProduct.id,
-            p_type: currentType,
-            p_quantite: quantite,
-            p_motif: motif,
-        });
-        
-        if (error) throw error;
-        
-        showToast('Mouvement enregistré avec succès.', 'success');
-        resetForm();
-        await loadProducts();
-        loadHistorique();
-        
-    } catch (error) {
-        showMsg(msgEl, friendlyError(error));
-    } finally {
-        btn.disabled = false;
-        btn.textContent = '✅ Enregistrer le mouvement';
-    }
+        return `
+            <div class="product-card ${cardClass}" onclick="openProductDetail(${p.id})">
+                <div class="product-card-header">
+                    <span class="product-emoji">📦</span>
+                    <span class="product-stock-badge ${stockClass}">${stockLabel}</span>
+                </div>
+                <div class="product-name">${esc(p.designation)}</div>
+                <div class="product-ref">${esc(p.reference_oem || '')}</div>
+                <div class="product-price-row">
+                    <span class="product-price">${fmtMoney(p.prix_vente)}</span>
+                    <div class="product-actions">
+                        <button class="icon-btn edit" onclick="event.stopPropagation(); editProduct(${p.id})" title="Modifier">✏️</button>
+                        <button class="icon-btn delete" onclick="event.stopPropagation(); deleteProduct(${p.id})" title="Supprimer">🗑️</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
-function resetForm() {
-    selectedProduct = null;
-    document.getElementById('piece-search-input').value = '';
-    document.getElementById('quantite').value = '';
-    document.getElementById('motif').value = '';
-    document.getElementById('selected-piece').innerHTML = '';
-    document.getElementById('piece-search-results').style.display = 'none';
+function openProductDetail(id) {
+    window.location.href = `catalogue.html?edit=${id}`;
 }
 
-// --- Historique ---
-async function loadHistorique() {
-    const el = document.getElementById('historique-content');
-    
-    const { items, offline, savedAt } = await loadWithCache('mouvements', () =>
-        supabaseClient
-            .from('mouvements_stock')
-            .select('id, type_mouvement, quantite, quantite_avant, quantite_apres, motif, created_at, pieces(designation, reference_interne, unite_mesure)')
-            .order('created_at', { ascending: false })
-            .limit(30)
+function editProduct(id) {
+    window.location.href = `catalogue.html?edit=${id}`;
+}
+
+async function deleteProduct(id) {
+    const p = allProducts.find(x => x.id === id);
+    if (!p) return;
+
+    const ok = await confirmDialog(
+        `Supprimer "${p.designation}" ?`,
+        { title: 'Supprimer l\'article', confirmLabel: 'Supprimer', danger: true }
     );
-    
-    const pending = getPendingMovements()
-        .filter(m => m.status !== 'done')
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    
-    if (offline && savedAt) {
-        showToast(`Historique hors ligne : données du ${fmtDateTime(savedAt)}.`, 'info');
-    }
-    
-    if (items.length === 0 && pending.length === 0) {
-        el.innerHTML = `<div class="empty-state">Aucun mouvement enregistré.</div>`;
+    if (!ok) return;
+
+    const { error } = await supabaseClient.from('pieces').update({ actif: false }).eq('id', id);
+
+    if (error) {
+        showToast(friendlyError(error), 'error');
         return;
     }
-    
-    const badgeClass = { ENTREE: 'badge-success', SORTIE: 'badge-danger', AJUSTEMENT: 'badge-warning' };
-    const label = { ENTREE: '📥 Entrée', SORTIE: '📤 Sortie', AJUSTEMENT: '⚖️ Ajustement' };
-    
-    el.innerHTML = `
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Article</th>
-                        <th>Type</th>
-                        <th>Quantité</th>
-                        <th>Motif</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${pending.map(m => `
-                        <tr class="pending-row">
-                            <td class="hint">${fmtDateTime(m.createdAt)}</td>
-                            <td>${esc(m.piece_designation || '—')}</td>
-                            <td><span class="badge ${badgeClass[m.type_mouvement]}">${label[m.type_mouvement]}</span></td>
-                            <td class="num">${m.quantite}</td>
-                            <td class="hint">${esc(m.motif || '—')} <span class="badge badge-info">⏳ En attente</span></td>
-                        </tr>
-                    `).join('')}
-                    
-                    ${items.map(m => `
-                        <tr>
-                            <td class="hint">${fmtDateTime(m.created_at)}</td>
-                            <td>${esc(m.pieces?.designation || '—')}</td>
-                            <td><span class="badge ${badgeClass[m.type_mouvement]}">${label[m.type_mouvement]}</span></td>
-                            <td class="num">${m.quantite}</td>
-                            <td class="hint">${esc(m.motif || '—')}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        </div>
-    `;
+
+    showToast('Article supprimé.', 'success');
+    await loadProducts();
 }
-
-// Écouter les changements
-document.addEventListener('sylla:connectivity-changed', async (e) => {
-    if (e.detail?.online) {
-        await loadProducts();
-        loadHistorique();
-    }
-});
-
-document.addEventListener('sylla:pending-movements-updated', loadHistorique);
-
-// Fermer les résultats si on clique ailleurs
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('#piece-search-input') && !e.target.closest('#piece-search-results')) {
-        document.getElementById('piece-search-results').style.display = 'none';
-    }
-});
 </script>
 </body>
 </html>
