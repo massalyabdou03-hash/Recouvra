@@ -606,28 +606,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Message d'accueil personnalisé
 async function loadWelcomeMessage() {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session) return;
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) return;
 
-    const { data: profile } = await supabaseClient
-        .from('profiles')
-        .select('*, entreprises(nom, gerant_nom)')
-        .eq('id', session.user.id)
-        .single();
+        const { data: profile } = await supabaseClient
+            .from('profiles')
+            .select('*, entreprises(nom, gerant_nom)')
+            .eq('id', session.user.id)
+            .single();
 
-    if (!profile) return;
+        if (!profile) return;
 
-    // Priorité : entreprise.gerant_nom -> user_metadata.gerant_nom -> 'Gérant'
-    const gerantNom =
-        profile.entreprises?.gerant_nom ||
-        session.user?.user_metadata?.gerant_nom ||
-        'Gérant';
+        // Récupération en cascade : base -> metadata -> fallback
+        const gerantNom =
+            profile.entreprises?.gerant_nom ||
+            session.user?.user_metadata?.gerant_nom ||
+            'Gérant';
 
-    const boutiqueNom = profile.entreprises?.nom || 'votre boutique';
-    const prenom = gerantNom.split(' ')[0] || 'Gérant';
+        const boutiqueNom = profile.entreprises?.nom || 'votre boutique';
+        const prenom = gerantNom.split(' ')[0] || 'Gérant';
 
-    document.getElementById('welcome-name').textContent = `Bonjour ${prenom} 👋`;
-    document.getElementById('welcome-company').textContent = `Voici ce qui se passe dans votre boutique ${boutiqueNom}.`;
+        document.getElementById('welcome-name').textContent = `Bonjour ${prenom} 👋`;
+        document.getElementById('welcome-company').textContent = `Voici ce qui se passe dans votre boutique ${boutiqueNom}.`;
+    } catch (error) {
+        console.error('Erreur chargement message accueil:', error);
+    }
 }
 
 // Charger les données du tableau de bord
