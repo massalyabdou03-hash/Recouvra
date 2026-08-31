@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const session = await requireAuth();
     if (!session) return;
 
+    initDarkMode();
     await loadSettings();
 
     const form = document.getElementById('settings-form');
@@ -26,10 +27,27 @@ async function requireAuth() {
 
 async function loadSettings() {
     try {
+        // Récupérer l'entreprise de l'utilisateur
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) return;
+
+        const { data: profile } = await supabaseClient
+            .from('profiles')
+            .select('entreprise_id')
+            .eq('id', session.user.id)
+            .single();
+
+        if (!profile?.entreprise_id) {
+            showToast('Entreprise non trouvée.', 'error');
+            return;
+        }
+
+        // Charger les paramètres de CETTE entreprise
         const { data, error } = await supabaseClient
             .from('entreprise_settings')
             .select('*')
-            .single();
+            .eq('entreprise_id', profile.entreprise_id)
+            .maybeSingle();
 
         if (error) throw error;
 
@@ -74,7 +92,6 @@ async function handleLogoUpload(e) {
 
         if (error) throw error;
 
-        // Obtenir l'URL publique
         const { data: urlData } = supabaseClient.storage
             .from('company-logos')
             .getPublicUrl(filePath);
@@ -115,11 +132,24 @@ async function saveSettings(e) {
     };
 
     try {
-        // Vérifier si une ligne existe déjà
+        // Récupérer l'entreprise de l'utilisateur
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) throw new Error('Session expirée');
+
+        const { data: profile } = await supabaseClient
+            .from('profiles')
+            .select('entreprise_id')
+            .eq('id', session.user.id)
+            .single();
+
+        if (!profile?.entreprise_id) throw new Error('Entreprise non trouvée');
+
+        // Vérifier si les paramètres existent déjà
         const { data: existing, error: checkError } = await supabaseClient
             .from('entreprise_settings')
             .select('entreprise_id')
-            .single();
+            .eq('entreprise_id', profile.entreprise_id)
+            .maybeSingle();
 
         if (checkError && checkError.code !== 'PGRST116') {
             throw checkError;
@@ -127,25 +157,12 @@ async function saveSettings(e) {
 
         let error;
         if (existing) {
-            // Mise à jour
             const { error: updateError } = await supabaseClient
                 .from('entreprise_settings')
                 .update(payload)
-                .eq('entreprise_id', existing.entreprise_id);
+                .eq('entreprise_id', profile.entreprise_id);
             error = updateError;
         } else {
-            // Insertion (récupérer l'entreprise_id depuis le profil)
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) throw new Error('Session expirée');
-
-            const { data: profile } = await supabaseClient
-                .from('profiles')
-                .select('entreprise_id')
-                .eq('id', session.user.id)
-                .single();
-
-            if (!profile?.entreprise_id) throw new Error('Entreprise non trouvée');
-
             const { error: insertError } = await supabaseClient
                 .from('entreprise_settings')
                 .insert({
@@ -157,7 +174,6 @@ async function saveSettings(e) {
 
         if (error) throw error;
 
-        // Mettre à jour le cache local
         const settings = { ...payload };
         localStorage.setItem('sylla_company_settings', JSON.stringify(settings));
 
