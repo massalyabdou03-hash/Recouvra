@@ -1185,3 +1185,125 @@ document.addEventListener('DOMContentLoaded', () => {
         }));
     });
 });
+// ============================================================================
+// MENU MOBILE - FONCTIONS GLOBALES
+// ============================================================================
+
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    
+    if (sidebar) {
+        sidebar.classList.toggle('open');
+        if (overlay) overlay.classList.toggle('active');
+    }
+}
+
+// Fermer le menu quand on clique sur un lien
+document.addEventListener('click', (e) => {
+    if (e.target.closest('.nav-link')) {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+    }
+});
+// ============================================================================
+// AMÉLIORATIONS SIMPLES - INDEX
+// ============================================================================
+
+async function loadGerantName() {
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) return;
+        
+        const { data: profile } = await supabaseClient
+            .from('profiles')
+            .select('id')
+            .eq('id', session.user.id)
+            .single();
+            
+        const { data: entreprise } = await supabaseClient
+            .from('entreprises')
+            .select('gerant_nom')
+            .eq('id', profile?.entreprise_id)
+            .single();
+            
+        if (entreprise?.gerant_nom) {
+            const prenom = entreprise.gerant_nom.split(' ')[0];
+            document.getElementById('gerant-nom').textContent = prenom;
+        }
+    } catch {
+        // Silencieux - pas bloquant
+    }
+}
+
+function calculerTendance() {
+    // Récupérer les données du cache ou du DOM
+    const caJour = document.getElementById('stat-ca-jour').textContent;
+    const trendEl = document.getElementById('trend-jour');
+    if (!trendEl) return;
+    
+    // Si pas de données, on affiche rien
+    if (caJour === '—' || caJour === '0 F') {
+        trendEl.textContent = '';
+        return;
+    }
+    
+    // Comparaison simple avec hier (si possible)
+    // On garde ça léger : on affiche juste le nombre de ventes
+    const nbVentes = document.getElementById('stat-nb-jour').textContent;
+    if (nbVentes) {
+        trendEl.textContent = '✅ ' + nbVentes;
+    }
+}
+// ============================================================================
+// MODE SOMBRE GLOBAL
+// ============================================================================
+
+function initDarkMode() {
+    if (localStorage.getItem('recouvra_dark_mode') === '1') {
+        document.body.classList.add('dark-mode');
+        const icon = document.getElementById('dark-mode-icon');
+        const label = document.getElementById('dark-mode-label');
+        if (icon) icon.textContent = '☀️';
+        if (label) label.textContent = 'Mode clair';
+    }
+}
+
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
+    const icon = document.getElementById('dark-mode-icon');
+    const label = document.getElementById('dark-mode-label');
+    if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+    if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre';
+}
+// ============================================================================
+// MODE SOMBRE GLOBAL - AUTO-INITIALISATION
+// ============================================================================
+
+function initDarkMode() {
+    if (localStorage.getItem('recouvra_dark_mode') === '1') {
+        document.body.classList.add('dark-mode');
+        const icon = document.getElementById('dark-mode-icon');
+        const label = document.getElementById('dark-mode-label');
+        if (icon) icon.textContent = '☀️';
+        if (label) label.textContent = 'Mode clair';
+    }
+}
+
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
+    const icon = document.getElementById('dark-mode-icon');
+    const label = document.getElementById('dark-mode-label');
+    if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+    if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre';
+}
+
+// AUTO-INITIALISATION : s'exécute automatiquement sur chaque page
+// sans avoir à modifier le DOMContentLoaded de chaque page
+document.addEventListener('DOMContentLoaded', initDarkMode);

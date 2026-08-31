@@ -3004,3 +3004,28 @@ body.dark-mode .admin-search input {
         padding-top: 60px;
     }
 }
+/* Tendances */
+.big-card-trend {
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.big-card-trend.up {
+    color: #10B981;
+}
+
+.big-card-trend.down {
+    color: #EF4444;
+}
+
+body.dark-mode .big-card-trend.up {
+    color: #34D399;
+}
+
+body.dark-mode .big-card-trend.down {
+    color: #F87171;
+}
