@@ -3,391 +3,274 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tableau de bord — Entreprise</title>
+<title>Accueil — Ma Boutique</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
-<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#4F46E5"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Recouvra"><link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4F46E5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ma Boutique">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 <div class="app">
+  
+  <!-- ==================== NAVIGATION SIMPLIFIÉE ==================== -->
   <nav class="sidebar">
-    <div class="brand"><img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo"> <span data-company-name>Entreprise</span></div>
-    <a class="nav-link active" href="index.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> Tableau de bord</a>
-    <a class="nav-link" href="catalogue.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg> Catalogue</a>
-    <a class="nav-link" href="stock.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v18"/><path d="M4 7l4-4 4 4"/><path d="M16 21V3"/><path d="M20 17l-4 4-4-4"/></svg> Mouvements stock</a>
-    <a class="nav-link" href="rupture-stock.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 17h.01"/></svg> Ruptures de stock</a>
-    <a class="nav-link" href="factures.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v19l-3-2-3 2-3-2-3 2V2z"/><path d="M9 8h6M9 12h6"/></svg> Factures</a>
-    <a class="nav-link" href="credits.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg> Emprunts</a>
-    <a class="nav-link" href="clients.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Clients</a>
-    <a class="nav-link" href="recouvra.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10H7z"/><path d="M4 12h16M12 4v16"/></svg> Recouvra</a>
+    <div class="brand">
+      <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
+      <span data-company-name>Ma Boutique</span>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Quotidien</div>
+      <a href="index.html" class="nav-link active">
+        <span class="nav-emoji">🏠</span> Accueil
+      </a>
+      <a href="factures.html" class="nav-link">
+        <span class="nav-emoji">🧾</span> Vendre
+      </a>
+      <a href="clients.html" class="nav-link">
+        <span class="nav-emoji">👥</span> Mes Clients
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Stock</div>
+      <a href="catalogue.html" class="nav-link">
+        <span class="nav-emoji">📦</span> Mes Articles
+      </a>
+      <a href="stock.html" class="nav-link">
+        <span class="nav-emoji">🔄</span> Entrées / Sorties
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Argent</div>
+      <a href="credits.html" class="nav-link">
+        <span class="nav-emoji">💸</span> On me doit
+      </a>
+      <a href="recouvra.html" class="nav-link premium">
+        <span class="nav-emoji">📣</span> Relancer
+        <span class="badge-premium">PRO</span>
+      </a>
+    </div>
+
     <div class="sidebar-footer">
-      <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
+      <a href="parametres.html" class="nav-link">
+        <span class="nav-emoji">⚙️</span> Réglages
+      </a>
       <button class="btn-logout" onclick="logout()">Déconnexion</button>
     </div>
   </nav>
 
+  <!-- ==================== CONTENU PRINCIPAL ==================== -->
   <main class="main">
-    <div class="topbar">
-      <div>
-        <h1>Tableau de bord</h1>
-        <div class="subtitle">Vue d'ensemble du stock et de l'activité</div>
+    
+    <!-- En-tête de bienvenue -->
+    <div class="welcome-header">
+      <h1>Bonjour 👋</h1>
+      <p>Voici ce qui se passe aujourd'hui dans votre boutique.</p>
+    </div>
+
+    <!-- 3 GROSSES CARTES ESSENTIELLES -->
+    <div class="dashboard-big-cards">
+      
+      <!-- Carte 1 : Argent encaissé aujourd'hui -->
+      <div class="big-card primary" onclick="window.location.href='factures.html'">
+        <div class="big-card-icon">💰</div>
+        <div class="big-card-content">
+          <div class="big-card-label">J'ai gagné aujourd'hui</div>
+          <div class="big-card-value" id="stat-ca-jour">—</div>
+          <div class="big-card-hint" id="stat-nb-jour"></div>
+        </div>
+        <div class="big-card-arrow">→</div>
+      </div>
+
+      <!-- Carte 2 : Argent qu'on me doit -->
+      <div class="big-card warning" onclick="window.location.href='credits.html'">
+        <div class="big-card-icon">⚠️</div>
+        <div class="big-card-content">
+          <div class="big-card-label">On me doit de l'argent</div>
+          <div class="big-card-value" id="stat-creances">—</div>
+          <div class="big-card-hint">Clients à relancer</div>
+        </div>
+        <div class="big-card-arrow">→</div>
+      </div>
+
+      <!-- Carte 3 : Stock faible -->
+      <div class="big-card info" onclick="window.location.href='rupture-stock.html'">
+        <div class="big-card-icon">📦</div>
+        <div class="big-card-content">
+          <div class="big-card-label">Articles à commander</div>
+          <div class="big-card-value" id="stat-alertes">—</div>
+          <div class="big-card-hint">Stock faible ou épuisé</div>
+        </div>
+        <div class="big-card-arrow">→</div>
       </div>
     </div>
 
-    <div class="grid-stats">
-      <div class="stat-card">
-        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></div>
-        <div class="stat-body"><div class="label">Articles au catalogue</div><div class="value" id="stat-pieces">—</div></div>
+    <!-- GROS BOUTONS D'ACTION RAPIDE -->
+    <div class="dashboard-actions">
+      <div class="section-title">Que voulez-vous faire ?</div>
+      <div class="action-grid">
+        <button class="action-button primary" onclick="window.location.href='factures.html'">
+          <span class="action-emoji">🧾</span>
+          <span class="action-text">Faire une vente</span>
+        </button>
+        <button class="action-button" onclick="window.location.href='catalogue.html'">
+          <span class="action-emoji">➕</span>
+          <span class="action-text">Ajouter un article</span>
+        </button>
+        <button class="action-button" onclick="window.location.href='clients.html'">
+          <span class="action-emoji">👥</span>
+          <span class="action-text">Nouveau client</span>
+        </button>
+        <button class="action-button" onclick="window.location.href='recouvra.html'">
+          <span class="action-emoji">📣</span>
+          <span class="action-text">Relancer un client</span>
+        </button>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-        <div class="stat-body">
-          <div class="label" style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-            <span>Valeur du stock (achat)</span>
-            <button type="button" class="btn-icon" id="toggle-valeur-btn" title="Afficher/masquer" style="padding:2px;">
-              <svg class="icon" id="toggle-valeur-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
-          </div>
-          <div class="value" id="stat-valeur">—</div>
+    </div>
+
+    <!-- RÉCAPITULATIF DE LA SEMAINE -->
+    <div class="dashboard-recap">
+      <div class="section-title">Ma semaine en un coup d'œil</div>
+      <div class="recap-grid">
+        <div class="recap-item">
+          <div class="recap-icon">📅</div>
+          <div class="recap-label">Cette semaine</div>
+          <div class="recap-value" id="stat-ca-semaine">—</div>
+          <div class="recap-hint" id="stat-nb-semaine"></div>
+        </div>
+        <div class="recap-item">
+          <div class="recap-icon">🗓️</div>
+          <div class="recap-label">Ce mois</div>
+          <div class="recap-value" id="stat-ca-mois">—</div>
+          <div class="recap-hint" id="stat-nb-mois"></div>
+        </div>
+        <div class="recap-item">
+          <div class="recap-icon">📦</div>
+          <div class="recap-label">Articles en catalogue</div>
+          <div class="recap-value" id="stat-pieces">—</div>
+          <div class="recap-hint">Articles disponibles</div>
+        </div>
+        <div class="recap-item">
+          <div class="recap-icon">💰</div>
+          <div class="recap-label">Valeur du stock</div>
+          <div class="recap-value" id="stat-valeur">—</div>
+          <div class="recap-hint">Prix d'achat</div>
         </div>
       </div>
-      <div class="stat-card warn">
-        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 17h.01"/></svg></div>
-        <div class="stat-body"><div class="label">Alertes réappro</div><div class="value" id="stat-alertes">—</div></div>
-      </div>
     </div>
 
-    <div class="topbar" style="margin-bottom:14px;">
-      <div><h3 style="margin:0;">Activité commerciale</h3><div class="subtitle">Aujourd'hui, cette semaine, ce mois</div></div>
-    </div>
-    <div class="grid-stats">
-      <div class="stat-card">
-        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-        <div class="stat-body"><div class="label">Ventes du jour</div><div class="value" id="stat-ca-jour">—</div><div class="hint" id="stat-nb-jour"></div></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
-        <div class="stat-body"><div class="label">Ventes de la semaine</div><div class="value" id="stat-ca-semaine">—</div><div class="hint" id="stat-nb-semaine"></div></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v19l-3-2-3 2-3-2-3 2V2z"/><path d="M9 8h6M9 12h6"/></svg></div>
-        <div class="stat-body"><div class="label">Ventes du mois</div><div class="value" id="stat-ca-mois">—</div><div class="hint" id="stat-nb-mois"></div></div>
-      </div>
-      <div class="stat-card danger">
-        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
-        <div class="stat-body"><div class="label">Créances (impayés)</div><div class="value" id="stat-creances">—</div><a href="credits.html" class="hint">Voir les emprunts →</a></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-head">
-        <h3>Produits les plus vendus</h3>
-        <span class="hint">Ce mois-ci</span>
-      </div>
-      <div id="top-produits-content">Chargement...</div>
-    </div>
-
-    <div class="card">
-      <div class="card-head">
-        <h3>Produits sous le seuil d'alerte</h3>
-        <div style="display:flex; align-items:center; gap:14px;">
-          <button class="btn btn-secondary" id="export-alertes-pdf-btn" onclick="partagerAlertesPdf()" disabled><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v19l-3-2-3 2-3-2-3 2V2z"/><path d="M9 8h6M9 12h6"/></svg>Commande fournisseur (PDF)</button>
-          <a href="catalogue.html" class="hint">Voir le catalogue →</a>
-        </div>
-      </div>
-      <div id="alertes-content">Chargement...</div>
-    </div>
   </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@4.2.1/dist/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@5.0.8/dist/jspdf.plugin.autotable.min.js"></script>
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
 <script>
-let alertesPieces = [];
+// ============================================================================
+// LOGIQUE DU TABLEAU DE BORD SIMPLIFIÉ
+// ============================================================================
 
-// ---------- Bon de commande fournisseur (PDF) — même moteur jsPDF/autoTable que
-// facture-detail.html, pour un rendu identique en Web/PWA/TWA sans dépendance serveur.
-function hexToRgb(hex) {
-  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || "");
-  return m ? [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)] : [79, 70, 229];
-}
-function pdfNum(n) { return String(n).replace(/ /g, " "); }
-async function logoDataUrl(url) {
-  if (!url || !url.startsWith("http")) return null;
-  try {
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const blob = await res.blob();
-    return await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  } catch {
-    return null;
-  }
-}
+document.addEventListener('DOMContentLoaded', async () => {
+    const session = await requireAuth();
+    if (!session) return;
 
-async function buildAlertesPdf() {
-  const settings = await getCompanySettings();
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: "mm", format: "a4" });
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  const marginX = 15;
-  const accent = hexToRgb(settings?.primary_color || "#4F46E5");
-  const dark = [23, 23, 23];
-  const muted = [110, 110, 110];
-  let y = 20;
-  let textX = marginX;
+    await loadDashboardData();
+});
 
-  const logo = await logoDataUrl(settings?.logo_url || settings?.logo_path);
-  if (logo) {
-    try {
-      const format = logo.startsWith("data:image/png") ? "PNG" : "JPEG";
-      doc.addImage(logo, format, marginX, y - 5, 20, 20);
-      textX = marginX + 26;
-    } catch { /* logo non supporte par jsPDF (ex: SVG) : on continue sans */ }
-  }
+async function loadDashboardData() {
+    // 1. Charger les articles (pour stock et valeur)
+    const { items: pieces, offline, savedAt } = await loadWithCache('pieces', () =>
+        fetchAllRows(() => supabaseClient.from('pieces').select('*').eq('actif', true).order('id'))
+    );
 
-  doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(...dark);
-  doc.text(settings?.nom_commercial || "Entreprise", textX, y);
-  if (settings?.adresse) {
-    y += 5.5;
-    doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...muted);
-    doc.text(settings.adresse, textX, y);
-  }
+    // Mettre à jour les cartes
+    document.getElementById('stat-pieces').textContent = pieces.length;
+    
+    const valeur = pieces.reduce((sum, p) => sum + (p.quantite_stock * Number(p.prix_achat)), 0);
+    document.getElementById('stat-valeur').textContent = fmtMoney(valeur);
 
-  let yContact = 20;
-  doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...muted);
-  [settings?.telephone ? `Tél : ${settings.telephone}` : null, settings?.email].filter(Boolean)
-    .forEach((line) => { doc.text(line, pageWidth - marginX, yContact, { align: "right" }); yContact += 4.5; });
+    // Alertes stock
+    const alertes = pieces.filter(p => p.quantite_stock <= p.seuil_alerte);
+    document.getElementById('stat-alertes').textContent = alertes.length;
 
-  y = Math.max(y, yContact, marginX + 15) + 5;
-  doc.setDrawColor(...accent); doc.setLineWidth(0.7);
-  doc.line(marginX, y, pageWidth - marginX, y);
-  y += 10;
-
-  doc.setFont("helvetica", "bold"); doc.setFontSize(13); doc.setTextColor(...dark);
-  doc.text("Bon de commande fournisseur", marginX, y);
-  doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...muted);
-  doc.text(`Produits sous le seuil d'alerte — ${fmtDate(new Date().toISOString())}`, marginX, y + 5);
-  y += 16;
-
-  doc.autoTable({
-    startY: y,
-    margin: { left: marginX, right: marginX, bottom: 22 },
-    head: [["Référence", "Désignation", "Marque", "Emplacement", "Stock", "Seuil", "Qté à commander"]],
-    body: alertesPieces.map((p) => [
-      p.reference_oem || p.reference_interne || "—",
-      p.designation,
-      p.marque || "—",
-      p.emplacement || "—",
-      pdfNum(p.quantite_stock),
-      pdfNum(p.seuil_alerte),
-      pdfNum(Math.max(p.seuil_alerte - p.quantite_stock, 1)),
-    ]),
-    theme: "grid",
-    headStyles: { fillColor: accent, textColor: [255, 255, 255], fontStyle: "bold", fontSize: 8.5 },
-    bodyStyles: { fontSize: 9, textColor: dark },
-    columnStyles: { 4: { halign: "right" }, 5: { halign: "right" }, 6: { halign: "right" } },
-  });
-
-  const pageCount = doc.internal.getNumberOfPages();
-  for (let i = 1; i <= pageCount; i++) {
-    doc.setPage(i);
-    doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(...muted);
-    doc.text(`Page ${i} / ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: "center" });
-  }
-
-  return doc;
-}
-
-async function partagerAlertesPdf() {
-  if (alertesPieces.length === 0) return;
-  const btn = document.getElementById("export-alertes-pdf-btn");
-  btn.disabled = true;
-  try {
-    const doc = await buildAlertesPdf();
-    const filename = `commande-fournisseur_${new Date().toISOString().slice(0, 10)}.pdf`;
-    const file = new File([doc.output("blob")], filename, { type: "application/pdf" });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: filename });
-    } else {
-      doc.save(filename);
+    if (offline && savedAt) {
+        showToast(`Hors ligne : données du ${fmtDateTime(savedAt)}.`, 'info');
     }
-  } catch (err) {
-    if (err?.name !== "AbortError") showToast("Impossible de générer le PDF : " + (err?.message || err), "error");
-  } finally {
-    btn.disabled = alertesPieces.length === 0;
-  }
-}
-// La valeur du stock (achat) est une information sensible qu'on ne veut pas laisser
-// affichée en permanence à l'écran : l'utilisateur peut la masquer, et ce choix est
-// mémorisé (localStorage) pour rester masquée aux prochaines visites sur ce poste.
-const HIDE_VALEUR_STOCK_KEY = "sylla_hide_valeur_stock";
 
-function setupValeurStockToggle(valeur) {
-  const valueEl = document.getElementById("stat-valeur");
-  const btn = document.getElementById("toggle-valeur-btn");
-  const icon = document.getElementById("toggle-valeur-icon");
-  const eyeOffPath = '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.3 20.3 0 0 1 5.06-6.06M9.9 4.24A10.6 10.6 0 0 1 12 4c7 0 11 8 11 8a20.3 20.3 0 0 1-3.22 4.44"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/>';
-  const eyePath = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
-
-  function render() {
-    const hidden = localStorage.getItem(HIDE_VALEUR_STOCK_KEY) === "1";
-    valueEl.textContent = hidden ? "•••••• F" : fmtMoney(valeur);
-    icon.innerHTML = hidden ? eyeOffPath : eyePath;
-    btn.title = hidden ? "Afficher la valeur du stock" : "Masquer la valeur du stock";
-  }
-
-  btn.onclick = () => {
-    const hidden = localStorage.getItem(HIDE_VALEUR_STOCK_KEY) === "1";
-    localStorage.setItem(HIDE_VALEUR_STOCK_KEY, hidden ? "0" : "1");
-    render();
-  };
-  render();
+    // 2. Charger l'activité commerciale
+    await loadActiviteCommerciale();
 }
 
-(async () => {
-  const session = await requireAuth();
-  if (!session) return;
-
-  // Stat: nombre de pièces actives + valeur stock (achat) — avec repli sur le cache
-  // local si hors ligne (dernier catalogue connu, éventuellement pas à jour).
-  const { items: pieces, offline: piecesOffline, savedAt } = await loadWithCache("pieces", () =>
-    fetchAllRows(() => supabaseClient.from("pieces").select("*").eq("actif", true).order("id"))
-  );
-  if (piecesOffline && savedAt) {
-    showToast(`Hors ligne : données du ${fmtDateTime(savedAt)}.`, "info");
-  }
-
-  document.getElementById("stat-pieces").textContent = pieces.length;
-  const valeur = pieces.reduce((sum, p) => sum + (p.quantite_stock * Number(p.prix_achat)), 0);
-  setupValeurStockToggle(valeur);
-
-  // Alertes stock — dérivées directement du catalogue (en ligne comme hors ligne),
-  // pour ne pas dépendre d'une deuxième requête réseau qui échouerait hors connexion.
-  const alertesEl = document.getElementById("alertes-content");
-  const alertes = pieces
-    .filter(p => p.quantite_stock <= p.seuil_alerte)
-    .sort((a, b) => a.quantite_stock - b.quantite_stock);
-  document.getElementById("stat-alertes").textContent = alertes.length;
-  alertesPieces = alertes;
-  document.getElementById("export-alertes-pdf-btn").disabled = alertes.length === 0;
-
-  if (alertes.length === 0) {
-    alertesEl.innerHTML = `<div class="empty-state">Aucune alerte — tout le stock est au-dessus du seuil.</div>`;
-  } else {
-    alertesEl.innerHTML = `
-      <div style="overflow-x:auto;">
-      <table>
-        <thead><tr><th>Référence OEM</th><th>Désignation</th><th>Marque</th><th>Emplacement</th><th class="num">Stock</th><th class="num">Seuil</th></tr></thead>
-        <tbody>
-          ${alertes.slice(0, 50).map(a => `
-            <tr>
-              <td class="ref">${esc(a.reference_oem)}</td>
-              <td>${esc(a.designation)}</td>
-              <td>${esc(a.marque || "—")}</td>
-              <td>${esc(a.emplacement || "—")}</td>
-              <td class="num"><span class="badge ${a.quantite_stock === 0 ? "badge-danger" : "badge-warn"}">${a.quantite_stock} ${MEASURE_UNIT_LABELS[a.unite_mesure] || ""}</span></td>
-              <td class="num">${a.seuil_alerte}</td>
-            </tr>`).join("")}
-        </tbody>
-      </table>
-      </div>`;
-  }
-
-  await loadActiviteCommerciale();
-})();
-
-// Ventes du jour / de la semaine / du mois + créances totales + produits les plus
-// vendus. Une seule requête large (factures validées depuis le début du mois) suffit
-// pour dériver jour/semaine/mois côté client, plutôt que 3 requêtes réseau distinctes.
 async function loadActiviteCommerciale() {
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  const debutSemaine = new Date(today);
-  const jourSemaine = (debutSemaine.getDay() + 6) % 7; // lundi = 0
-  debutSemaine.setDate(debutSemaine.getDate() - jourSemaine);
-  const debutMois = new Date(today.getFullYear(), today.getMonth(), 1);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-  const setVentes = (prefix, rows) => {
-    const total = rows.reduce((s, f) => s + Number(f.montant_total), 0);
-    document.getElementById(`stat-ca-${prefix}`).textContent = fmtMoney(total);
-    document.getElementById(`stat-nb-${prefix}`).textContent = `${rows.length} vente${rows.length > 1 ? "s" : ""}`;
-  };
+    const debutSemaine = new Date(today);
+    const jourSemaine = (debutSemaine.getDay() + 6) % 7;
+    debutSemaine.setDate(debutSemaine.getDate() - jourSemaine);
 
-  try {
-    // La semaine (lundi) peut commencer avant le 1er du mois (ex: le 2 du mois si le
-    // 1er est un mardi) : on charge depuis la plus ancienne des deux bornes, puis on
-    // filtre chaque période côté client, sinon "ventes de la semaine" sous-compte les
-    // ventes des tout premiers jours d'un mois.
-    const debutChargement = debutSemaine < debutMois ? debutSemaine : debutMois;
-    const { data: ventes, error } = await supabaseClient
-      .from("factures")
-      .select("id, montant_total, validated_at")
-      .eq("statut", "VALIDEE")
-      .gte("validated_at", debutChargement.toISOString());
-    if (error) throw error;
+    const debutMois = new Date(today.getFullYear(), today.getMonth(), 1);
 
-    const rows = (ventes || []).filter(f => new Date(f.validated_at) >= debutMois);
-    setVentes("mois", rows);
-    setVentes("semaine", (ventes || []).filter(f => new Date(f.validated_at) >= debutSemaine));
-    setVentes("jour", (ventes || []).filter(f => new Date(f.validated_at) >= today));
+    try {
+        const debutChargement = debutSemaine < debutMois ? debutSemaine : debutMois;
 
-    const idsMois = rows.map(f => f.id);
-    const topEl = document.getElementById("top-produits-content");
-    if (idsMois.length === 0) {
-      topEl.innerHTML = `<div class="empty-state">Aucune vente validée ce mois-ci.</div>`;
-    } else {
-      const { data: lignes, error: errLignes } = await supabaseClient
-        .from("factures_lignes").select("designation, quantite, montant").in("facture_id", idsMois);
-      if (errLignes) throw errLignes;
+        const { data: ventes, error } = await supabaseClient
+            .from('factures')
+            .select('id, montant_total, validated_at')
+            .eq('statut', 'VALIDEE')
+            .gte('validated_at', debutChargement.toISOString());
 
-      const parProduit = new Map();
-      (lignes || []).forEach(l => {
-        const cur = parProduit.get(l.designation) || { quantite: 0, montant: 0 };
-        cur.quantite += Number(l.quantite);
-        cur.montant += Number(l.montant);
-        parProduit.set(l.designation, cur);
-      });
-      const top = [...parProduit.entries()].sort((a, b) => b[1].quantite - a[1].quantite).slice(0, 8);
+        if (error) throw error;
 
-      topEl.innerHTML = `
-        <div style="overflow-x:auto;">
-        <table>
-          <thead><tr><th>Désignation</th><th class="num">Quantité vendue</th><th class="num">Chiffre d'affaires</th></tr></thead>
-          <tbody>
-            ${top.map(([designation, v]) => `
-              <tr><td>${esc(designation)}</td><td class="num">${v.quantite}</td><td class="num">${fmtMoney(v.montant)}</td></tr>`).join("")}
-          </tbody>
-        </table>
-        </div>`;
+        const ventesMois = (ventes || []).filter(f => new Date(f.validated_at) >= debutMois);
+        const ventesSemaine = (ventes || []).filter(f => new Date(f.validated_at) >= debutSemaine);
+        const ventesJour = (ventes || []).filter(f => new Date(f.validated_at) >= today);
+
+        // Cartes principales
+        const caJour = ventesJour.reduce((s, f) => s + Number(f.montant_total), 0);
+        document.getElementById('stat-ca-jour').textContent = fmtMoney(caJour);
+        document.getElementById('stat-nb-jour').textContent = `${ventesJour.length} vente${ventesJour.length > 1 ? 's' : ''} faite${ventesJour.length > 1 ? 's' : ''}`;
+
+        // Récapitulatif
+        const caSemaine = ventesSemaine.reduce((s, f) => s + Number(f.montant_total), 0);
+        document.getElementById('stat-ca-semaine').textContent = fmtMoney(caSemaine);
+        document.getElementById('stat-nb-semaine').textContent = `${ventesSemaine.length} vente${ventesSemaine.length > 1 ? 's' : ''}`;
+
+        const caMois = ventesMois.reduce((s, f) => s + Number(f.montant_total), 0);
+        document.getElementById('stat-ca-mois').textContent = fmtMoney(caMois);
+        document.getElementById('stat-nb-mois').textContent = `${ventesMois.length} vente${ventesMois.length > 1 ? 's' : ''}`;
+
+    } catch (error) {
+        console.error('Erreur chargement activité:', error);
+        document.getElementById('stat-ca-jour').textContent = '—';
+        document.getElementById('stat-ca-semaine').textContent = '—';
+        document.getElementById('stat-ca-mois').textContent = '—';
     }
-  } catch {
-    ["jour", "semaine", "mois"].forEach(p => {
-      document.getElementById(`stat-ca-${p}`).textContent = "—";
-      document.getElementById(`stat-nb-${p}`).textContent = "Connexion requise";
-    });
-    document.getElementById("top-produits-content").innerHTML = `<div class="empty-state">Connexion requise pour afficher les produits les plus vendus.</div>`;
-  }
 
-  // Créances totales : même logique que credits.html/Recouvra (montant_restant > 0
-  // sur les factures non annulées), affichée ici indépendamment de l'abonnement
-  // Recouvra puisque ce total est déjà visible sans lui sur la page Emprunts.
-  try {
-    const { data: creances, error } = await supabaseClient
-      .from("factures").select("montant_restant").neq("statut", "ANNULEE").gt("montant_restant", 0);
-    if (error) throw error;
-    const total = (creances || []).reduce((s, f) => s + Number(f.montant_restant), 0);
-    document.getElementById("stat-creances").textContent = fmtMoney(total);
-  } catch {
-    document.getElementById("stat-creances").textContent = "—";
-  }
+    // 3. Charger les créances
+    try {
+        const { data: creances, error } = await supabaseClient
+            .from('factures')
+            .select('montant_restant')
+            .neq('statut', 'ANNULEE')
+            .gt('montant_restant', 0);
+
+        if (error) throw error;
+
+        const total = (creances || []).reduce((s, f) => s + Number(f.montant_restant), 0);
+        document.getElementById('stat-creances').textContent = fmtMoney(total);
+
+    } catch (error) {
+        console.error('Erreur chargement créances:', error);
+        document.getElementById('stat-creances').textContent = '—';
+    }
 }
 </script>
 </body>
