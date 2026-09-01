@@ -109,7 +109,23 @@ const MODE_PAIEMENT_LABELS = {
   ESPECES: "Espèces", CARTE: "Carte", VIREMENT: "Virement",
   WAVE: "Wave", OM: "Orange Money", CHEQUE: "Chèque", CREDIT: "Crédit (bon)",
 };
-window.MEASURE_UNIT_LABELS = { PCS: "pcs", M: "m", M2: "m²", KG: "kg", L: "L", ROULEAU: "rouleau", CARTON: "carton", PAQUET: "paquet" };
+window.MEASURE_UNIT_LABELS = { 
+  PCS: "pcs", 
+  M: "m", 
+  M2: "m²", 
+  KG: "kg", 
+  L: "L", 
+  ML: "ml", 
+  G: "g", 
+  ROULEAU: "rouleau", 
+  CARTON: "carton", 
+  PAQUET: "paquet", 
+  BOITE: "boîte", 
+  SACHET: "sachet", 
+  FLACON: "flacon", 
+  TUBE: "tube", 
+  POT: "pot" 
+};
 
 function fmtMoney(n) {
   const v = Number(n || 0);
