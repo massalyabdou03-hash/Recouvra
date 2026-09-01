@@ -1,8 +1,7 @@
-// Parcours en 5 étapes affiché une seule fois après l'inscription (voir
-// redirectAfterAuth() dans login.html, basé sur entreprises.onboarding_completed_at).
-
+// Parcours en 5 étapes affiché une seule fois après l'inscription
 let selectedCommerce = null;
 const selectedBesoins = new Set();
+let selectedPlan = 'standard'; // Par défaut : Pack Standard
 
 function goToStep(n) {
   document.querySelectorAll(".onboarding-step").forEach(s => { s.hidden = Number(s.dataset.step) !== n; });
@@ -33,8 +32,6 @@ document.getElementById("besoins-choices").addEventListener("click", (e) => {
   document.getElementById("step3-next").disabled = selectedBesoins.size === 0;
 });
 
-// Un message par besoin coché — pas de generation dynamique compliquee, juste
-// un texte prepare par cas, comme demande.
 const VALUE_MESSAGES = {
   stock: "Recouvra vous aide à garder une vision claire de votre stock et à suivre chaque mouvement d'entrée ou de sortie.",
   facturation: "Créez des factures professionnelles en quelques secondes, avec le nom et les couleurs de votre entreprise.",
@@ -51,34 +48,55 @@ function renderValueStep() {
   `).join("");
 }
 
+function selectPlan(plan, element) {
+  selectedPlan = plan;
+  document.querySelectorAll('#offer-choices .pricing-option').forEach(card => {
+    card.classList.remove('selected');
+  });
+  element.classList.add('selected');
+  
+  const amounts = {
+    simple: "10 000 FCFA",
+    standard: "50 000 FCFA",
+    premium: "100 000 FCFA"
+  };
+  document.getElementById('selected-amount').textContent = amounts[plan];
+}
+
 async function finishOnboarding() {
   const btn = document.getElementById("finish-btn");
   const msgEl = document.getElementById("onboarding-msg");
-  btn.disabled = true; btn.textContent = "Enregistrement...";
+  btn.disabled = true;
+  btn.textContent = "Enregistrement...";
+  clearMsg(msgEl);
 
   const { data: userData } = await supabaseClient.auth.getUser();
-  const { data: profile } = await supabaseClient.from("profiles").select("entreprise_id").eq("id", userData.user.id).maybeSingle();
+  const { data: profile } = await supabaseClient
+    .from("profiles")
+    .select("entreprise_id")
+    .eq("id", userData.user.id)
+    .maybeSingle();
 
-  const { error } = await supabaseClient.from("entreprises").update({
-    type_commerce: selectedCommerce,
-    besoins: [...selectedBesoins],
-    onboarding_completed_at: new Date().toISOString(),
-  }).eq("id", profile.entreprise_id);
-
-  if (error) {
-    btn.disabled = false; btn.textContent = "J'ai effectué le paiement";
-    showMsg(msgEl, friendlyError(error));
+  if (!profile?.entreprise_id) {
+    showMsg(msgEl, "Entreprise non trouvée.", "error");
+    btn.disabled = false;
+    btn.textContent = "J'ai effectué le paiement";
     return;
   }
 
-  // V1 du paiement : lien Wave Business + declaration client + validation manuelle
-  // par un administrateur (voir super-admin.html). Aucune activation directe ici :
-  // subscriptions.status ne passe a "active" que via confirm_subscription_payment(),
-  // cote base, apres verification humaine du paiement dans Wave Business.
-  const { data: subscription } = await supabaseClient.from("subscriptions").select("id").eq("entreprise_id", profile.entreprise_id).maybeSingle();
-  if (!subscription) {
-    btn.disabled = false; btn.textContent = "J'ai effectué le paiement";
-    showMsg(msgEl, "Configuration de votre compte incomplète. Contactez le support Recouvra.");
+  const { error: updateError } = await supabaseClient
+    .from("entreprises")
+    .update({
+      type_commerce: selectedCommerce,
+      besoins: [...selectedBesoins],
+      onboarding_completed_at: new Date().toISOString(),
+    })
+    .eq("id", profile.entreprise_id);
+
+  if (updateError) {
+    showMsg(msgEl, friendlyError(updateError), "error");
+    btn.disabled = false;
+    btn.textContent = "J'ai effectué le paiement";
     return;
   }
 
@@ -87,40 +105,54 @@ async function finishOnboarding() {
   if (proofFile) {
     const extension = proofFile.name.split(".").pop().toLowerCase();
     proofPath = `${profile.entreprise_id}/setup-${Date.now()}.${extension}`;
-    const upload = await supabaseClient.storage.from("payment-proofs").upload(proofPath, proofFile, { upsert: false, contentType: proofFile.type });
+    const upload = await supabaseClient.storage
+      .from("payment-proofs")
+      .upload(proofPath, proofFile, { upsert: false, contentType: proofFile.type });
     if (upload.error) {
-      btn.disabled = false; btn.textContent = "J'ai effectué le paiement";
-      showMsg(msgEl, upload.error.message);
+      showMsg(msgEl, upload.error.message, "error");
+      btn.disabled = false;
+      btn.textContent = "J'ai effectué le paiement";
       return;
     }
   }
 
-  const { error: paymentError } = await supabaseClient.from("subscription_payments").insert({
-    entreprise_id: profile.entreprise_id,
-    subscription_id: subscription.id,
-    submitted_by: userData.user.id,
-    payment_type: "setup",
-    amount: 50000,
-    payment_reference: document.getElementById("payment-reference")?.value.trim() || null,
-    proof_path: proofPath,
-  });
+  const montants = { simple: 10000, standard: 50000, premium: 100000 };
+  const reference = document.getElementById("payment-reference")?.value.trim() || null;
+  
+  const { error: paymentError } = await supabaseClient
+    .from("subscription_payments")
+    .insert({
+      entreprise_id: profile.entreprise_id,
+      submitted_by: userData.user.id,
+      payment_type: selectedPlan,
+      amount: montants[selectedPlan],
+      payment_reference: reference,
+      proof_path: proofPath,
+      status: 'pending'
+    });
 
-  btn.disabled = false; btn.textContent = "J'ai effectué le paiement";
+  btn.disabled = false;
+  btn.textContent = "J'ai effectué le paiement";
 
   if (paymentError) {
     if (proofPath) await supabaseClient.storage.from("payment-proofs").remove([proofPath]);
-    showMsg(msgEl, paymentError.code === "23505" ? "Un paiement est déjà en attente de vérification." : friendlyError(paymentError));
+    showMsg(msgEl, paymentError.code === "23505" ? "Une demande est déjà en attente." : friendlyError(paymentError), "error");
     return;
   }
 
-  document.getElementById("payment-step-initial").hidden = true;
+  document.getElementById("payment-section").hidden = true;
   document.getElementById("payment-step-pending").hidden = false;
+  
   pollSubscriptionActivation(profile.entreprise_id);
 }
 
 function pollSubscriptionActivation(entrepriseId) {
   const interval = setInterval(async () => {
-    const { data } = await supabaseClient.from("subscriptions").select("status").eq("entreprise_id", entrepriseId).maybeSingle();
+    const { data } = await supabaseClient
+      .from("subscriptions")
+      .select("status")
+      .eq("entreprise_id", entrepriseId)
+      .maybeSingle();
     if (data?.status === "active") {
       clearInterval(interval);
       window.location.href = "index.html";
