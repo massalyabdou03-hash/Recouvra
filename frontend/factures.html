@@ -782,10 +782,10 @@ body.dark-mode label {
 
     <!-- Historique des ventes du jour -->
     <div class="sales-history">
-      <div class="section-title">Ventes d'aujourd'hui</div>
-      <div id="today-sales">
-        <div class="empty-state">Aucune vente aujourd'hui pour le moment.</div>
-      </div>
+        <div class="section-title">Ventes du mois</div>
+        <div id="today-sales">
+            <div class="empty-state">Chargement des ventes du mois...</div>
+        </div>
     </div>
 
   </main>
@@ -1216,23 +1216,31 @@ async function loadTodaySales() {
     const el = document.getElementById('today-sales');
     
     try {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        // Début du mois en cours à 00h00
+        const debutMois = new Date();
+        debutMois.setDate(1);
+        debutMois.setHours(0, 0, 0, 0);
+        
+        // Fin du mois (le mois suivant à 00h00)
+        const finMois = new Date(debutMois);
+        finMois.setMonth(finMois.getMonth() + 1);
         
         const { data, error } = await supabaseClient
             .from('factures')
-            .select('id, numero_facture, montant_total, mode_paiement, created_at, clients(nom)')
+            .select('id, numero_facture, montant_total, mode_paiement, created_at, validated_at, clients(nom)')
             .eq('statut', 'VALIDEE')
-            .gte('validated_at', today.toISOString())
+            .gte('validated_at', debutMois.toISOString())
+            .lt('validated_at', finMois.toISOString())
             .order('created_at', { ascending: false });
-            
+
         if (error) throw error;
-        
+
+        // Si aucune facture
         if (!data || data.length === 0) {
-            el.innerHTML = '<div class="empty-state">Aucune vente aujourd\'hui pour le moment.</div>';
+            el.innerHTML = '<div class="empty-state">Aucune vente validée ce mois-ci.</div>';
             return;
         }
-        
+
         const modeLabels = {
             ESPECES: '💵 Espèces',
             WAVE: '📱 Wave',
@@ -1242,36 +1250,43 @@ async function loadTodaySales() {
             VIREMENT: '🏦 Virement',
             CHEQUE: '📄 Chèque',
         };
-        
+
         el.innerHTML = `
             <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
                             <th>N° Facture</th>
+                            <th>Date</th>
                             <th>Client</th>
                             <th>Montant</th>
                             <th>Paiement</th>
-                            <th>Heure</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${data.map(f => `
                             <tr onclick="window.location.href='facture-detail.html?id=${f.id}'" style="cursor:pointer;">
                                 <td class="ref">${esc(f.numero_facture || '—')}</td>
+                                <td class="hint">${fmtDate(f.validated_at || f.created_at)}</td>
                                 <td>${esc(f.clients?.nom || '—')}</td>
                                 <td class="num"><strong>${fmtMoney(f.montant_total)}</strong></td>
                                 <td>${modeLabels[f.mode_paiement] || f.mode_paiement}</td>
-                                <td class="hint">${new Date(f.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</td>
+                                <td class="actions-cell">
+                                    <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); window.location.href='facture-detail.html?id=${f.id}'">
+                                        Voir
+                                    </button>
+                                </td>
                             </tr>
                         `).join('')}
                     </tbody>
                 </table>
             </div>
+            <p class="hint" style="margin-top:12px; text-align:center;">${data.length} facture(s) validée(s) ce mois-ci — Cliquez sur une ligne pour voir le détail.</p>
         `;
-        
+
     } catch (error) {
-        console.error('Erreur chargement ventes du jour:', error);
+        console.error('Erreur chargement ventes du mois:', error);
         el.innerHTML = `<div class="error-msg">${friendlyError(error)}</div>`;
     }
 }
