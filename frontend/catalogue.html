@@ -78,7 +78,7 @@
 }
 
 /* ============================================================================
-   CORRECTIONS MOBILE GLOBALES (AJOUTÉES)
+   CORRECTIONS MOBILE GLOBALES
    ============================================================================ */
 @media (max-width: 768px) {
     body { overflow-x: hidden; }
@@ -635,28 +635,65 @@ body.dark-mode .btn-secondary {
     </div>
     <form id="piece-form">
       <input type="hidden" id="piece-id">
+      <label>Nom du produit *</label>
+      <input id="designation" required placeholder="Ex : Crème hydratante, Parfum, Savon...">
       <div class="field-row">
-        <div><label>Référence OEM *</label><input id="reference_oem" required></div>
-        <div><label>Référence interne</label><input id="reference_interne" placeholder="Générée automatiquement"></div>
-      </div>
-      <label>Désignation *</label>
-      <input id="designation" required>
-      <div class="field-row-3">
-        <div><label>Marque</label><input id="marque"></div>
-        <div><label>Catégorie</label><input id="categorie"></div>
-        <div><label>Emplacement</label><input id="emplacement" placeholder="ex: A2-03"></div>
+        <div><label>Code article (optionnel)</label><input id="reference_oem" placeholder="Ex : CR-001"></div>
+        <div><label>Référence (optionnel)</label><input id="reference_interne" placeholder="Générée automatiquement"></div>
       </div>
       <div class="field-row-3">
-        <div><label>Prix achat (F)</label><input id="prix_achat" type="number" min="0" step="1" value="0"></div>
-        <div><label>Prix vente (F)</label><input id="prix_vente" type="number" min="0" step="1" value="0"></div>
-        <div><label>Seuil d'alerte</label><input id="seuil_alerte" type="number" min="0" step="1" value="1"></div>
+        <div><label>Marque</label><input id="marque" placeholder="Ex : L'Oréal"></div>
+        <div>
+          <label>Catégorie</label>
+          <select id="categorie">
+            <option value="">— Choisir une catégorie —</option>
+            <option value="COSMETIQUES">Cosmétiques</option>
+            <option value="PARFUMS">Parfums</option>
+            <option value="SOINS">Soins visage & corps</option>
+            <option value="COIFFURE">Coiffure</option>
+            <option value="ACCESSOIRES">Accessoires</option>
+            <option value="ALIMENTATION">Alimentation</option>
+            <option value="QUINCAILLERIE">Quincaillerie</option>
+            <option value="VETEMENTS">Vêtements</option>
+            <option value="ELECTRONIQUE">Électronique</option>
+            <option value="AUTRE">Autre</option>
+          </select>
+        </div>
+        <div><label>Emplacement</label><input id="emplacement" placeholder="Ex : Étagère A"></div>
+      </div>
+      <div class="field-row-3">
+        <div><label>Prix d'achat (FCFA)</label><input id="prix_achat" type="number" min="0" step="1" value="0"></div>
+        <div><label>Prix de vente (FCFA)</label><input id="prix_vente" type="number" min="0" step="1" value="0"></div>
+        <div><label>Quantité en stock</label><input id="quantite_stock" type="number" min="0" step="1" value="0"></div>
       </div>
       <div class="field-row">
-        <div><label>Stock initial</label><input id="quantite_stock" type="number" min="0" step="1" value="0"></div>
-        <div><label>Unité de mesure</label><select id="unite_mesure"><option value="PCS">Pièce (pcs)</option><option value="M">Mètre (m)</option><option value="M2">Mètre carré (m²)</option><option value="KG">Kilogramme (kg)</option><option value="L">Litre (L)</option><option value="ROULEAU">Rouleau</option><option value="CARTON">Carton</option><option value="PAQUET">Paquet</option></select></div>
+        <div>
+          <label>Unité</label>
+          <select id="unite_mesure">
+            <option value="PCS">Pièce (pcs)</option>
+            <option value="CARTON">Carton</option>
+            <option value="PAQUET">Paquet</option>
+            <option value="BOITE">Boîte</option>
+            <option value="SACHET">Sachet</option>
+            <option value="FLACON">Flacon</option>
+            <option value="TUBE">Tube</option>
+            <option value="POT">Pot</option>
+            <option value="L">Litre (L)</option>
+            <option value="ML">Millilitre (ml)</option>
+            <option value="KG">Kilogramme (kg)</option>
+            <option value="G">Gramme (g)</option>
+            <option value="M">Mètre (m)</option>
+            <option value="M2">Mètre carré (m²)</option>
+            <option value="ROULEAU">Rouleau</option>
+          </select>
+        </div>
+        <div>
+          <label>Alerte stock</label>
+          <input id="seuil_alerte" type="number" min="0" step="1" value="1" placeholder="Ex : 5">
+        </div>
       </div>
-      <label>Description</label>
-      <textarea id="description" rows="2" placeholder="Description de l'article..."></textarea>
+      <label>Description (optionnel)</label>
+      <textarea id="description" rows="2" placeholder="Description du produit..."></textarea>
       <div id="form-msg"></div>
       <div class="modal-actions">
         <button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>
@@ -765,13 +802,14 @@ function renderProducts(products) {
     grid.innerHTML = products.map(p => {
         const stockClass = p.quantite_stock === 0 ? 'danger' : (p.quantite_stock <= p.seuil_alerte ? 'warning' : 'success');
         const stockLabel = p.quantite_stock === 0 ? '❌ Rupture' : (p.quantite_stock <= p.seuil_alerte ? `⚠️ Plus que ${p.quantite_stock} !` : `${p.quantite_stock} en stock`);
+        const catLabel = p.categorie ? ` · ${p.categorie}` : '';
         
         return `
             <div class="product-card" onclick="openProductDetail(${p.id})">
                 <div class="product-image">📦</div>
                 <div class="product-details">
                     <div class="product-name">${esc(p.designation)}</div>
-                    <div class="product-ref">${esc(p.reference_oem || '')}</div>
+                    <div class="product-ref">${esc(p.reference_oem || '')}${catLabel}</div>
                     <div class="product-price">${fmtMoney(p.prix_vente)}</div>
                     <div class="product-stock-badge ${stockClass}">${stockLabel}</div>
                 </div>
@@ -806,8 +844,12 @@ function openProductDetail(id) {
     content.innerHTML = `
         <div class="detail-grid">
             <div>
+                <div class="hint">Code article</div>
+                <div>${esc(p.reference_oem || '—')}</div>
+            </div>
+            <div>
                 <div class="hint">Référence</div>
-                <div>${esc(p.reference_oem)}</div>
+                <div>${esc(p.reference_interne || '—')}</div>
             </div>
             <div>
                 <div class="hint">Marque</div>
@@ -868,7 +910,7 @@ function openModal() {
     document.getElementById('modal-title').textContent = 'Nouvel article';
     clearMsg(document.getElementById('form-msg'));
     document.getElementById('modal-backdrop').classList.add('open');
-    document.getElementById('reference_oem').focus();
+    document.getElementById('designation').focus();
 }
 
 function closeModal() {
@@ -880,24 +922,31 @@ function editProduct(id) {
     if (!p) return;
     
     document.getElementById('piece-id').value = p.id;
-    document.getElementById('reference_oem').value = p.reference_oem;
-    document.getElementById('reference_interne').value = p.reference_interne;
     document.getElementById('designation').value = p.designation;
+    document.getElementById('reference_oem').value = p.reference_oem || '';
+    document.getElementById('reference_interne').value = p.reference_interne || '';
     document.getElementById('marque').value = p.marque || '';
     document.getElementById('categorie').value = p.categorie || '';
     document.getElementById('emplacement').value = p.emplacement || '';
     document.getElementById('prix_achat').value = p.prix_achat;
     document.getElementById('prix_vente').value = p.prix_vente;
-    document.getElementById('seuil_alerte').value = p.seuil_alerte;
     document.getElementById('quantite_stock').value = p.quantite_stock;
     document.getElementById('unite_mesure').value = p.unite_mesure || 'PCS';
+    document.getElementById('seuil_alerte').value = p.seuil_alerte;
     document.getElementById('description').value = p.description || '';
     document.getElementById('modal-title').textContent = 'Modifier l\'article';
     clearMsg(document.getElementById('form-msg'));
     document.getElementById('modal-backdrop').classList.add('open');
 }
+
+// Génère une référence interne unique si le champ est vide
 function generateReference() {
     return 'REF-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+}
+
+// Génère un code article unique si le champ est vide
+function generateCode() {
+    return 'ART-' + Date.now().toString(36).toUpperCase();
 }
 
 async function saveProduct(e) {
@@ -907,23 +956,28 @@ async function saveProduct(e) {
     clearMsg(msgEl);
     
     const id = document.getElementById('piece-id').value;
+    
+    // Générer automatiquement les références si elles sont vides
+    const refOem = document.getElementById('reference_oem').value.trim() || generateCode();
+    const refInterne = document.getElementById('reference_interne').value.trim() || generateReference();
+    
     const payload = {
-        reference_oem: document.getElementById('reference_oem').value.trim(),
-        reference_interne: document.getElementById('reference_interne').value.trim() || generateReference(),  // 🔥 Correction ici
+        reference_oem: refOem,
+        reference_interne: refInterne,
         designation: document.getElementById('designation').value.trim(),
         marque: document.getElementById('marque').value.trim() || null,
-        categorie: document.getElementById('categorie').value.trim() || null,
+        categorie: document.getElementById('categorie').value || null,
         emplacement: document.getElementById('emplacement').value.trim() || null,
         prix_achat: Number(document.getElementById('prix_achat').value) || 0,
         prix_vente: Number(document.getElementById('prix_vente').value) || 0,
         quantite_stock: Number(document.getElementById('quantite_stock').value) || 0,
-        seuil_alerte: Number(document.getElementById('seuil_alerte').value) || 0,
+        seuil_alerte: Number(document.getElementById('seuil_alerte').value) || 1,
         unite_mesure: document.getElementById('unite_mesure').value,
         description: document.getElementById('description').value.trim() || null,
     };
     
-    if (!payload.reference_oem || !payload.designation) {
-        showMsg(msgEl, 'La référence et la désignation sont obligatoires.');
+    if (!payload.designation) {
+        showMsg(msgEl, 'Le nom du produit est obligatoire.');
         return;
     }
     
