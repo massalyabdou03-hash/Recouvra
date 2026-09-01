@@ -77,6 +77,33 @@
     }
 }
 
+/* ============================================================================
+   CORRECTIONS MOBILE GLOBALES (AJOUTÉES)
+   ============================================================================ */
+@media (max-width: 768px) {
+    body { overflow-x: hidden; }
+}
+
+body.menu-open .mobile-menu-btn { display: none; }
+
+@media (max-width: 600px) {
+    .modal-backdrop { padding: 16px 10px; }
+    .modal { margin: 0 auto; width: calc(100% - 32px); max-height: calc(100vh - 32px); }
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+    width: 100%;
+}
+
+.table-wrapper > table { min-width: 720px; }
+
+@media (max-width: 480px) {
+    .table-wrapper > table { min-width: 100%; }
+}
+
 body.dark-mode {
     --surface: #1F2937;
     --surface-2: #374151;
@@ -652,6 +679,7 @@ function toggleSidebar() {
     const overlay = document.querySelector('.sidebar-overlay');
     if (sidebar) sidebar.classList.toggle('open');
     if (overlay) overlay.classList.toggle('active');
+    document.body.classList.toggle('menu-open', sidebar?.classList.contains('open'));
 }
 
 document.addEventListener('click', (e) => {
@@ -660,6 +688,7 @@ document.addEventListener('click', (e) => {
         const overlay = document.querySelector('.sidebar-overlay');
         if (sidebar) sidebar.classList.remove('open');
         if (overlay) overlay.classList.remove('active');
+        document.body.classList.remove('menu-open');
     }
 });
 
@@ -867,6 +896,9 @@ function editProduct(id) {
     clearMsg(document.getElementById('form-msg'));
     document.getElementById('modal-backdrop').classList.add('open');
 }
+function generateReference() {
+    return 'REF-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+}
 
 async function saveProduct(e) {
     e.preventDefault();
@@ -877,7 +909,7 @@ async function saveProduct(e) {
     const id = document.getElementById('piece-id').value;
     const payload = {
         reference_oem: document.getElementById('reference_oem').value.trim(),
-        reference_interne: document.getElementById('reference_interne').value.trim() || null,
+        reference_interne: document.getElementById('reference_interne').value.trim() || generateReference(),  // 🔥 Correction ici
         designation: document.getElementById('designation').value.trim(),
         marque: document.getElementById('marque').value.trim() || null,
         categorie: document.getElementById('categorie').value.trim() || null,
