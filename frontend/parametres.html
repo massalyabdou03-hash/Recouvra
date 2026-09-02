@@ -167,10 +167,17 @@ async function loadPlanInfo() {
     const plan = await getCurrentPlan();
     const el = document.getElementById('plan-info');
     if (!el) return;
-    if (!plan) {
-        el.innerHTML = `<p class="hint">Aucun abonnement actif. <a href="abonnement.html" style="color:var(--accent);">S'abonner</a></p>`;
-        return;
-    }
+if (!plan) {
+    el.innerHTML = `
+        <div style="text-align:center; padding:20px; border:2px dashed var(--border); border-radius:12px;">
+            <p style="margin-bottom:16px; font-weight:600;">Vous n'avez pas encore d'abonnement actif.</p>
+            <button class="btn recouvra-cta" onclick="window.location.href='abonnement.html'" style="font-size:16px; padding:14px 28px;">
+                🔔 S'abonner maintenant
+            </button>
+        </div>
+    `;
+    return;
+}
     el.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
             <div>
