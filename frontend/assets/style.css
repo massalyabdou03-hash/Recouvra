@@ -3419,3 +3419,73 @@ body.dark-mode .support-link:hover {
         overflow: hidden !important;
     }
 }
+/* ============================================================
+   CORRECTIFS MOBILE - SIDEBAR INTERACTIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+    /* Overlay : en dessous de la sidebar pour ne pas bloquer les clics */
+    .sidebar-overlay {
+        z-index: 998 !important;
+        pointer-events: auto;
+    }
+
+    /* Sidebar : au-dessus de l'overlay, cliquable */
+    .sidebar {
+        z-index: 999 !important;
+        pointer-events: auto;
+    }
+
+    /* Les liens et boutons de la sidebar doivent être cliquables */
+    .sidebar a,
+    .sidebar button {
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        z-index: 1000 !important;
+    }
+
+    /* Permettre le scroll vertical dans la sidebar */
+    .sidebar {
+        height: 100vh !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 20px !important; /* espace pour le scroll */
+    }
+
+    /* Footer fixe en bas de la sidebar */
+    .sidebar .sidebar-footer {
+        margin-top: auto !important;
+        padding-bottom: 20px !important;
+    }
+
+    /* Masquer le contenu principal quand le menu est ouvert */
+    body.menu-open .main {
+        margin-left: 300px !important;
+        transition: margin-left 0.3s ease;
+    }
+
+    /* Empêcher le scroll de la page quand le menu est ouvert */
+    body.menu-open {
+        overflow: hidden !important;
+    }
+
+    /* Bouton hamburger : toujours cliquable */
+    .mobile-menu-btn {
+        pointer-events: auto !important;
+        z-index: 1001 !important;
+    }
+}
+.admin-nav-link {
+    color: #F59E0B !important;
+    font-weight: 600;
+}
+
+.admin-nav-link:hover {
+    background: #FEF3C7 !important;
+    color: #B45309 !important;
+}
+
+.admin-nav-link.active {
+    background: #F59E0B !important;
+    color: white !important;
+}

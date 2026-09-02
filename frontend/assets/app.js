@@ -1122,3 +1122,93 @@ document.addEventListener('DOMContentLoaded', addSupportLinkToSidebar);
         document.body.appendChild(overlay);
     }
 })();
+// ============================================================
+// AJOUTER LE LIEN ADMINISTRATION UNIQUEMENT POUR SUPER_ADMIN
+// ============================================================
+
+async function addAdminLinkIfSuperAdmin() {
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) return;
+
+        const { data: profile } = await supabaseClient
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
+
+        // Vérifier si l'utilisateur est super_admin
+        if (profile?.role === 'super_admin') {
+            const sidebar = document.querySelector('.sidebar');
+            if (!sidebar) return;
+
+            // Vérifier si le lien existe déjà
+            if (sidebar.querySelector('.admin-nav-link')) return;
+
+            // Créer le lien
+            const adminLink = document.createElement('a');
+            adminLink.href = 'super-admin.html';
+            adminLink.className = 'nav-link admin-nav-link';
+            adminLink.innerHTML = '<span class="nav-emoji">🔐</span> <span>Administration</span>';
+
+            // L'insérer dans la section "Mon Argent" (après Relancer)
+            const monArgentSection = sidebar.querySelectorAll('.nav-section');
+            if (monArgentSection.length >= 3) {
+                monArgentSection[2].appendChild(adminLink);
+            } else {
+                // Si pas de section, l'ajouter à la fin du menu
+                sidebar.querySelector('.sidebar-footer')?.before(adminLink);
+            }
+        }
+    } catch (error) {
+        console.error('Erreur vérification admin:', error);
+    }
+}
+
+// Appeler cette fonction au chargement de chaque page
+document.addEventListener('DOMContentLoaded', addAdminLinkIfSuperAdmin);
+// ============================================================
+// AJOUTER LE LIEN ADMINISTRATION POUR SUPER_ADMIN
+// ============================================================
+
+async function addAdminLinkIfSuperAdmin() {
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) return;
+
+        const { data: profile } = await supabaseClient
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
+
+        if (profile?.role !== 'super_admin') return;
+
+        const sidebar = document.querySelector('.sidebar');
+        if (!sidebar) return;
+
+        // Vérifier si le lien existe déjà
+        if (sidebar.querySelector('.admin-nav-link')) return;
+
+        // Créer le lien
+        const adminLink = document.createElement('a');
+        adminLink.href = 'super-admin.html';
+        adminLink.className = 'nav-link admin-nav-link';
+        adminLink.innerHTML = '<span class="nav-emoji">🔐</span> <span>Administration</span>';
+
+        // Trouver la section "Mon Argent"
+        const sections = sidebar.querySelectorAll('.nav-section');
+        if (sections.length >= 3) {
+            sections[2].appendChild(adminLink);
+        } else {
+            // Fallback : ajouter avant le footer
+            const footer = sidebar.querySelector('.sidebar-footer');
+            if (footer) footer.parentNode.insertBefore(adminLink, footer);
+        }
+    } catch (error) {
+        console.error('Erreur admin link:', error);
+    }
+}
+
+// Appeler après le chargement de la page
+document.addEventListener('DOMContentLoaded', addAdminLinkIfSuperAdmin);
