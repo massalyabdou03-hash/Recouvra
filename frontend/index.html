@@ -13,6 +13,8 @@
 <meta name="apple-mobile-web-app-title" content="Ma Boutique">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="stylesheet" href="assets/style.css">
+<!-- Chart.js pour le graphique -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -29,43 +31,25 @@
 
     <div class="nav-section">
       <div class="nav-section-title">Mon Quotidien</div>
-      <a href="index.html" class="nav-link active">
-        <span class="nav-emoji">🏠</span> Accueil
-      </a>
-      <a href="factures.html" class="nav-link">
-        <span class="nav-emoji">🧾</span> Vendre
-      </a>
-      <a href="clients.html" class="nav-link">
-        <span class="nav-emoji">👥</span> Mes Clients
-      </a>
+      <a href="index.html" class="nav-link active"><span class="nav-emoji">🏠</span> Accueil</a>
+      <a href="factures.html" class="nav-link"><span class="nav-emoji">🧾</span> Vendre</a>
+      <a href="clients.html" class="nav-link"><span class="nav-emoji">👥</span> Mes Clients</a>
     </div>
 
     <div class="nav-section">
       <div class="nav-section-title">Mon Stock</div>
-      <a href="catalogue.html" class="nav-link">
-        <span class="nav-emoji">📦</span> Mes Articles
-      </a>
-      <a href="stock.html" class="nav-link">
-        <span class="nav-emoji">📊</span> Stock & Produits
-      </a>
+      <a href="catalogue.html" class="nav-link"><span class="nav-emoji">📦</span> Mes Articles</a>
+      <a href="stock.html" class="nav-link"><span class="nav-emoji">📊</span> Stock & Produits</a>
     </div>
 
     <div class="nav-section">
       <div class="nav-section-title">Mon Argent</div>
-      <a href="credits.html" class="nav-link">
-        <span class="nav-emoji">💸</span> On me doit
-      </a>
-      <a href="recouvra.html" class="nav-link premium">
-        <span class="nav-emoji">📣</span> Relancer
-        <span class="badge-premium">PRO</span>
-      </a>
+      <a href="credits.html" class="nav-link"><span class="nav-emoji">💸</span> On me doit</a>
+      <a href="recouvra.html" class="nav-link premium"><span class="nav-emoji">📣</span> Relancer <span class="badge-premium">PRO</span></a>
     </div>
 
     <div class="sidebar-footer">
-      <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;">
-        <span id="dark-mode-icon">🌙</span>
-        <span id="dark-mode-label">Mode sombre</span>
-      </button>
+      <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;"><span id="dark-mode-icon">🌙</span> <span id="dark-mode-label">Mode sombre</span></button>
       <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
       <button class="btn-logout" onclick="logout()">Déconnexion</button>
     </div>
@@ -160,6 +144,12 @@
         </div>
       </div>
     </div>
+
+    <!-- GRAPHIQUE TENDANCES -->
+    <div class="dashboard-recap">
+      <div class="section-title">Tendances de ventes (30 jours)</div>
+      <canvas id="salesChart" height="100"></canvas>
+    </div>
   </main>
 </div>
 
@@ -167,44 +157,11 @@
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
 <script>
-// Fonctions globales déjà dans app.js, mais redéclarées pour compatibilité
-function toggleSidebar() {
-    const sidebar = document.querySelector('.sidebar');
-    const overlay = document.querySelector('.sidebar-overlay');
-    if (sidebar) sidebar.classList.toggle('open');
-    if (overlay) overlay.classList.toggle('active');
-    document.body.classList.toggle('menu-open', sidebar?.classList.contains('open'));
-}
-
-document.addEventListener('click', (e) => {
-    if (e.target.closest('.nav-link')) {
-        const sidebar = document.querySelector('.sidebar');
-        const overlay = document.querySelector('.sidebar-overlay');
-        if (sidebar) sidebar.classList.remove('open');
-        if (overlay) overlay.classList.remove('active');
-        document.body.classList.remove('menu-open');
-    }
-});
-
-function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
-    const icon = document.getElementById('dark-mode-icon');
-    const label = document.getElementById('dark-mode-label');
-    if (icon) icon.textContent = isDark ? '☀️' : '🌙';
-    if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre';
-}
-
-function initDarkMode() {
-    if (localStorage.getItem('recouvra_dark_mode') === '1') {
-        document.body.classList.add('dark-mode');
-        const icon = document.getElementById('dark-mode-icon');
-        const label = document.getElementById('dark-mode-label');
-        if (icon) icon.textContent = '☀️';
-        if (label) label.textContent = 'Mode clair';
-    }
-}
+// Fonctions globales (redéclarées)
+function toggleSidebar() { const sidebar = document.querySelector('.sidebar'); const overlay = document.querySelector('.sidebar-overlay'); if (sidebar) sidebar.classList.toggle('open'); if (overlay) overlay.classList.toggle('active'); document.body.classList.toggle('menu-open', sidebar?.classList.contains('open')); }
+document.addEventListener('click', (e) => { if (e.target.closest('.nav-link')) { const sidebar = document.querySelector('.sidebar'); const overlay = document.querySelector('.sidebar-overlay'); if (sidebar) sidebar.classList.remove('open'); if (overlay) overlay.classList.remove('active'); document.body.classList.remove('menu-open'); } });
+function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = isDark ? '☀️' : '🌙'; if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre'; }
+function initDarkMode() { if (localStorage.getItem('recouvra_dark_mode') === '1') { document.body.classList.add('dark-mode'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = '☀️'; if (label) label.textContent = 'Mode clair'; } }
 
 // ============================================================================
 // LOGIQUE DU TABLEAU DE BORD
@@ -216,6 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!session) return;
     await loadWelcomeMessage();
     await loadDashboardData();
+    await loadSalesChart();   // <-- Ajout du graphique
 });
 
 async function loadWelcomeMessage() {
@@ -306,6 +264,72 @@ async function loadActiviteCommerciale() {
         console.error('Erreur chargement créances:', error);
         document.getElementById('stat-creances').textContent = '—';
     }
+}
+
+// ============================================================================
+// GRAPHIQUE TENDANCES DE VENTES (30 jours)
+// ============================================================================
+
+async function loadSalesChart() {
+    const ctx = document.getElementById('salesChart')?.getContext('2d');
+    if (!ctx) return;
+
+    const days = [];
+    const totals = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let i = 29; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
+        days.push(d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }));
+        totals.push(0);
+    }
+
+    try {
+        const { data: ventes, error } = await supabaseClient
+            .from('factures')
+            .select('validated_at, montant_total')
+            .eq('statut', 'VALIDEE')
+            .gte('validated_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+
+        if (error) throw error;
+
+        (ventes || []).forEach(f => {
+            const dateVente = new Date(f.validated_at);
+            const diffDays = Math.floor((today - dateVente) / (1000 * 60 * 60 * 24));
+            const idx = 29 - diffDays;
+            if (idx >= 0 && idx < 30) totals[idx] += Number(f.montant_total);
+        });
+    } catch (error) {
+        console.error('Erreur chargement graphique:', error);
+    }
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: days,
+            datasets: [{
+                label: 'Ventes (FCFA)',
+                data: totals,
+                borderColor: '#4F46E5',
+                backgroundColor: 'rgba(79,70,229,0.1)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
 }
 </script>
 </body>

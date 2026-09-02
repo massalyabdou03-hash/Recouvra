@@ -18,24 +18,24 @@
 <main class="onboarding-shell">
   <div class="onboarding-card">
     <div class="onboarding-progress">
-      <i data-step="1"></i><i data-step="2"></i><i data-step="3"></i><i data-step="4"></i><i data-step="5"></i>
+      <i data-step="1"></i><i data-step="2"></i><i data-step="3"></i>
     </div>
 
-    <!-- Étape 1 — Bienvenue -->
+    <!-- Étape 1 : Bienvenue -->
     <section class="onboarding-step" data-step="1">
-      <span class="onboarding-eyebrow">Étape 1 sur 5</span>
+      <span class="onboarding-eyebrow">Étape 1 sur 3</span>
       <h1>Bienvenue sur Recouvra 👋</h1>
-      <p class="lead">Votre espace de gestion est prêt. Avant de commencer, quelques questions rapides pour vous montrer exactement comment Recouvra peut vous aider.</p>
+      <p class="lead">Votre espace de gestion est prêt. Quelques questions rapides pour adapter l'application à votre commerce.</p>
       <div class="onboarding-nav" style="justify-content:flex-end;">
-        <button type="button" class="btn" onclick="goToStep(2)">Découvrir Recouvra</button>
+        <button type="button" class="btn" onclick="goToStep(2)">Continuer</button>
       </div>
     </section>
 
-    <!-- Étape 2 — Type de commerce -->
+    <!-- Étape 2 : Type de commerce -->
     <section class="onboarding-step" data-step="2" hidden>
-      <span class="onboarding-eyebrow">Étape 2 sur 5</span>
+      <span class="onboarding-eyebrow">Étape 2 sur 3</span>
       <h1>Quel est votre commerce ?</h1>
-      <p class="lead">Ça nous aide à adapter les exemples et les suggestions à votre activité.</p>
+      <p class="lead">Ça nous aide à personnaliser votre expérience.</p>
       <div class="onboarding-choice-grid" id="commerce-choices">
         <button type="button" class="onboarding-choice" data-value="boutique">Boutique</button>
         <button type="button" class="onboarding-choice" data-value="quincaillerie">Quincaillerie</button>
@@ -50,114 +50,48 @@
       </div>
     </section>
 
-    <!-- Étape 3 — Besoins -->
+    <!-- Étape 3 : Besoins + Plan + Essai gratuit -->
     <section class="onboarding-step" data-step="3" hidden>
-      <span class="onboarding-eyebrow">Étape 3 sur 5</span>
-      <h1>Qu'est-ce que vous souhaitez améliorer ?</h1>
-      <p class="lead">Sélectionnez tout ce qui vous concerne — ça ne limite rien, Recouvra couvre tout ça de toute façon.</p>
+      <span class="onboarding-eyebrow">Étape 3 sur 3</span>
+      <h1>Configurez votre espace</h1>
+      <p class="lead">Sélectionnez ce qui vous concerne et choisissez votre plan. Vous avez 14 jours d'essai gratuit.</p>
+
+      <h3>Vos besoins (optionnel)</h3>
       <div class="onboarding-choice-grid" id="besoins-choices">
-        <button type="button" class="onboarding-choice" data-value="stock">📦 Gestion du stock</button>
+        <button type="button" class="onboarding-choice" data-value="stock">📦 Stock</button>
         <button type="button" class="onboarding-choice" data-value="facturation">🧾 Facturation</button>
-        <button type="button" class="onboarding-choice" data-value="paiements">💳 Suivi des paiements</button>
-        <button type="button" class="onboarding-choice" data-value="credits">🤝 Gestion des crédits</button>
+        <button type="button" class="onboarding-choice" data-value="paiements">💳 Paiements</button>
+        <button type="button" class="onboarding-choice" data-value="credits">🤝 Crédits</button>
         <button type="button" class="onboarding-choice" data-value="recouvrement">📣 Recouvrement</button>
-        <button type="button" class="onboarding-choice" data-value="clients">👥 Suivi des clients</button>
+        <button type="button" class="onboarding-choice" data-value="clients">👥 Clients</button>
       </div>
-      <div class="onboarding-nav">
-        <button type="button" class="btn-back" onclick="goToStep(2)"><span class="arrow">←</span> Retour</button>
-        <button type="button" class="btn" id="step3-next" onclick="renderValueStep(); goToStep(4)" disabled>Continuer</button>
-      </div>
-    </section>
 
-    <!-- Étape 4 — Valeur personnalisée -->
-    <section class="onboarding-step" data-step="4" hidden>
-      <span class="onboarding-eyebrow">Étape 4 sur 5</span>
-      <h1>Voici comment Recouvra peut vous aider</h1>
-      <p class="lead">D'après ce que vous nous avez dit :</p>
-      <div id="value-blocks"></div>
-      <div class="onboarding-nav">
-        <button type="button" class="btn-back" onclick="goToStep(3)"><span class="arrow">←</span> Retour</button>
-        <button type="button" class="btn" onclick="goToStep(5)">Continuer</button>
-      </div>
-    </section>
-
-    <!-- Étape 5 — Choix du plan et paiement -->
-    <section class="onboarding-step" data-step="5" hidden>
-      <span class="onboarding-eyebrow">Étape 5 sur 5</span>
-      <h1>Choisissez votre plan</h1>
-      <p class="lead">Le montant s'adapte automatiquement à votre type de commerce.</p>
-
-      <!-- Recommandation personnalisée -->
-      <div id="recommendation-text" class="reassurance-box" style="margin-bottom:20px;"></div>
-
-      <!-- Sélection du plan mensuel -->
-      <h3>Abonnement mensuel</h3>
+      <h3>Choisissez votre plan mensuel</h3>
       <div class="pricing-options" id="plan-choices">
-        <div class="pricing-option" data-plan="simple" onclick="selectMonthlyPlan('simple', this)">
+        <div class="pricing-option" data-plan="simple" onclick="selectPlan('simple', this)">
           <strong>🛒 Simple</strong>
           <div class="amount">10 000 FCFA/mois</div>
-          <ul>
-            <li>Jusqu'à 1 000 articles</li>
-            <li>1 utilisateur</li>
-            <li>Gestion stock & ventes</li>
-            <li>Facturation</li>
-          </ul>
+          <ul><li>1 000 articles</li><li>1 utilisateur</li><li>Gestion stock & ventes</li></ul>
         </div>
-        <div class="pricing-option" data-plan="recouvrement" onclick="selectMonthlyPlan('recouvrement', this)">
+        <div class="pricing-option" data-plan="recouvrement" onclick="selectPlan('recouvrement', this)">
           <strong>📣 Recouvrement</strong>
           <div class="amount">15 000 FCFA/mois</div>
-          <ul>
-            <li>Articles illimités</li>
-            <li>3 utilisateurs</li>
-            <li>Tout le plan Simple</li>
-            <li>Relances WhatsApp & suivi des créances</li>
-          </ul>
+          <ul><li>Articles illimités</li><li>3 utilisateurs</li><li>Relances WhatsApp</li></ul>
           <span class="badge badge-success">Recommandé</span>
         </div>
       </div>
 
-      <!-- Détail du paiement initial -->
-      <p class="onboarding-note" id="payment-detail"></p>
-      <p class="onboarding-note">Frais de mise en place : calculés selon votre commerce (10 000 ou 25 000 FCFA)</p>
+      <div id="value-blocks" style="margin-top:20px;"></div>
 
-      <!-- Paiement Wave -->
-      <div id="payment-section" style="border-top:1px solid #eee; padding-top:20px; margin-top:20px;">
-        <h3>Paiement initial (mise en place + 1er mois)</h3>
-        <ol class="payment-steps">
-          <li>Cliquez sur « Payer avec Wave »</li>
-          <li>Effectuez le paiement du montant affiché</li>
-          <li>Revenez ici et cliquez sur « J'ai effectué le paiement »</li>
-          <li>Notre équipe vérifie et active votre compte</li>
-        </ol>
-
-    <a href="https://pay.wave.com/m/M_sn_JSmkfYmhcg2h/c/sn/" target="_blank" rel="noopener" class="pay-wave-btn" id="pay-wave-btn">
-    <span style="display:inline-flex; align-items:center; gap:10px;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M2 12h4l3-9 4 18 3-9h4"/>
-        </svg>
-        Payer avec Wave
-    </span>
-    </a>
-
-        <label>Référence / commentaire du paiement (facultatif)
-          <input id="payment-reference" type="text" maxlength="200" placeholder="Ex : référence de la transaction">
-        </label>
-        <label>Capture d'écran du paiement (facultatif)
-          <input id="payment-proof" type="file" accept="image/jpeg,image/png,application/pdf">
-        </label>
-
-        <div id="onboarding-msg"></div>
-        <div class="onboarding-nav">
-          <button type="button" class="btn-back" onclick="goToStep(4)"><span class="arrow">←</span> Retour</button>
-          <button type="button" class="btn" id="finish-btn" onclick="finishOnboarding()">J'ai effectué le paiement</button>
-        </div>
+      <div class="reassurance-box">
+        <span class="icon">🎁</span>
+        <span><strong>Essai gratuit de 14 jours</strong> — Testez toutes les fonctionnalités sans payer. Aucune carte bancaire requise.</span>
       </div>
 
-      <div id="payment-step-pending" hidden>
-        <div class="reassurance-box">
-          <span class="icon">⏳</span>
-          <span><strong>Paiement en attente de vérification.</strong> Cette page passera automatiquement à votre tableau de bord dès la confirmation.</span>
-        </div>
+      <div id="onboarding-msg"></div>
+      <div class="onboarding-nav">
+        <button type="button" class="btn-back" onclick="goToStep(2)"><span class="arrow">←</span> Retour</button>
+        <button type="button" class="btn" id="finish-btn" onclick="startTrial()">Commencer mon essai gratuit</button>
       </div>
     </section>
   </div>
