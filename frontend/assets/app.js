@@ -47,7 +47,7 @@ async function requireAuth() {
     // Récupérer le profil et l'entreprise de l'utilisateur
     const { data: profile } = await supabaseClient
         .from('profiles')
-        .select('*, entreprises(subscriptions(status))')
+        .select('*, entreprises(subscriptions(status, trial_ends_at))') // Ajout trial_ends_at
         .eq('id', session.user.id)
         .single();
 
@@ -67,10 +67,15 @@ async function requireAuth() {
         return session;
     }
 
-    // Vérifier que l'abonnement de l'entreprise est actif
+    // Vérifier que l'abonnement de l'entreprise est actif OU en essai (trial)
     const subStatus = profile.entreprises.subscriptions?.status;
-    if (subStatus !== 'active') {
-        // Rediriger vers la page d'abonnement
+    const trialEnd = profile.entreprises.subscriptions?.trial_ends_at;
+
+    // Si l'abonnement est actif ou si on est encore dans la période d'essai (trial non expiré)
+    if (subStatus === 'active' || (subStatus === 'trial' && trialEnd && new Date(trialEnd) > new Date())) {
+        // Continuer
+    } else {
+        // Sinon rediriger vers l'abonnement
         window.location.href = "abonnement.html";
         return null;
     }
@@ -789,217 +794,6 @@ async function syncFieldUpdates() {
   }
 }
 
-
-async function handleRecouvraNavigation(event) {
-  event.preventDefault();
-  const { data: userData } = await supabaseClient.auth.getUser();
-  if (!userData.user) { window.location.href = "login.html"; return; }
-  const { data: profile } = await supabaseClient.from("profiles").select("id,entreprise_id,has_recouvra").eq("id", userData.user.id).maybeSingle();
-  if (profile?.has_recouvra) { window.location.href = "recouvra.html"; return; }
-
-  window.location.href = "abonnement.html";
-}
-
-function openSubscriptionModal(profile) {
-  const existing = document.getElementById("premium-access-modal");
-  if (existing) return;
-  const modal = document.createElement("div");
-  modal.id = "premium-access-modal";
-  modal.className = "premium-access-modal";
-  modal.innerHTML = `<div class="premium-access-dialog" role="dialog" aria-modal="true" aria-labelledby="premium-access-title"><button type="button" class="premium-access-close" aria-label="Fermer">×</button><span class="eyebrow">Abonnement Recouvra</span><h2 id="premium-access-title">15 000 FCFA / mois</h2><p>Faites un transfert Wave de <strong>15 000 FCFA au 77 033 80 30</strong>, puis saisissez la référence de la transaction.</p><label for="wave-reference">Référence / ID Transaction Wave</label><input id="wave-reference" type="text" required maxlength="120" placeholder="Ex : TXN-123456"><button type="button" class="button recouvra-cta" data-premium-request>Soumettre le paiement</button><p class="premium-access-message" aria-live="polite"></p></div>`;
-  document.body.appendChild(modal);
-  const close = () => modal.remove();
-  modal.querySelector(".premium-access-close").addEventListener("click", close);
-  modal.addEventListener("click", event => { if (event.target === modal) close(); });
-  modal.querySelector("[data-premium-request]").addEventListener("click", async () => {
-    const button = modal.querySelector("[data-premium-request]");
-    const message = modal.querySelector(".premium-access-message");
-    const reference = modal.querySelector("#wave-reference").value.trim();
-    if (!reference) { message.textContent = "Saisissez la référence Wave."; return; }
-    button.disabled = true;
-    const user = (await supabaseClient.auth.getUser()).data.user;
-    const { error } = await supabaseClient.from("demandes_abonnement").insert({ entreprise_id: profile?.entreprise_id, submitted_by: user.id, reference_wave: reference, montant: 15000 });
-    message.textContent = error ? (error.code === "23505" ? "Une demande est déjà en attente." : error.message) : "Paiement envoyé. L'activation sera faite après vérification.";
-    button.textContent = error ? "Réessayer" : "Demande envoyée";
-    button.disabled = false;
-  });
-}
-
-//if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initGlobalNavigation);
-//else initGlobalNavigation();
-
-async function currentProfile() {
-  const { data: userData } = await supabaseClient.auth.getUser();
-  if (!userData.user) return null;
-  const { data } = await supabaseClient.from("profiles").select("*, entreprises(nom)").eq("id", userData.user.id).maybeSingle();
-  return data;
-}
-
-async function requireRecouvra() {
-  const profile = await currentProfile();
-  if (!profile) { window.location.href = "login.html"; return null; }
-  if (!profile?.has_recouvra && profile?.role !== "super_admin") {
-    document.body.innerHTML = `<main class="shell"><section class="panel access-panel"><span class="eyebrow">Module Premium</span><h1>Recouvra</h1><p>Le suivi des paiements et des relances n'est pas encore activé pour ce compte.</p><button class="button recouvra-cta" onclick="requestRecouvra()">Demander l'activation</button></section></main>`;
-    return null;
-  }
-  return profile;
-}
-
-async function requestRecouvra() {
-  const profile = await currentProfile();
-  if (!profile) return;
-  window.location.href = "abonnement.html";
-}
-
-function money(value) { return `${Number(value || 0).toLocaleString("fr-FR")} F`; }
-function date(value) { return value ? new Date(value).toLocaleDateString("fr-FR") : "-"; }
-
-let companySettingsPromise;
-async function getCompanySettings() {
-  if (!companySettingsPromise) {
-    companySettingsPromise = currentProfile().then(async profile => {
-      if (!profile?.entreprise_id) return null;
-      const { data } = await supabaseClient.from("entreprise_settings").select("*").eq("entreprise_id", profile.entreprise_id).maybeSingle();
-      if (!data) return null;
-      if (data.logo_path && !data.logo_path.startsWith("http")) {
-        const { data: signed } = await supabaseClient.storage.from("company-logos").createSignedUrl(data.logo_path, 3600);
-        data.logo_url = signed?.signedUrl || null;
-      } else data.logo_url = data.logo_path;
-      return data;
-    });
-  }
-  return companySettingsPromise;
-}
-
-async function applyCompanySettings() {
-  const settings = await getCompanySettings();
-  if (!settings) return;
-  if (settings.primary_color) document.documentElement.style.setProperty("--accent", settings.primary_color);
-  if (settings.secondary_color) document.documentElement.style.setProperty("--secondary", settings.secondary_color);
-  document.querySelectorAll("[data-company-name]").forEach(el => { el.textContent = settings.nom_commercial || "Entreprise"; });
-  document.querySelectorAll(".global-nav-mark").forEach(mark => { mark.textContent = (settings.nom_commercial || "Entreprise").trim().charAt(0).toUpperCase(); });
-  if (settings.logo_url) document.querySelectorAll("[data-company-logo]").forEach(img => { img.src = settings.logo_url; });
-  if (settings.nom_commercial && document.title.includes(" — ")) {
-    document.title = document.title.split(" — ")[0] + " — " + settings.nom_commercial;
-  }
-}
-
-if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", applyCompanySettings);
-else applyCompanySettings();
-
-// ============================================================================
-// MODE SOMBRE GLOBAL (défini une seule fois ici)
-// ============================================================================
-
-function initDarkMode() {
-  if (localStorage.getItem('recouvra_dark_mode') === '1') {
-    document.body.classList.add('dark-mode');
-    const icon = document.getElementById('dark-mode-icon');
-    const label = document.getElementById('dark-mode-label');
-    if (icon) icon.textContent = '☀️';
-    if (label) label.textContent = 'Mode clair';
-  }
-}
-
-function toggleDarkMode() {
-  document.body.classList.toggle('dark-mode');
-  const isDark = document.body.classList.contains('dark-mode');
-  localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
-  const icon = document.getElementById('dark-mode-icon');
-  const label = document.getElementById('dark-mode-label');
-  if (icon) icon.textContent = isDark ? '☀️' : '🌙';
-  if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre';
-}
-
-// AUTO-INITIALISATION : s'exécute automatiquement sur chaque page
-// sans avoir à modifier le DOMContentLoaded de chaque page
-document.addEventListener('DOMContentLoaded', initDarkMode);
-
-// ============================================================================
-// MENU MOBILE - FONCTIONS GLOBALES (défini une seule fois ici)
-// ============================================================================
-
-function toggleSidebar() {
-    const sidebar = document.querySelector('.sidebar');
-    const overlay = document.querySelector('.sidebar-overlay');
-    const isOpen = sidebar?.classList.contains('open');
-
-    if (isOpen) {
-        sidebar?.classList.remove('open');
-        overlay?.classList.remove('active');
-        document.body.classList.remove('menu-open');
-    } else {
-        sidebar?.classList.add('open');
-        overlay?.classList.add('active');
-        document.body.classList.add('menu-open');
-        // S'assurer que le scroll fonctionne dans la sidebar
-        setTimeout(() => { sidebar.scrollTop = 0; }, 100);
-    }
-}
-
-// Fermer le menu quand on clique sur un lien
-document.addEventListener('click', (e) => {
-    if (e.target.closest('.nav-link, .support-link')) {
-        const sidebar = document.querySelector('.sidebar');
-        const overlay = document.querySelector('.sidebar-overlay');
-        sidebar?.classList.remove('open');
-        overlay?.classList.remove('active');
-        document.body.classList.remove('menu-open');
-    }
-});
-
-// Empêcher la fermeture quand on clique DANS la sidebar
-document.querySelector('.sidebar')?.addEventListener('click', (e) => {
-    e.stopPropagation();
-});
-
-// ============================================================================
-// SYSTÈME DE RESYNCHRONISATION GLOBALE (une seule définition)
-// ============================================================================
-
-// Écouteur de reconnexion
-let reconnectHandler = null;
-
-function setupReconnectHandler() {
-    window.addEventListener('online', () => {
-        console.log('🔄 Connexion rétablie - Démarrage de la resynchronisation...');
-        syncAllPendingData();
-    });
-}
-
-async function syncAllPendingData() {
-    const results = {
-        sales: await syncPendingSales(),
-        movements: await syncPendingMovements(),
-        fieldUpdates: await syncFieldUpdates(),
-    };
-    
-    // Notifier toutes les pages
-    document.dispatchEvent(new CustomEvent('sylla:sync-completed', { 
-        detail: results 
-    }));
-    
-    console.log('✅ Synchronisation terminée', results);
-    return results;
-}
-
-// Initialiser le système
-document.addEventListener('DOMContentLoaded', () => {
-    setupReconnectHandler();
-    
-    // Écouter les changements de connectivité
-    window.addEventListener('online', () => {
-        document.dispatchEvent(new CustomEvent('sylla:connectivity-changed', { 
-            detail: { online: true } 
-        }));
-    });
-    
-    window.addEventListener('offline', () => {
-        document.dispatchEvent(new CustomEvent('sylla:connectivity-changed', { 
-            detail: { online: false } 
-        }));
-    });
-});
 // ============================================================================
 // GESTION DES PLANS ET LIMITES
 // ============================================================================
@@ -1076,7 +870,14 @@ async function canAddUser() {
     };
   }
   return { ok: true };
-}function addSupportLinkToSidebar() {
+}
+
+// ============================================================================
+// FONCTIONS DE NAVIGATION, SUPPORT ET ADMIN
+// ============================================================================
+
+// Lien support WhatsApp dans la sidebar
+function addSupportLinkToSidebar() {
     const sidebar = document.querySelector('.sidebar');
     if (!sidebar) return;
 
@@ -1090,7 +891,7 @@ async function canAddUser() {
     supportLink.target = '_blank';
     supportLink.className = 'support-link';
     supportLink.innerHTML = `
-        <svg viewBox="0 0 24 24">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.019-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
         </svg>
         <span>Support WhatsApp</span>
@@ -1099,48 +900,7 @@ async function canAddUser() {
     footer.insertBefore(supportLink, footer.firstChild);
 }
 
-document.addEventListener('DOMContentLoaded', addSupportLinkToSidebar);
-// ============================================================
-// CORRECTIF MOBILE : hamburger + suppression de la barre du bas
-// ============================================================
-
-(function() {
-    // 1. Supprimer la navigation globale si elle existe encore
-    document.querySelectorAll('.global-nav').forEach(el => el.remove());
-
-    // 2. Créer le bouton hamburger si absent
-    if (!document.querySelector('.mobile-menu-btn')) {
-        const btn = document.createElement('button');
-        btn.className = 'mobile-menu-btn';
-        btn.setAttribute('aria-label', 'Ouvrir le menu');
-        btn.innerHTML = '☰';
-        btn.onclick = function() {
-            const sidebar = document.querySelector('.sidebar');
-            const overlay = document.querySelector('.sidebar-overlay');
-            if (sidebar) sidebar.classList.toggle('open');
-            if (overlay) overlay.classList.toggle('active');
-            document.body.classList.toggle('menu-open', sidebar?.classList.contains('open'));
-        };
-        document.body.prepend(btn);
-    }
-
-    // 3. S'assurer que l'overlay existe et ferme la sidebar au clic
-    if (!document.querySelector('.sidebar-overlay')) {
-        const overlay = document.createElement('div');
-        overlay.className = 'sidebar-overlay';
-        overlay.onclick = function() {
-            const sidebar = document.querySelector('.sidebar');
-            if (sidebar) sidebar.classList.remove('open');
-            overlay.classList.remove('active');
-            document.body.classList.remove('menu-open');
-        };
-        document.body.appendChild(overlay);
-    }
-})();
-// ============================================================
-// AJOUTER LE LIEN ADMINISTRATION UNIQUEMENT POUR SUPER_ADMIN
-// ============================================================
-
+// Ajouter le lien Administration uniquement pour les super admins
 async function addAdminLinkIfSuperAdmin() {
     try {
         const { data: { session } } = await supabaseClient.auth.getSession();
@@ -1152,45 +912,6 @@ async function addAdminLinkIfSuperAdmin() {
             .eq('id', session.user.id)
             .single();
 
-        // Vérifier si l'utilisateur est super_admin
-        if (profile?.role === 'super_admin') {
-            const sidebar = document.querySelector('.sidebar');
-            if (!sidebar) return;
-
-            // Vérifier si le lien existe déjà
-            if (sidebar.querySelector('.admin-nav-link')) return;
-
-            // Créer le lien
-            const adminLink = document.createElement('a');
-            adminLink.href = 'super-admin.html';
-            adminLink.className = 'nav-link admin-nav-link';
-            adminLink.innerHTML = '<span class="nav-emoji">🔐</span> <span>Administration</span>';
-
-            // L'insérer dans la section "Mon Argent" (après Relancer)
-            const monArgentSection = sidebar.querySelectorAll('.nav-section');
-            if (monArgentSection.length >= 3) {
-                monArgentSection[2].appendChild(adminLink);
-            } else {
-                // Si pas de section, l'ajouter à la fin du menu
-                sidebar.querySelector('.sidebar-footer')?.before(adminLink);
-            }
-        }
-    } catch (error) {
-        console.error('Erreur vérification admin:', error);
-    }
-}
-
-// Appeler cette fonction au chargement de chaque page
-document.addEventListener('DOMContentLoaded', addAdminLinkIfSuperAdmin);
-async function addAdminLinkIfSuperAdmin() {
-    try {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) return;
-        const { data: profile } = await supabaseClient
-            .from('profiles')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
         if (profile?.role !== 'super_admin') return;
 
         const sidebar = document.querySelector('.sidebar');
@@ -1209,24 +930,219 @@ async function addAdminLinkIfSuperAdmin() {
             footer?.before(adminLink);
         }
     } catch (error) {
-        console.error('Erreur admin link:', error);
+        console.error('Erreur vérification admin:', error);
     }
 }
-document.addEventListener('DOMContentLoaded', addAdminLinkIfSuperAdmin);
-// Appeler après le chargement de la page
-document.addEventListener('DOMContentLoaded', addAdminLinkIfSuperAdmin);
+
+// ============================================================================
+// MENU MOBILE : toggleSidebar et fermeture automatique
+// ============================================================================
+
 function toggleSidebar() {
     const sidebar = document.querySelector('.sidebar');
     const overlay = document.querySelector('.sidebar-overlay');
-    if (sidebar) sidebar.classList.toggle('open');
-    if (overlay) overlay.classList.toggle('active');
-    document.body.classList.toggle('menu-open', sidebar?.classList.contains('open'));
-    
-    // Ajout : si la sidebar est ouverte, on désactive les clics sur l'overlay pour ne pas fermer le menu quand on clique sur un lien
-    if (sidebar?.classList.contains('open')) {
-        overlay.style.pointerEvents = 'auto';
+    const isOpen = sidebar?.classList.contains('open');
+
+    if (isOpen) {
+        sidebar?.classList.remove('open');
+        overlay?.classList.remove('active');
+        document.body.classList.remove('menu-open');
     } else {
-        overlay.style.pointerEvents = 'none';
+        sidebar?.classList.add('open');
+        overlay?.classList.add('active');
+        document.body.classList.add('menu-open');
+        // S'assurer que le scroll fonctionne dans la sidebar
+        setTimeout(() => { sidebar.scrollTop = 0; }, 100);
     }
 }
-overlay.style.pointerEvents = 'auto'; // reste cliquable pour fermer
+
+// Fermer le menu quand on clique sur un lien
+document.addEventListener('click', (e) => {
+    if (e.target.closest('.nav-link, .support-link')) {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        sidebar?.classList.remove('open');
+        overlay?.classList.remove('active');
+        document.body.classList.remove('menu-open');
+    }
+});
+
+// Empêcher la fermeture quand on clique DANS la sidebar
+document.querySelector('.sidebar')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+});
+
+// ============================================================================
+// AUTRES FONCTIONS GLOBALES (currentProfile, settings, etc.)
+// ============================================================================
+
+async function handleRecouvraNavigation(event) {
+  event.preventDefault();
+  const { data: userData } = await supabaseClient.auth.getUser();
+  if (!userData.user) { window.location.href = "login.html"; return; }
+  const { data: profile } = await supabaseClient.from("profiles").select("id,entreprise_id,has_recouvra").eq("id", userData.user.id).maybeSingle();
+  if (profile?.has_recouvra) { window.location.href = "recouvra.html"; return; }
+
+  window.location.href = "abonnement.html";
+}
+
+function openSubscriptionModal(profile) {
+  const existing = document.getElementById("premium-access-modal");
+  if (existing) return;
+  const modal = document.createElement("div");
+  modal.id = "premium-access-modal";
+  modal.className = "premium-access-modal";
+  modal.innerHTML = `<div class="premium-access-dialog" role="dialog" aria-modal="true" aria-labelledby="premium-access-title"><button type="button" class="premium-access-close" aria-label="Fermer">×</button><span class="eyebrow">Abonnement Recouvra</span><h2 id="premium-access-title">15 000 FCFA / mois</h2><p>Faites un transfert Wave de <strong>15 000 FCFA au 77 033 80 30</strong>, puis saisissez la référence de la transaction.</p><label for="wave-reference">Référence / ID Transaction Wave</label><input id="wave-reference" type="text" required maxlength="120" placeholder="Ex : TXN-123456"><button type="button" class="button recouvra-cta" data-premium-request>Soumettre le paiement</button><p class="premium-access-message" aria-live="polite"></p></div>`;
+  document.body.appendChild(modal);
+  const close = () => modal.remove();
+  modal.querySelector(".premium-access-close").addEventListener("click", close);
+  modal.addEventListener("click", event => { if (event.target === modal) close(); });
+  modal.querySelector("[data-premium-request]").addEventListener("click", async () => {
+    const button = modal.querySelector("[data-premium-request]");
+    const message = modal.querySelector(".premium-access-message");
+    const reference = modal.querySelector("#wave-reference").value.trim();
+    if (!reference) { message.textContent = "Saisissez la référence Wave."; return; }
+    button.disabled = true;
+    const user = (await supabaseClient.auth.getUser()).data.user;
+    const { error } = await supabaseClient.from("demandes_abonnement").insert({ entreprise_id: profile?.entreprise_id, submitted_by: user.id, reference_wave: reference, montant: 15000 });
+    message.textContent = error ? (error.code === "23505" ? "Une demande est déjà en attente." : error.message) : "Paiement envoyé. L'activation sera faite après vérification.";
+    button.textContent = error ? "Réessayer" : "Demande envoyée";
+    button.disabled = false;
+  });
+}
+
+async function currentProfile() {
+  const { data: userData } = await supabaseClient.auth.getUser();
+  if (!userData.user) return null;
+  const { data } = await supabaseClient.from("profiles").select("*, entreprises(nom)").eq("id", userData.user.id).maybeSingle();
+  return data;
+}
+
+async function requireRecouvra() {
+  const profile = await currentProfile();
+  if (!profile) { window.location.href = "login.html"; return null; }
+  if (!profile?.has_recouvra && profile?.role !== "super_admin") {
+    document.body.innerHTML = `<main class="shell"><section class="panel access-panel"><span class="eyebrow">Module Premium</span><h1>Recouvra</h1><p>Le suivi des paiements et des relances n'est pas encore activé pour ce compte.</p><button class="button recouvra-cta" onclick="requestRecouvra()">Demander l'activation</button></section></main>`;
+    return null;
+  }
+  return profile;
+}
+
+async function requestRecouvra() {
+  const profile = await currentProfile();
+  if (!profile) return;
+  window.location.href = "abonnement.html";
+}
+
+function money(value) { return `${Number(value || 0).toLocaleString("fr-FR")} F`; }
+function date(value) { return value ? new Date(value).toLocaleDateString("fr-FR") : "-"; }
+
+let companySettingsPromise;
+async function getCompanySettings() {
+  if (!companySettingsPromise) {
+    companySettingsPromise = currentProfile().then(async profile => {
+      if (!profile?.entreprise_id) return null;
+      const { data } = await supabaseClient.from("entreprise_settings").select("*").eq("entreprise_id", profile.entreprise_id).maybeSingle();
+      if (!data) return null;
+      if (data.logo_path && !data.logo_path.startsWith("http")) {
+        const { data: signed } = await supabaseClient.storage.from("company-logos").createSignedUrl(data.logo_path, 3600);
+        data.logo_url = signed?.signedUrl || null;
+      } else data.logo_url = data.logo_path;
+      return data;
+    });
+  }
+  return companySettingsPromise;
+}
+
+async function applyCompanySettings() {
+  const settings = await getCompanySettings();
+  if (!settings) return;
+  if (settings.primary_color) document.documentElement.style.setProperty("--accent", settings.primary_color);
+  if (settings.secondary_color) document.documentElement.style.setProperty("--secondary", settings.secondary_color);
+  document.querySelectorAll("[data-company-name]").forEach(el => { el.textContent = settings.nom_commercial || "Entreprise"; });
+  document.querySelectorAll(".global-nav-mark").forEach(mark => { mark.textContent = (settings.nom_commercial || "Entreprise").trim().charAt(0).toUpperCase(); });
+  if (settings.logo_url) document.querySelectorAll("[data-company-logo]").forEach(img => { img.src = settings.logo_url; });
+  if (settings.nom_commercial && document.title.includes(" — ")) {
+    document.title = document.title.split(" — ")[0] + " — " + settings.nom_commercial;
+  }
+}
+
+// ============================================================================
+// MODE SOMBRE GLOBAL
+// ============================================================================
+
+function initDarkMode() {
+  if (localStorage.getItem('recouvra_dark_mode') === '1') {
+    document.body.classList.add('dark-mode');
+    const icon = document.getElementById('dark-mode-icon');
+    const label = document.getElementById('dark-mode-label');
+    if (icon) icon.textContent = '☀️';
+    if (label) label.textContent = 'Mode clair';
+  }
+}
+
+function toggleDarkMode() {
+  document.body.classList.toggle('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
+  const icon = document.getElementById('dark-mode-icon');
+  const label = document.getElementById('dark-mode-label');
+  if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+  if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre';
+}
+
+// AUTO-INITIALISATION
+document.addEventListener('DOMContentLoaded', initDarkMode);
+document.addEventListener('DOMContentLoaded', addSupportLinkToSidebar);
+document.addEventListener('DOMContentLoaded', addAdminLinkIfSuperAdmin);
+
+// ============================================================================
+// SYSTÈME DE RESYNCHRONISATION GLOBALE
+// ============================================================================
+
+function setupReconnectHandler() {
+    window.addEventListener('online', () => {
+        console.log('🔄 Connexion rétablie - Démarrage de la resynchronisation...');
+        syncAllPendingData();
+    });
+}
+
+async function syncAllPendingData() {
+    const results = {
+        sales: await syncPendingSales(),
+        movements: await syncPendingMovements(),
+        fieldUpdates: await syncFieldUpdates(),
+    };
+    
+    // Notifier toutes les pages
+    document.dispatchEvent(new CustomEvent('sylla:sync-completed', { 
+        detail: results 
+    }));
+    
+    console.log('✅ Synchronisation terminée', results);
+    return results;
+}
+
+// Initialiser le système
+document.addEventListener('DOMContentLoaded', () => {
+    setupReconnectHandler();
+    
+    // Écouter les changements de connectivité
+    window.addEventListener('online', () => {
+        document.dispatchEvent(new CustomEvent('sylla:connectivity-changed', { 
+            detail: { online: true } 
+        }));
+    });
+    
+    window.addEventListener('offline', () => {
+        document.dispatchEvent(new CustomEvent('sylla:connectivity-changed', { 
+            detail: { online: false } 
+        }));
+    });
+});
+
+// ============================================================================
+// INITIALISATION DES PARAMÈTRES ENTREPRISE
+// ============================================================================
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", applyCompanySettings);
+else applyCompanySettings();
