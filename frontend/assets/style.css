@@ -2977,3 +2977,61 @@ body.menu-open .mobile-menu-btn { display: none; }
 .mobile-menu-btn {
     display: none !important;
 }
+.pricing-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.pricing-option {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.pricing-option:hover {
+  border-color: #4F46E5;
+  box-shadow: 0 4px 12px rgba(79,70,229,0.1);
+}
+.pricing-option.selected {
+  border-color: #4F46E5;
+  background: #EEF2FF;
+}
+.pricing-option .amount {
+  font-size: 28px;
+  font-weight: 800;
+  color: #4F46E5;
+  margin-bottom: 12px;
+}
+.pricing-option ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.pricing-option ul li {
+  font-size: 13px;
+  color: #6B7280;
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pricing-option ul li::before {
+  content: "✓";
+  color: #10B981;
+  font-weight: 700;
+}
+.pricing-option .badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: #10B981;
+  color: white;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-weight: 700;
+}
