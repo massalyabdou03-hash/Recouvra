@@ -13,725 +13,6 @@
 <meta name="apple-mobile-web-app-title" content="Recouvra">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="stylesheet" href="assets/style.css">
-
-<style>
-/* ============================================================================
-   MENU MOBILE + MODE SOMBRE GLOBAL
-   ============================================================================ */
-
-.mobile-menu-btn {
-    display: none;
-    position: fixed;
-    top: 12px;
-    left: 12px;
-    z-index: 1001;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    border: none;
-    background: #4F46E5;
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
-}
-
-.sidebar-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 999;
-}
-
-.sidebar-overlay.active {
-    display: block;
-}
-
-@media (max-width: 768px) {
-    .mobile-menu-btn {
-        display: flex;
-    }
-    .sidebar {
-        position: fixed;
-        top: 0;
-        left: -280px;
-        width: 280px;
-        height: 100vh;
-        transition: left 0.3s ease;
-        z-index: 1000;
-        overflow-y: auto;
-    }
-    .sidebar.open {
-        left: 0;
-    }
-    .main {
-        padding-left: 16px;
-        padding-right: 16px;
-        padding-top: 60px;
-    }
-}
-
-/* ============================================================================
-   CORRECTIONS MOBILE GLOBALES (AJOUTÉES)
-   ============================================================================ */
-@media (max-width: 768px) {
-    body { overflow-x: hidden; }
-}
-
-body.menu-open .mobile-menu-btn { display: none; }
-
-@media (max-width: 600px) {
-    .modal-backdrop { padding: 16px 10px; }
-    .modal { margin: 0 auto; width: calc(100% - 32px); max-height: calc(100vh - 32px); }
-}
-
-.table-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    display: block;
-    width: 100%;
-}
-
-.table-wrapper > table { min-width: 720px; }
-
-@media (max-width: 480px) {
-    .table-wrapper > table { min-width: 100%; }
-}
-
-body.dark-mode {
-    --surface: #1F2937;
-    --surface-2: #374151;
-    --surface-3: #4B5563;
-    --border: #4B5563;
-    --border-soft: #374151;
-    --text: #F9FAFB;
-    --text-muted: #9CA3AF;
-    --text-light: #6B7280;
-    background: #111827;
-    color: #F9FAFB;
-}
-
-body.dark-mode .card,
-body.dark-mode .sidebar {
-    background: #1F2937;
-    border-color: #374151;
-}
-
-body.dark-mode .nav-link {
-    color: #9CA3AF;
-}
-
-body.dark-mode .nav-link.active {
-    background: #4F46E5;
-    color: white;
-}
-
-body.dark-mode table {
-    background: #1F2937;
-}
-
-body.dark-mode th {
-    background: #374151;
-    color: #9CA3AF;
-}
-
-body.dark-mode td {
-    border-color: #374151;
-}
-
-body.dark-mode input,
-body.dark-mode select,
-body.dark-mode textarea {
-    background: #374151;
-    border-color: #4B5563;
-    color: #F9FAFB;
-}
-
-body.dark-mode .btn-secondary {
-    background: #374151;
-    border-color: #4B5563;
-    color: #F9FAFB;
-}
-
-body.dark-mode .empty-state {
-    color: #9CA3AF;
-}
-
-body.dark-mode .hint {
-    color: #9CA3AF;
-}
-
-/* ============================================================================
-   STYLES SPÉCIFIQUES SUPER ADMIN
-   ============================================================================ */
-
-.admin-shell {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 24px;
-}
-
-.admin-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-    padding: 20px;
-    background: white;
-    border-radius: 16px;
-    border: 1px solid #eee;
-    flex-wrap: wrap;
-    gap: 16px;
-}
-
-.admin-header-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.admin-icon {
-    width: 48px;
-    height: 48px;
-    background: #4F46E5;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    color: white;
-}
-
-.admin-header h1 {
-    font-size: 24px;
-    font-weight: 800;
-    margin: 0;
-}
-
-.admin-header p {
-    color: #888;
-    font-size: 14px;
-    margin: 0;
-}
-
-.admin-header-actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-.dark-mode-toggle {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    background: #f9fafb;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    transition: all 0.2s;
-}
-
-.dark-mode-toggle:hover {
-    background: #f3f4f6;
-}
-
-.payments-notice {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: #FEF3C7;
-    color: #92400E;
-    border: 1px solid #F59E0B;
-    border-radius: 12px;
-    padding: 12px 16px;
-    margin: 0 0 20px;
-    font-weight: 600;
-    font-size: 0.92rem;
-}
-
-.payments-filters {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin: 22px 0 14px;
-}
-
-.filter-chip {
-    padding: 8px 16px;
-    border-radius: 999px;
-    border: 1px solid #e5e7eb;
-    background: white;
-    color: #6B7280;
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.filter-chip.active {
-    background: #4F46E5;
-    color: white;
-    border-color: #4F46E5;
-}
-
-.filter-chip:hover:not(.active) {
-    background: #f3f4f6;
-}
-
-.payments-table-wrap {
-    overflow-x: auto;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    background: white;
-}
-
-table.payments-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.86rem;
-    min-width: 900px;
-}
-
-table.payments-table th {
-    text-align: left;
-    padding: 12px 14px;
-    color: #6B7280;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    border-bottom: 1px solid #e5e7eb;
-    background: #f9fafb;
-}
-
-table.payments-table td {
-    padding: 12px 14px;
-    border-bottom: 1px solid #f3f4f6;
-    vertical-align: middle;
-}
-
-table.payments-table tr:last-child td {
-    border-bottom: none;
-}
-
-table.payments-table tr:hover {
-    background: #f9fafb;
-}
-
-.payments-empty {
-    padding: 24px;
-    text-align: center;
-    color: #6B7280;
-}
-
-.admin-actions {
-    display: flex;
-    gap: 4px;
-    flex-wrap: wrap;
-}
-
-.admin-btn {
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid #e5e7eb;
-    background: white;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.admin-btn:hover {
-    background: #f3f4f6;
-}
-
-.admin-btn.success {
-    background: #D1FAE5;
-    color: #065F46;
-    border-color: #10B981;
-}
-
-.admin-btn.success:hover {
-    background: #A7F3D0;
-}
-
-.admin-btn.danger {
-    background: #FEE2E2;
-    color: #991B1B;
-    border-color: #EF4444;
-}
-
-.admin-btn.danger:hover {
-    background: #FECACA;
-}
-
-.admin-btn.info {
-    background: #DBEAFE;
-    color: #1E40AF;
-    border-color: #3B82F6;
-}
-
-.admin-btn.info:hover {
-    background: #BFDBFE;
-}
-
-.detail-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 8px 0;
-    border-bottom: 1px solid #f3f4f6;
-    font-size: 0.9rem;
-}
-
-.detail-row:last-child {
-    border-bottom: none;
-}
-
-.detail-row .k {
-    color: #6B7280;
-}
-
-.detail-row .v {
-    font-weight: 600;
-    text-align: right;
-}
-
-.admin-reminder {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-    background: #FEF3C7;
-    border: 1px solid #F59E0B;
-    border-radius: 12px;
-    padding: 12px 14px;
-    font-size: 0.86rem;
-    color: #92400E;
-    margin: 16px 0;
-}
-
-.section-divider {
-    margin: 44px 0 18px;
-    border-top: 1px solid #f3f4f6;
-    padding-top: 24px;
-}
-
-.section-divider .eyebrow {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #6B7280;
-    font-weight: 700;
-}
-
-.admin-search {
-    margin-bottom: 16px;
-}
-
-.admin-search input {
-    width: 100%;
-    padding: 14px;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    font-size: 15px;
-    outline: none;
-    background: white;
-}
-
-.admin-search input:focus {
-    border-color: #4F46E5;
-}
-
-.admin-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.admin-tab {
-    padding: 10px 20px;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    background: white;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.admin-tab.active {
-    background: #4F46E5;
-    color: white;
-    border-color: #4F46E5;
-}
-
-.admin-tab:hover:not(.active) {
-    background: #f3f4f6;
-}
-
-.grid-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.stat-card {
-    background: white;
-    border-radius: 12px;
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border: 1px solid #eee;
-}
-
-.stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    color: #4F46E5;
-    background: #EEF2FF;
-}
-
-.stat-card.warning .stat-icon {
-    background: #FEF3C7;
-    color: #F59E0B;
-}
-
-.stat-body {
-    flex: 1;
-}
-
-.stat-body .label {
-    font-size: 12px;
-    color: #888;
-    font-weight: 600;
-    text-transform: uppercase;
-    margin-bottom: 2px;
-}
-
-.stat-body .value {
-    font-size: 24px;
-    font-weight: 800;
-    color: #333;
-}
-
-/* Modal */
-.modal-backdrop {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 2000;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal-backdrop.open {
-    display: flex;
-}
-
-.modal {
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    width: 100%;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.modal-lg {
-    max-width: 700px;
-}
-
-.modal-sm {
-    max-width: 400px;
-}
-
-.modal-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-}
-
-.modal-head h3 {
-    font-size: 18px;
-    font-weight: 700;
-    margin: 0;
-}
-
-.close-x {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #888;
-    padding: 4px;
-}
-
-.modal-actions {
-    display: flex;
-    gap: 8px;
-    justify-content: flex-end;
-    margin-top: 20px;
-}
-
-.field-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 12px;
-}
-
-label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 6px;
-}
-
-input, select, textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s;
-}
-
-input:focus, select:focus, textarea:focus {
-    border-color: #4F46E5;
-}
-
-.btn {
-    padding: 10px 20px;
-    border-radius: 8px;
-    border: none;
-    background: #4F46E5;
-    color: white;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn:hover {
-    background: #4338CA;
-}
-
-.btn-secondary {
-    background: #f3f4f6;
-    color: #333;
-    border: 1px solid #e5e7eb;
-}
-
-.btn-secondary:hover {
-    background: #e5e7eb;
-}
-
-.btn-danger {
-    background: #EF4444;
-    color: white;
-}
-
-.btn-danger:hover {
-    background: #DC2626;
-}
-
-body.dark-mode .modal {
-    background: #1F2937;
-    border-color: #374151;
-}
-
-body.dark-mode label {
-    color: #F9FAFB;
-}
-
-body.dark-mode input,
-body.dark-mode select,
-body.dark-mode textarea {
-    background: #374151;
-    border-color: #4B5563;
-    color: #F9FAFB;
-}
-
-body.dark-mode .btn-secondary {
-    background: #374151;
-    border-color: #4B5563;
-    color: #F9FAFB;
-}
-
-body.dark-mode .admin-header,
-body.dark-mode .stat-card,
-body.dark-mode .payments-table-wrap {
-    background: #1F2937;
-    border-color: #374151;
-}
-
-body.dark-mode .admin-header p,
-body.dark-mode .stat-body .label {
-    color: #9CA3AF;
-}
-
-body.dark-mode .stat-body .value {
-    color: #F9FAFB;
-}
-
-body.dark-mode .detail-row .k {
-    color: #9CA3AF;
-}
-
-body.dark-mode .admin-reminder {
-    background: #451A03;
-    border-color: #F59E0B;
-    color: #FEF3C7;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .admin-shell {
-        padding: 16px;
-    }
-    
-    .admin-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .admin-header-actions {
-        width: 100%;
-        justify-content: space-between;
-    }
-    
-    .grid-stats {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-</style>
 </head>
 <body>
 
@@ -748,54 +29,33 @@ body.dark-mode .admin-reminder {
 
     <div class="nav-section">
       <div class="nav-section-title">Mon Quotidien</div>
-      <a href="index.html" class="nav-link">
-        <span class="nav-emoji">🏠</span> Accueil
-      </a>
-      <a href="factures.html" class="nav-link">
-        <span class="nav-emoji">🧾</span> Vendre
-      </a>
-      <a href="clients.html" class="nav-link">
-        <span class="nav-emoji">👥</span> Mes Clients
-      </a>
+      <a href="index.html" class="nav-link"><span class="nav-emoji">🏠</span> Accueil</a>
+      <a href="factures.html" class="nav-link"><span class="nav-emoji">🧾</span> Vendre</a>
+      <a href="clients.html" class="nav-link"><span class="nav-emoji">👥</span> Mes Clients</a>
     </div>
 
     <div class="nav-section">
       <div class="nav-section-title">Mon Stock</div>
-      <a href="catalogue.html" class="nav-link">
-        <span class="nav-emoji">📦</span> Mes Articles
-      </a>
-      <a href="stock.html" class="nav-link">
-        <span class="nav-emoji">📊</span> Stock & Produits
-      </a>
+      <a href="catalogue.html" class="nav-link"><span class="nav-emoji">📦</span> Mes Articles</a>
+      <a href="stock.html" class="nav-link"><span class="nav-emoji">📊</span> Stock & Produits</a>
     </div>
 
     <div class="nav-section">
       <div class="nav-section-title">Mon Argent</div>
-      <a href="credits.html" class="nav-link">
-        <span class="nav-emoji">💸</span> On me doit
-      </a>
-      <a href="recouvra.html" class="nav-link premium">
-        <span class="nav-emoji">📣</span> Relancer
-        <span class="badge-premium">PRO</span>
-      </a>
+      <a href="credits.html" class="nav-link"><span class="nav-emoji">💸</span> On me doit</a>
+      <a href="recouvra.html" class="nav-link premium"><span class="nav-emoji">📣</span> Relancer <span class="badge-premium">PRO</span></a>
     </div>
 
     <div class="sidebar-footer">
-      <!-- ========== MODE SOMBRE ========== -->
-      <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;">
-        <span id="dark-mode-icon">🌙</span>
-        <span id="dark-mode-label">Mode sombre</span>
-      </button>
-      
+      <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;"><span id="dark-mode-icon">🌙</span> <span id="dark-mode-label">Mode sombre</span></button>
       <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
       <button class="btn-logout" onclick="logout()">Déconnexion</button>
     </div>
   </nav>
 
   <main class="main">
-    
     <div class="admin-shell">
-      
+
       <!-- En-tête admin -->
       <div class="admin-header">
         <div class="admin-header-left">
@@ -806,13 +66,8 @@ body.dark-mode .admin-reminder {
           </div>
         </div>
         <div class="admin-header-actions">
-          <button class="dark-mode-toggle" onclick="toggleDarkMode()">
-            <span id="dark-mode-icon">🌙</span>
-            <span id="dark-mode-label">Mode sombre</span>
-          </button>
-          <a href="index.html" class="btn-back">
-            <span class="arrow">←</span> Retour
-          </a>
+          <button class="dark-mode-toggle" onclick="toggleDarkMode()"><span id="dark-mode-icon">🌙</span> <span id="dark-mode-label">Mode sombre</span></button>
+          <a href="index.html" class="btn-back"><span class="arrow">←</span> Retour</a>
         </div>
       </div>
 
@@ -822,65 +77,24 @@ body.dark-mode .admin-reminder {
       <!-- Statistiques -->
       <div class="grid-stats">
         <div class="stat-card warning">
-          <div class="stat-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 8v4l3 3"/>
-              <circle cx="12" cy="12" r="9"/>
-            </svg>
-          </div>
-          <div class="stat-body">
-            <div class="label">Paiements en attente</div>
-            <div class="value" id="stat-pending-count">—</div>
-          </div>
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg></div>
+          <div class="stat-body"><div class="label">Paiements en attente</div><div class="value" id="stat-pending-count">—</div></div>
         </div>
         <div class="stat-card warning">
-          <div class="stat-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="5" width="20" height="14" rx="2"/>
-              <path d="M2 10h20"/>
-            </svg>
-          </div>
-          <div class="stat-body">
-            <div class="label">Montant en attente</div>
-            <div class="value" id="stat-pending-amount">—</div>
-          </div>
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
+          <div class="stat-body"><div class="label">Montant en attente</div><div class="value" id="stat-pending-amount">—</div></div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 6L9 17l-5-5"/>
-            </svg>
-          </div>
-          <div class="stat-body">
-            <div class="label">Paiements confirmés</div>
-            <div class="value" id="stat-confirmed-count">—</div>
-          </div>
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <div class="stat-body"><div class="label">Paiements confirmés</div><div class="value" id="stat-confirmed-count">—</div></div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 1v22"/>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-            </svg>
-          </div>
-          <div class="stat-body">
-            <div class="label">Revenus confirmés</div>
-            <div class="value" id="stat-confirmed-amount">—</div>
-          </div>
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div class="stat-body"><div class="label">Revenus confirmés</div><div class="value" id="stat-confirmed-amount">—</div></div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-          </div>
-          <div class="stat-body">
-            <div class="label">Entreprises actives</div>
-            <div class="value" id="stat-entreprises">—</div>
-          </div>
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div class="stat-body"><div class="label">Entreprises actives</div><div class="value" id="stat-entreprises">—</div></div>
         </div>
       </div>
 
@@ -920,9 +134,7 @@ body.dark-mode .admin-reminder {
               </tr>
             </thead>
             <tbody id="payments-tbody">
-              <tr>
-                <td colspan="8" class="payments-empty">Chargement...</td>
-              </tr>
+              <tr><td colspan="8" class="payments-empty">Chargement...</td></tr>
             </tbody>
           </table>
         </div>
@@ -943,9 +155,7 @@ body.dark-mode .admin-reminder {
               </tr>
             </thead>
             <tbody id="entreprises-tbody">
-              <tr>
-                <td colspan="6" class="payments-empty">Chargement...</td>
-              </tr>
+              <tr><td colspan="6" class="payments-empty">Chargement...</td></tr>
             </tbody>
           </table>
         </div>
@@ -965,9 +175,7 @@ body.dark-mode .admin-reminder {
               </tr>
             </thead>
             <tbody id="utilisateurs-tbody">
-              <tr>
-                <td colspan="5" class="payments-empty">Chargement...</td>
-              </tr>
+              <tr><td colspan="5" class="payments-empty">Chargement...</td></tr>
             </tbody>
           </table>
         </div>
@@ -1091,9 +299,7 @@ body.dark-mode .admin-reminder {
         <option value="vendeur">🛒 Vendeur</option>
         <option value="magasinier">📦 Magasinier</option>
       </select>
-      <label>
-        <input type="checkbox" id="edit-user-recouvra"> Accès Recouvra (PRO)
-      </label>
+      <label><input type="checkbox" id="edit-user-recouvra"> Accès Recouvra (PRO)</label>
       <div id="edit-user-msg"></div>
       <div class="modal-actions">
         <button type="button" class="btn btn-secondary" onclick="closeModal('edit-user-backdrop')">Annuler</button>
@@ -1107,47 +313,11 @@ body.dark-mode .admin-reminder {
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
 <script>
-// ============================================================================
-// MENU MOBILE + MODE SOMBRE
-// ============================================================================
-
-function toggleSidebar() {
-    const sidebar = document.querySelector('.sidebar');
-    const overlay = document.querySelector('.sidebar-overlay');
-    if (sidebar) sidebar.classList.toggle('open');
-    if (overlay) overlay.classList.toggle('active');
-    document.body.classList.toggle('menu-open', sidebar?.classList.contains('open'));
-}
-
-document.addEventListener('click', (e) => {
-    if (e.target.closest('.nav-link')) {
-        const sidebar = document.querySelector('.sidebar');
-        const overlay = document.querySelector('.sidebar-overlay');
-        if (sidebar) sidebar.classList.remove('open');
-        if (overlay) overlay.classList.remove('active');
-        document.body.classList.remove('menu-open');
-    }
-});
-
-function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
-    const icon = document.getElementById('dark-mode-icon');
-    const label = document.getElementById('dark-mode-label');
-    if (icon) icon.textContent = isDark ? '☀️' : '🌙';
-    if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre';
-}
-
-function initDarkMode() {
-    if (localStorage.getItem('recouvra_dark_mode') === '1') {
-        document.body.classList.add('dark-mode');
-        const icon = document.getElementById('dark-mode-icon');
-        const label = document.getElementById('dark-mode-label');
-        if (icon) icon.textContent = '☀️';
-        if (label) label.textContent = 'Mode clair';
-    }
-}
+// Fonctions globales (redéclarées)
+function toggleSidebar() { const sidebar = document.querySelector('.sidebar'); const overlay = document.querySelector('.sidebar-overlay'); if (sidebar) sidebar.classList.toggle('open'); if (overlay) overlay.classList.toggle('active'); document.body.classList.toggle('menu-open', sidebar?.classList.contains('open')); }
+document.addEventListener('click', (e) => { if (e.target.closest('.nav-link')) { const sidebar = document.querySelector('.sidebar'); const overlay = document.querySelector('.sidebar-overlay'); if (sidebar) sidebar.classList.remove('open'); if (overlay) overlay.classList.remove('active'); document.body.classList.remove('menu-open'); } });
+function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = isDark ? '☀️' : '🌙'; if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre'; }
+function initDarkMode() { if (localStorage.getItem('recouvra_dark_mode') === '1') { document.body.classList.add('dark-mode'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = '☀️'; if (label) label.textContent = 'Mode clair'; } }
 
 // ============================================================================
 // SUPER ADMIN - GESTION COMPLÈTE
@@ -1162,24 +332,10 @@ let currentAdminTab = 'paiements';
 
 document.addEventListener('DOMContentLoaded', async () => {
     initDarkMode();
-    
     const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session) {
-        window.location.href = 'login.html';
-        return;
-    }
-
-    const { data: profile, error } = await supabaseClient
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .single();
-
-    if (error || !profile || profile.role !== 'super_admin') {
-        showToast('Accès non autorisé.', 'error');
-        window.location.href = 'index.html';
-        return;
-    }
+    if (!session) { window.location.href = 'login.html'; return; }
+    const { data: profile, error } = await supabaseClient.from('profiles').select('role').eq('id', session.user.id).single();
+    if (error || !profile || profile.role !== 'super_admin') { showToast('Accès non autorisé.', 'error'); window.location.href = 'index.html'; return; }
 
     await loadPayments();
     await loadEntreprises();
@@ -1194,20 +350,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // Écouter le changement de motif de rejet
-    const reasonSelect = document.getElementById('reject-reason-select');
-    if (reasonSelect) {
-        reasonSelect.addEventListener('change', (e) => {
-            document.getElementById('reject-other-wrap').hidden = e.target.value !== 'Autre';
-        });
-    }
+    document.getElementById('reject-reason-select').addEventListener('change', (e) => {
+        document.getElementById('reject-other-wrap').hidden = e.target.value !== 'Autre';
+    });
 
-    // Bouton de rejet final
-    const rejectBtn = document.getElementById('reject-final-btn');
-    if (rejectBtn) {
-        rejectBtn.addEventListener('click', submitRejection);
-    }
-
+    document.getElementById('reject-final-btn').addEventListener('click', submitRejection);
     document.getElementById('edit-entreprise-form').addEventListener('submit', saveEntreprise);
     document.getElementById('reset-password-form').addEventListener('submit', resetPassword);
     document.getElementById('edit-user-form').addEventListener('submit', saveUser);
@@ -1215,41 +362,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function showTab(tabName) {
     currentAdminTab = tabName;
-    
     document.querySelectorAll('.admin-tab').forEach(tab => {
-        tab.classList.toggle('active', tab.textContent.toLowerCase().includes(
-            tabName === 'paiements' ? 'paiement' : 
-            tabName === 'entreprises' ? 'entreprise' : 'utilisateur'
-        ));
+        tab.classList.toggle('active', tab.textContent.toLowerCase().includes(tabName === 'paiements' ? 'paiement' : tabName === 'entreprises' ? 'entreprise' : 'utilisateur'));
     });
-    
     document.getElementById('tab-paiements').style.display = tabName === 'paiements' ? 'block' : 'none';
     document.getElementById('tab-entreprises').style.display = tabName === 'entreprises' ? 'block' : 'none';
     document.getElementById('tab-utilisateurs').style.display = tabName === 'utilisateurs' ? 'block' : 'none';
-    
     filterData();
 }
 
 function filterData() {
     const q = document.getElementById('admin-search').value.trim().toLowerCase();
-    
-    if (currentAdminTab === 'paiements') {
-        renderPayments(q);
-    } else if (currentAdminTab === 'entreprises') {
-        renderEntreprises(q);
-    } else {
-        renderUsers(q);
-    }
+    if (currentAdminTab === 'paiements') renderPayments(q);
+    else if (currentAdminTab === 'entreprises') renderEntreprises(q);
+    else renderUsers(q);
 }
 
-function closeModal(modalId) {
-    const el = document.getElementById(modalId);
-    if (el) el.classList.remove('open');
-}
-
-function closeRejectModal() {
-    closeModal('reject-backdrop');
-}
+function closeModal(modalId) { document.getElementById(modalId).classList.remove('open'); }
+function closeRejectModal() { closeModal('reject-backdrop'); }
 
 // ============================================================================
 // GESTION DES PAIEMENTS
@@ -1257,278 +387,122 @@ function closeRejectModal() {
 
 async function loadPayments() {
     try {
-        const { data, error } = await supabaseClient
-            .from('subscription_payments')
-            .select(`
-                *,
-                entreprises(nom, gerant_nom, telephone)
-            `)
-            .order('created_at', { ascending: false });
-
+        const { data, error } = await supabaseClient.from('subscription_payments').select('*, entreprises(nom, gerant_nom, telephone)').order('created_at', { ascending: false });
         if (error) throw error;
-
         allPayments = data || [];
         renderStats();
         renderPayments();
-
     } catch (error) {
         console.error('Erreur chargement paiements:', error);
-        document.getElementById('payments-tbody').innerHTML = `
-            <tr><td colspan="8" class="payments-empty">${friendlyError(error)}</td></tr>
-        `;
+        document.getElementById('payments-tbody').innerHTML = `<tr><td colspan="8" class="payments-empty">${friendlyError(error)}</td></tr>`;
     }
 }
 
 function renderStats() {
     const pending = allPayments.filter(p => p.status === 'pending');
     const confirmed = allPayments.filter(p => p.status === 'confirmed');
-
     const pendingAmount = pending.reduce((s, p) => s + Number(p.amount), 0);
     const confirmedAmount = confirmed.reduce((s, p) => s + Number(p.amount), 0);
-
     document.getElementById('stat-pending-count').textContent = pending.length;
     document.getElementById('stat-pending-amount').textContent = fmtMoney(pendingAmount);
     document.getElementById('stat-confirmed-count').textContent = confirmed.length;
     document.getElementById('stat-confirmed-amount').textContent = fmtMoney(confirmedAmount);
-
     const notice = document.getElementById('payments-notice');
     if (pending.length > 0) {
         notice.hidden = false;
         notice.innerHTML = `⚠️ <strong>${pending.length}</strong> paiement(s) en attente de validation (${fmtMoney(pendingAmount)})`;
-    } else {
-        notice.hidden = true;
-    }
+    } else { notice.hidden = true; }
 }
 
 function renderPayments(search = '') {
     const tbody = document.getElementById('payments-tbody');
     if (!tbody) return;
-
     let filtered = allPayments;
-    if (currentPaymentFilter !== 'all') {
-        filtered = filtered.filter(p => p.status === currentPaymentFilter);
-    }
-
-    if (search) {
-        filtered = filtered.filter(p => {
-            const nom = p.entreprises?.nom || '';
-            const gerant = p.entreprises?.gerant_nom || '';
-            const tel = p.entreprises?.telephone || '';
-            return nom.toLowerCase().includes(search) || 
-                   gerant.toLowerCase().includes(search) || 
-                   tel.toLowerCase().includes(search);
-        });
-    }
-
-    if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="payments-empty">Aucun paiement trouvé</td></tr>`;
-        return;
-    }
-
-    const statusBadge = {
-        pending: '<span class="badge badge-warning">🕐 En attente</span>',
-        confirmed: '<span class="badge badge-success">✅ Confirmé</span>',
-        rejected: '<span class="badge badge-danger">❌ Rejeté</span>',
-    };
-
-    tbody.innerHTML = filtered.map(p => `
-        <tr>
-            <td><strong>${esc(p.entreprises?.nom || '—')}</strong></td>
-            <td>${esc(p.entreprises?.gerant_nom || '—')}</td>
-            <td>${esc(p.entreprises?.telephone || '—')}</td>
-            <td><strong>${fmtMoney(p.amount)}</strong></td>
-            <td>${esc(p.payment_type || '—')}</td>
-            <td>${fmtDate(p.created_at)}</td>
-            <td>${statusBadge[p.status] || p.status}</td>
-            <td>
-                <div class="admin-actions">
-                    ${p.status === 'pending' ? `
-                        <button class="admin-btn success" onclick="confirmPayment('${p.id}')">✅ Valider</button>
-                        <button class="admin-btn info" onclick="openPaymentDetail('${p.id}')">👁️ Vérifier</button>
-                        <button class="admin-btn danger" onclick="rejectPayment('${p.id}')">❌ Rejeter</button>
-                    ` : ''}
-                    ${p.status === 'confirmed' ? `
-                        <button class="admin-btn danger" onclick="annulerPaiement('${p.id}')">↩️ Annuler</button>
-                    ` : ''}
-                    ${p.status === 'rejected' ? `
-                        <button class="admin-btn success" onclick="confirmPayment('${p.id}')">✅ Valider</button>
-                    ` : ''}
-                </div>
-            </td>
-        </tr>
-    `).join('');
+    if (currentPaymentFilter !== 'all') filtered = filtered.filter(p => p.status === currentPaymentFilter);
+    if (search) filtered = filtered.filter(p => (p.entreprises?.nom || '').toLowerCase().includes(search) || (p.entreprises?.gerant_nom || '').toLowerCase().includes(search) || (p.entreprises?.telephone || '').toLowerCase().includes(search));
+    if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="8" class="payments-empty">Aucun paiement trouvé</td></tr>`; return; }
+    const statusBadge = { pending: '<span class="badge badge-warning">🕐 En attente</span>', confirmed: '<span class="badge badge-success">✅ Confirmé</span>', rejected: '<span class="badge badge-danger">❌ Rejeté</span>' };
+    tbody.innerHTML = filtered.map(p => `<tr>
+        <td><strong>${esc(p.entreprises?.nom || '—')}</strong></td>
+        <td>${esc(p.entreprises?.gerant_nom || '—')}</td>
+        <td>${esc(p.entreprises?.telephone || '—')}</td>
+        <td><strong>${fmtMoney(p.amount)}</strong></td>
+        <td>${esc(p.payment_type || '—')}</td>
+        <td>${fmtDate(p.created_at)}</td>
+        <td>${statusBadge[p.status] || p.status}</td>
+        <td><div class="admin-actions">
+            ${p.status === 'pending' ? `<button class="admin-btn success" onclick="confirmPayment('${p.id}')">✅ Valider</button><button class="admin-btn info" onclick="openPaymentDetail('${p.id}')">👁️ Vérifier</button><button class="admin-btn danger" onclick="rejectPayment('${p.id}')">❌ Rejeter</button>` : ''}
+            ${p.status === 'confirmed' ? `<button class="admin-btn danger" onclick="annulerPaiement('${p.id}')">↩️ Annuler</button>` : ''}
+            ${p.status === 'rejected' ? `<button class="admin-btn success" onclick="confirmPayment('${p.id}')">✅ Valider</button>` : ''}
+        </div></td></tr>`).join('');
 }
 
 function openPaymentDetail(paymentId) {
     const payment = allPayments.find(p => p.id === paymentId);
     if (!payment) return;
-
     currentPaymentDetail = payment;
-
     const content = document.getElementById('payment-detail-content');
-    content.innerHTML = `
-        <div class="detail-row">
-            <span class="k">Entreprise</span>
-            <span class="v">${esc(payment.entreprises?.nom || '—')}</span>
-        </div>
-        <div class="detail-row">
-            <span class="k">Gérant</span>
-            <span class="v">${esc(payment.entreprises?.gerant_nom || '—')}</span>
-        </div>
-        <div class="detail-row">
-            <span class="k">Téléphone</span>
-            <span class="v">${esc(payment.entreprises?.telephone || '—')}</span>
-        </div>
-        <div class="detail-row">
-            <span class="k">Type</span>
-            <span class="v">${esc(payment.payment_type)}</span>
-        </div>
-        <div class="detail-row">
-            <span class="k">Montant</span>
-            <span class="v">${fmtMoney(payment.amount)} ${esc(payment.currency)}</span>
-        </div>
-        <div class="detail-row">
-            <span class="k">Référence</span>
-            <span class="v">${esc(payment.payment_reference || '—')}</span>
-        </div>
-        <div class="detail-row">
-            <span class="k">Date</span>
-            <span class="v">${fmtDateTime(payment.created_at)}</span>
-        </div>
-        ${payment.proof_path ? `
-            <div class="detail-row">
-                <span class="k">Preuve</span>
-                <span class="v">
-                    <a href="${getStorageUrl(payment.proof_path)}" target="_blank" class="btn btn-secondary btn-sm">
-                        Voir la preuve
-                    </a>
-                </span>
-            </div>
-        ` : ''}
-    `;
-
+    content.innerHTML = `<div class="detail-row"><span class="k">Entreprise</span><span class="v">${esc(payment.entreprises?.nom || '—')}</span></div>
+        <div class="detail-row"><span class="k">Gérant</span><span class="v">${esc(payment.entreprises?.gerant_nom || '—')}</span></div>
+        <div class="detail-row"><span class="k">Téléphone</span><span class="v">${esc(payment.entreprises?.telephone || '—')}</span></div>
+        <div class="detail-row"><span class="k">Type</span><span class="v">${esc(payment.payment_type)}</span></div>
+        <div class="detail-row"><span class="k">Montant</span><span class="v">${fmtMoney(payment.amount)} ${esc(payment.currency)}</span></div>
+        <div class="detail-row"><span class="k">Référence</span><span class="v">${esc(payment.payment_reference || '—')}</span></div>
+        <div class="detail-row"><span class="k">Date</span><span class="v">${fmtDateTime(payment.created_at)}</span></div>
+        ${payment.proof_path ? `<div class="detail-row"><span class="k">Preuve</span><span class="v"><a href="${getStorageUrl(payment.proof_path)}" target="_blank" class="btn btn-secondary btn-sm">Voir la preuve</a></span></div>` : ''}`;
     const actions = document.getElementById('payment-detail-actions');
-    if (actions) {
-        actions.innerHTML = `
-            <button class="btn btn-secondary" onclick="closeModal('payment-detail-backdrop')">Fermer</button>
-            <button class="btn btn-danger" onclick="rejectPayment('${payment.id}')">Rejeter</button>
-            <button class="btn" onclick="confirmPayment('${payment.id}')">Confirmer</button>
-        `;
-    }
-
+    actions.innerHTML = `<button class="btn btn-secondary" onclick="closeModal('payment-detail-backdrop')">Fermer</button><button class="btn btn-danger" onclick="rejectPayment('${payment.id}')">Rejeter</button><button class="btn" onclick="confirmPayment('${payment.id}')">Confirmer</button>`;
     document.getElementById('payment-detail-backdrop').classList.add('open');
 }
 
 async function confirmPayment(paymentId) {
-    const ok = await confirmDialog(
-        'Confirmer ce paiement ? L\'entreprise sera activée immédiatement.',
-        { title: 'Confirmer le paiement', confirmLabel: 'Confirmer', danger: false }
-    );
+    const ok = await confirmDialog('Confirmer ce paiement ? L\'entreprise sera activée immédiatement.', { title: 'Confirmer le paiement', confirmLabel: 'Confirmer', danger: false });
     if (!ok) return;
-
     try {
-        // 1. Appeler la RPC qui met à jour le statut de l'abonnement
-        const { error } = await supabaseClient
-            .rpc('confirm_subscription_payment', {
-                p_payment_id: paymentId,
-                p_decision: 'confirmed',
-            });
-
+        const { error } = await supabaseClient.rpc('confirm_subscription_payment', { p_payment_id: paymentId, p_decision: 'confirmed' });
         if (error) throw error;
-
-        // 2. Récupérer l'entreprise associée à ce paiement
-        const { data: payment } = await supabaseClient
-            .from('subscription_payments')
-            .select('entreprise_id')
-            .eq('id', paymentId)
-            .single();
-
+        const { data: payment } = await supabaseClient.from('subscription_payments').select('entreprise_id').eq('id', paymentId).single();
         if (payment) {
-            // 3. Activer l'accès Recouvra pour tous les utilisateurs de cette entreprise
-            const { error: updateError } = await supabaseClient
-                .from('profiles')
-                .update({ has_recouvra: true })
-                .eq('entreprise_id', payment.entreprise_id);
-
+            const { error: updateError } = await supabaseClient.from('profiles').update({ has_recouvra: true }).eq('entreprise_id', payment.entreprise_id);
             if (updateError) throw updateError;
         }
-
         showToast('Paiement confirmé — entreprise activée.', 'success');
         closeModal('payment-detail-backdrop');
         await loadPayments();
-
-    } catch (error) {
-        showToast(friendlyError(error), 'error');
-    }
+    } catch (error) { showToast(friendlyError(error), 'error'); }
 }
 
 function rejectPayment(paymentId) {
-    // Ouvrir le modal de rejet
-    const backdrop = document.getElementById('reject-backdrop');
-    if (backdrop) backdrop.classList.add('open');
-    
-    // Pré-remplir le motif
-    const reasonSelect = document.getElementById('reject-reason-select');
-    if (reasonSelect) reasonSelect.value = 'Paiement introuvable';
-    
-    const otherText = document.getElementById('reject-other-text');
-    if (otherText) otherText.value = '';
-    
-    const otherWrap = document.getElementById('reject-other-wrap');
-    if (otherWrap) otherWrap.hidden = true;
+    document.getElementById('reject-backdrop').classList.add('open');
+    document.getElementById('reject-reason-select').value = 'Paiement introuvable';
+    document.getElementById('reject-other-text').value = '';
+    document.getElementById('reject-other-wrap').hidden = true;
 }
 
 async function submitRejection() {
     const reason = document.getElementById('reject-reason-select').value;
     const otherReason = document.getElementById('reject-other-text').value.trim();
     const finalReason = reason === 'Autre' ? otherReason : reason;
-
-    if (!finalReason) {
-        showToast('Un motif est obligatoire pour rejeter.', 'error');
-        return;
-    }
-
+    if (!finalReason) { showToast('Un motif est obligatoire pour rejeter.', 'error'); return; }
     try {
-        const { error } = await supabaseClient
-            .rpc('confirm_subscription_payment', {
-                p_payment_id: currentPaymentDetail.id,
-                p_decision: 'rejected',
-                p_rejection_reason: finalReason,
-            });
-
+        const { error } = await supabaseClient.rpc('confirm_subscription_payment', { p_payment_id: currentPaymentDetail.id, p_decision: 'rejected', p_rejection_reason: finalReason });
         if (error) throw error;
-
         showToast('Paiement rejeté.', 'info');
         closeRejectModal();
         closeModal('payment-detail-backdrop');
         await loadPayments();
-
-    } catch (error) {
-        showToast(friendlyError(error), 'error');
-    }
+    } catch (error) { showToast(friendlyError(error), 'error'); }
 }
 
 async function annulerPaiement(paymentId) {
-    const ok = await confirmDialog(
-        'Annuler ce paiement confirmé ? L\'entreprise sera désactivée.',
-        { title: 'Annuler le paiement', confirmLabel: 'Annuler', danger: true }
-    );
+    const ok = await confirmDialog('Annuler ce paiement confirmé ? L\'entreprise sera désactivée.', { title: 'Annuler le paiement', confirmLabel: 'Annuler', danger: true });
     if (!ok) return;
-
     try {
-        const { error } = await supabaseClient
-            .rpc('annuler_paiement_admin', {
-                p_payment_id: paymentId,
-            });
-
+        const { error } = await supabaseClient.rpc('annuler_paiement_admin', { p_payment_id: paymentId });
         if (error) throw error;
-
         showToast('Paiement annulé — entreprise désactivée.', 'info');
         await loadPayments();
-
-    } catch (error) {
-        showToast(friendlyError(error), 'error');
-    }
+    } catch (error) { showToast(friendlyError(error), 'error'); }
 }
 
 // ============================================================================
@@ -1537,175 +511,86 @@ async function annulerPaiement(paymentId) {
 
 async function loadEntreprises() {
     try {
-        const { data: entreprisesData, error: err1 } = await supabaseClient
-            .from('entreprises')
-            .select('*')
-            .order('created_at', { ascending: false });
-
+        const { data: entreprisesData, error: err1 } = await supabaseClient.from('entreprises').select('*').order('created_at', { ascending: false });
         if (err1) throw err1;
-
-        const { data: subscriptionsData, error: err2 } = await supabaseClient
-            .from('subscriptions')
-            .select('*');
-
+        const { data: subscriptionsData, error: err2 } = await supabaseClient.from('subscriptions').select('*');
         if (err2) throw err2;
-
-        const { data: profilesData, error: err3 } = await supabaseClient
-            .from('profiles')
-            .select('id, entreprise_id, role, has_recouvra');
-
+        const { data: profilesData, error: err3 } = await supabaseClient.from('profiles').select('id, entreprise_id, role, has_recouvra');
         if (err3) throw err3;
-
         allEntreprises = (entreprisesData || []).map(e => {
             const sub = (subscriptionsData || []).find(s => s.entreprise_id === e.id);
             const users = (profilesData || []).filter(p => p.entreprise_id === e.id);
             return { ...e, subscriptions: sub, profiles: users };
         });
-
         renderEntreprises();
-
-        const actives = allEntreprises.filter(e => 
-            e.subscriptions?.status === 'active'
-        ).length;
+        const actives = allEntreprises.filter(e => e.subscriptions?.status === 'active').length;
         document.getElementById('stat-entreprises').textContent = actives;
-
     } catch (error) {
         console.error('Erreur chargement entreprises:', error);
-        document.getElementById('entreprises-tbody').innerHTML = `
-            <tr><td colspan="6" class="payments-empty">${friendlyError(error)}</td></tr>
-        `;
+        document.getElementById('entreprises-tbody').innerHTML = `<tr><td colspan="6" class="payments-empty">${friendlyError(error)}</td></tr>`;
     }
 }
 
 function renderEntreprises(search = '') {
     const tbody = document.getElementById('entreprises-tbody');
     if (!tbody) return;
-
     let filtered = allEntreprises;
-
-    if (search) {
-        filtered = filtered.filter(e =>
-            (e.nom || '').toLowerCase().includes(search) ||
-            (e.gerant_nom || '').toLowerCase().includes(search) ||
-            (e.telephone || '').toLowerCase().includes(search)
-        );
-    }
-
-    if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="payments-empty">Aucune entreprise trouvée</td></tr>`;
-        return;
-    }
-
-    const statusBadge = {
-        active: '<span class="badge badge-success">✅ Active</span>',
-        pending: '<span class="badge badge-warning">🕐 En attente</span>',
-        expired: '<span class="badge badge-danger">❌ Expirée</span>',
-        cancelled: '<span class="badge badge-muted">🚫 Annulée</span>',
-    };
-
-    tbody.innerHTML = filtered.map(e => `
-        <tr>
-            <td><strong>${esc(e.nom || '—')}</strong></td>
-            <td>${esc(e.gerant_nom || '—')}</td>
-            <td>${esc(e.telephone || '—')}</td>
-            <td>${e.subscriptions?.status ? statusBadge[e.subscriptions.status] : '—'}</td>
-            <td>${e.subscriptions?.current_period_end ? fmtDate(e.subscriptions.current_period_end) : '—'}</td>
-            <td>
-                <div class="admin-actions">
-                    <button class="admin-btn info" onclick="openEditEntreprise('${e.id}')">✏️ Modifier</button>
-                    <button class="admin-btn danger" onclick="desactiverEntreprise('${e.id}')">🚫 Désactiver</button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
+    if (search) filtered = filtered.filter(e => (e.nom || '').toLowerCase().includes(search) || (e.gerant_nom || '').toLowerCase().includes(search) || (e.telephone || '').toLowerCase().includes(search));
+    if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="payments-empty">Aucune entreprise trouvée</td></tr>`; return; }
+    const statusBadge = { active: '<span class="badge badge-success">✅ Active</span>', pending: '<span class="badge badge-warning">🕐 En attente</span>', expired: '<span class="badge badge-danger">❌ Expirée</span>', cancelled: '<span class="badge badge-muted">🚫 Annulée</span>' };
+    tbody.innerHTML = filtered.map(e => `<tr>
+        <td><strong>${esc(e.nom || '—')}</strong></td>
+        <td>${esc(e.gerant_nom || '—')}</td>
+        <td>${esc(e.telephone || '—')}</td>
+        <td>${e.subscriptions?.status ? statusBadge[e.subscriptions.status] : '—'}</td>
+        <td>${e.subscriptions?.current_period_end ? fmtDate(e.subscriptions.current_period_end) : '—'}</td>
+        <td><div class="admin-actions"><button class="admin-btn info" onclick="openEditEntreprise('${e.id}')">✏️ Modifier</button><button class="admin-btn danger" onclick="desactiverEntreprise('${e.id}')">🚫 Désactiver</button></div></td>
+    </tr>`).join('');
 }
 
 function openEditEntreprise(id) {
     const entreprise = allEntreprises.find(e => e.id === id);
     if (!entreprise) return;
-
     document.getElementById('edit-entreprise-id').value = entreprise.id;
     document.getElementById('edit-entreprise-nom').value = entreprise.nom || '';
     document.getElementById('edit-entreprise-gerant').value = entreprise.gerant_nom || '';
     document.getElementById('edit-entreprise-telephone').value = entreprise.telephone || '';
     document.getElementById('edit-entreprise-email').value = entreprise.email || '';
     document.getElementById('edit-entreprise-statut').value = entreprise.subscriptions?.status || 'pending';
-
     document.getElementById('edit-entreprise-backdrop').classList.add('open');
 }
 
 async function saveEntreprise(e) {
     e.preventDefault();
-
     const id = document.getElementById('edit-entreprise-id').value;
     const nom = document.getElementById('edit-entreprise-nom').value.trim();
     const gerant = document.getElementById('edit-entreprise-gerant').value.trim();
     const telephone = document.getElementById('edit-entreprise-telephone').value.trim();
     const statut = document.getElementById('edit-entreprise-statut').value;
-
     try {
-        const { error: err1 } = await supabaseClient
-            .from('entreprises')
-            .update({ nom, gerant_nom: gerant, telephone })
-            .eq('id', id);
-
+        const { error: err1 } = await supabaseClient.from('entreprises').update({ nom, gerant_nom: gerant, telephone }).eq('id', id);
         if (err1) throw err1;
-
-        const { error: err2 } = await supabaseClient
-            .from('subscriptions')
-            .update({ status: statut, updated_at: new Date().toISOString() })
-            .eq('entreprise_id', id);
-
+        const { error: err2 } = await supabaseClient.from('subscriptions').update({ status: statut, updated_at: new Date().toISOString() }).eq('entreprise_id', id);
         if (err2) throw err2;
-
-        if (statut === 'active') {
-            await supabaseClient
-                .from('profiles')
-                .update({ has_recouvra: true, updated_at: new Date().toISOString() })
-                .eq('entreprise_id', id);
-        } else {
-            await supabaseClient
-                .from('profiles')
-                .update({ has_recouvra: false, updated_at: new Date().toISOString() })
-                .eq('entreprise_id', id);
-        }
-
+        if (statut === 'active') await supabaseClient.from('profiles').update({ has_recouvra: true, updated_at: new Date().toISOString() }).eq('entreprise_id', id);
+        else await supabaseClient.from('profiles').update({ has_recouvra: false, updated_at: new Date().toISOString() }).eq('entreprise_id', id);
         showToast('Entreprise modifiée avec succès.', 'success');
         closeModal('edit-entreprise-backdrop');
         await loadEntreprises();
-
-    } catch (error) {
-        showToast(friendlyError(error), 'error');
-    }
+    } catch (error) { showToast(friendlyError(error), 'error'); }
 }
 
 async function desactiverEntreprise(id) {
-    const ok = await confirmDialog(
-        'Désactiver cette entreprise ? Elle ne pourra plus se connecter.',
-        { title: 'Désactiver l\'entreprise', confirmLabel: 'Désactiver', danger: true }
-    );
+    const ok = await confirmDialog('Désactiver cette entreprise ? Elle ne pourra plus se connecter.', { title: 'Désactiver l\'entreprise', confirmLabel: 'Désactiver', danger: true });
     if (!ok) return;
-
     try {
-        // 1. Mettre à jour le statut de l'abonnement
-        const { error: err1 } = await supabaseClient
-            .from('subscriptions')
-            .update({ status: 'cancelled', updated_at: new Date().toISOString() })
-            .eq('entreprise_id', id);
+        const { error: err1 } = await supabaseClient.from('subscriptions').update({ status: 'cancelled', updated_at: new Date().toISOString() }).eq('entreprise_id', id);
         if (err1) throw err1;
-
-        // 2. Désactiver l'accès Recouvra pour tous les profils liés
-        const { error: err2 } = await supabaseClient
-            .from('profiles')
-            .update({ has_recouvra: false, updated_at: new Date().toISOString() })
-            .eq('entreprise_id', id);
+        const { error: err2 } = await supabaseClient.from('profiles').update({ has_recouvra: false, updated_at: new Date().toISOString() }).eq('entreprise_id', id);
         if (err2) throw err2;
-
         showToast('Entreprise désactivée. Elle ne peut plus se connecter.', 'success');
-        await loadEntreprises(); // ou reload les données
-    } catch (error) {
-        showToast(friendlyError(error), 'error');
-    }
+        await loadEntreprises();
+    } catch (error) { showToast(friendlyError(error), 'error'); }
 }
 
 // ============================================================================
@@ -1714,128 +599,64 @@ async function desactiverEntreprise(id) {
 
 async function loadUsers() {
     try {
-        const { data, error } = await supabaseClient
-            .from('profiles')
-            .select(`
-                *,
-                entreprises(nom)
-            `)
-            .order('created_at', { ascending: false });
-
+        const { data, error } = await supabaseClient.from('profiles').select('*, entreprises(nom)').order('created_at', { ascending: false });
         if (error) throw error;
-
-        allUsers = (data || []).map(u => ({
-            ...u,
-            email: u.email || '—'
-        }));
-        
+        allUsers = (data || []).map(u => ({ ...u, email: u.email || '—' }));
         renderUsers();
-
     } catch (error) {
         console.error('Erreur chargement utilisateurs:', error);
-        document.getElementById('utilisateurs-tbody').innerHTML = `
-            <tr><td colspan="5" class="payments-empty">${friendlyError(error)}</td></tr>
-        `;
+        document.getElementById('utilisateurs-tbody').innerHTML = `<tr><td colspan="5" class="payments-empty">${friendlyError(error)}</td></tr>`;
     }
 }
 
 function renderUsers(search = '') {
     const tbody = document.getElementById('utilisateurs-tbody');
     if (!tbody) return;
-
     let filtered = allUsers;
-
-    if (search) {
-        filtered = filtered.filter(u =>
-            (u.entreprises?.nom || '').toLowerCase().includes(search) ||
-            (u.role || '').toLowerCase().includes(search)
-        );
-    }
-
-    if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="payments-empty">Aucun utilisateur trouvé</td></tr>`;
-        return;
-    }
-
-    tbody.innerHTML = filtered.map(u => `
-        <tr>
-            <td>${esc(u.email || '—')}</td>
-            <td>${esc(u.entreprises?.nom || '—')}</td>
-            <td>${esc(u.role || '—')}</td>
-            <td>${u.has_recouvra ? '<span class="badge badge-success">✅ PRO</span>' : '<span class="badge badge-muted">—</span>'}</td>
-            <td>
-                <div class="admin-actions">
-                    <button class="admin-btn info" onclick="openEditUser('${u.id}')">✏️ Modifier</button>
-                    <button class="admin-btn danger" onclick="resetPassword('${u.id}')">🔑 MDP</button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
+    if (search) filtered = filtered.filter(u => (u.entreprises?.nom || '').toLowerCase().includes(search) || (u.role || '').toLowerCase().includes(search));
+    if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="payments-empty">Aucun utilisateur trouvé</td></tr>`; return; }
+    tbody.innerHTML = filtered.map(u => `<tr>
+        <td>${esc(u.email || '—')}</td>
+        <td>${esc(u.entreprises?.nom || '—')}</td>
+        <td>${esc(u.role || '—')}</td>
+        <td>${u.has_recouvra ? '<span class="badge badge-success">✅ PRO</span>' : '<span class="badge badge-muted">—</span>'}</td>
+        <td><div class="admin-actions"><button class="admin-btn info" onclick="openEditUser('${u.id}')">✏️ Modifier</button><button class="admin-btn danger" onclick="resetPassword('${u.id}')">🔑 MDP</button></div></td>
+    </tr>`).join('');
 }
 
 function openEditUser(id) {
     const user = allUsers.find(u => u.id === id);
     if (!user) return;
-
     document.getElementById('edit-user-id').value = user.id;
     document.getElementById('edit-user-role').value = user.role || 'vendeur';
     document.getElementById('edit-user-recouvra').checked = user.has_recouvra || false;
-
     document.getElementById('edit-user-backdrop').classList.add('open');
 }
 
 async function saveUser(e) {
     e.preventDefault();
-
     const id = document.getElementById('edit-user-id').value;
     const role = document.getElementById('edit-user-role').value;
     const hasRecouvra = document.getElementById('edit-user-recouvra').checked;
-
     try {
-        const { error } = await supabaseClient
-            .from('profiles')
-            .update({ 
-                role, 
-                has_recouvra: hasRecouvra,
-                updated_at: new Date().toISOString()
-            })
-            .eq('id', id);
-
+        const { error } = await supabaseClient.from('profiles').update({ role, has_recouvra: hasRecouvra, updated_at: new Date().toISOString() }).eq('id', id);
         if (error) throw error;
-
         showToast('Utilisateur modifié avec succès.', 'success');
         closeModal('edit-user-backdrop');
         await loadUsers();
-
-    } catch (error) {
-        showToast(friendlyError(error), 'error');
-    }
+    } catch (error) { showToast(friendlyError(error), 'error'); }
 }
 
 async function resetPassword(userId) {
     const user = allUsers.find(u => u.id === userId);
     if (!user) return;
-
     const newPassword = prompt(`Nouveau mot de passe pour ${user.email} :`);
-    if (!newPassword || newPassword.length < 8) {
-        showToast('Le mot de passe doit contenir au moins 8 caractères.', 'error');
-        return;
-    }
-
+    if (!newPassword || newPassword.length < 8) { showToast('Le mot de passe doit contenir au moins 8 caractères.', 'error'); return; }
     try {
-        const { error } = await supabaseClient
-            .rpc('admin_reset_password', {
-                p_user_id: userId,
-                p_new_password: newPassword,
-            });
-
+        const { error } = await supabaseClient.rpc('admin_reset_password', { p_user_id: userId, p_new_password: newPassword });
         if (error) throw error;
-
         showToast('Mot de passe réinitialisé avec succès.', 'success');
-
-    } catch (error) {
-        showToast(friendlyError(error), 'error');
-    }
+    } catch (error) { showToast(friendlyError(error), 'error'); }
 }
 </script>
 </body>

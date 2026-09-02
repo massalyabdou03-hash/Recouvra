@@ -13,385 +13,6 @@
 <meta name="apple-mobile-web-app-title" content="Ma Boutique">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="stylesheet" href="assets/style.css">
-
-<style>
-/* ============================================================================
-   MENU MOBILE + MODE SOMBRE GLOBAL
-   ============================================================================ */
-
-.mobile-menu-btn {
-    display: none;
-    position: fixed;
-    top: 12px;
-    left: 12px;
-    z-index: 1001;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    border: none;
-    background: #4F46E5;
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
-}
-
-.sidebar-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 999;
-}
-
-.sidebar-overlay.active {
-    display: block;
-}
-
-@media (max-width: 768px) {
-    .mobile-menu-btn {
-        display: flex;
-    }
-    .sidebar {
-        position: fixed;
-        top: 0;
-        left: -280px;
-        width: 280px;
-        height: 100vh;
-        transition: left 0.3s ease;
-        z-index: 1000;
-        overflow-y: auto;
-    }
-    .sidebar.open {
-        left: 0;
-    }
-    .main {
-        padding-left: 16px;
-        padding-right: 16px;
-        padding-top: 60px;
-    }
-}
-
-body.dark-mode {
-    --surface: #1F2937;
-    --surface-2: #374151;
-    --surface-3: #4B5563;
-    --border: #4B5563;
-    --border-soft: #374151;
-    --text: #F9FAFB;
-    --text-muted: #9CA3AF;
-    --text-light: #6B7280;
-    background: #111827;
-    color: #F9FAFB;
-}
-
-body.dark-mode .card,
-body.dark-mode .sidebar {
-    background: #1F2937;
-    border-color: #374151;
-}
-
-body.dark-mode .nav-link {
-    color: #9CA3AF;
-}
-
-body.dark-mode .nav-link.active {
-    background: #4F46E5;
-    color: white;
-}
-
-body.dark-mode table {
-    background: #1F2937;
-}
-
-body.dark-mode th {
-    background: #374151;
-    color: #9CA3AF;
-}
-
-body.dark-mode td {
-    border-color: #374151;
-}
-
-body.dark-mode input,
-body.dark-mode select,
-body.dark-mode textarea {
-    background: #374151;
-    border-color: #4B5563;
-    color: #F9FAFB;
-}
-
-body.dark-mode .stat-card {
-    background: #1F2937;
-    border-color: #374151;
-}
-
-body.dark-mode .empty-state {
-    color: #9CA3AF;
-}
-
-body.dark-mode .hint {
-    color: #9CA3AF;
-}
-
-/* ============================================================================
-   CORRECTIONS MOBILE GLOBALES (AJOUTÉES)
-   ============================================================================ */
-@media (max-width: 768px) {
-    body { overflow-x: hidden; }
-}
-
-body.menu-open .mobile-menu-btn { display: none; }
-
-@media (max-width: 600px) {
-    .modal-backdrop { padding: 16px 10px; }
-    .modal { margin: 0 auto; width: calc(100% - 32px); max-height: calc(100vh - 32px); }
-}
-
-.table-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    display: block;
-    width: 100%;
-}
-
-.table-wrapper > table { min-width: 720px; }
-
-@media (max-width: 480px) {
-    .table-wrapper > table { min-width: 100%; }
-}
-
-/* Nouveau tableau de bord simplifié */
-.welcome-header {
-    margin-bottom: 24px;
-}
-
-.welcome-header h1 {
-    font-size: 28px;
-    font-weight: 800;
-    margin-bottom: 4px;
-}
-
-.welcome-header p {
-    color: #888;
-    font-size: 15px;
-}
-
-.dashboard-big-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* ← modifié de 280px à 250px */
-    gap: 16px;
-    margin-bottom: 32px;
-}
-
-.big-card {
-    background: white;
-    border-radius: 16px;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid #eee;
-}
-
-.big-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-}
-
-.big-card.primary {
-    background: linear-gradient(135deg, #4F46E5, #6366F1);
-    color: white;
-    border: none;
-}
-
-.big-card.warning {
-    background: linear-gradient(135deg, #f59e0b, #fbbf24);
-    color: white;
-    border: none;
-}
-
-.big-card.info {
-    background: white;
-    border: 1px solid #e0e7ff;
-}
-
-.big-card-icon {
-    font-size: 40px;
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255,255,255,0.2);
-}
-
-.big-card.info .big-card-icon {
-    background: #eef2ff;
-}
-
-.big-card-content {
-    flex: 1;
-}
-
-.big-card-label {
-    font-size: 13px;
-    opacity: 0.9;
-    font-weight: 500;
-    margin-bottom: 4px;
-}
-
-.big-card-value {
-    font-size: 32px;
-    font-weight: 800;
-    line-height: 1.2;
-}
-
-.big-card-hint {
-    font-size: 12px;
-    opacity: 0.8;
-    margin-top: 4px;
-}
-
-.big-card-arrow {
-    font-size: 24px;
-    opacity: 0.7;
-}
-
-.dashboard-actions {
-    margin-top: 24px;
-}
-
-.section-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 16px;
-}
-
-.action-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 12px;
-}
-
-.action-button {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
-}
-
-.action-button:hover {
-    border-color: #4F46E5;
-    background: #f8f7ff;
-    transform: translateY(-2px);
-}
-
-.action-button.primary {
-    background: #4F46E5;
-    color: white;
-    border: none;
-}
-
-.action-button.primary:hover {
-    background: #4338CA;
-}
-
-.action-emoji {
-    font-size: 36px;
-}
-
-.action-text {
-    font-size: 14px;
-    font-weight: 600;
-    color: inherit;
-}
-
-.dashboard-recap {
-    margin-top: 32px;
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    border: 1px solid #eee;
-}
-
-.recap-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 16px;
-}
-
-.recap-item {
-    text-align: center;
-    padding: 16px;
-    background: #fafafa;
-    border-radius: 12px;
-}
-
-.recap-icon {
-    font-size: 24px;
-    margin-bottom: 8px;
-}
-
-.recap-label {
-    font-size: 12px;
-    color: #888;
-    font-weight: 600;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-}
-
-.recap-value {
-    font-size: 24px;
-    font-weight: 800;
-    color: #333;
-}
-
-.recap-hint {
-    font-size: 11px;
-    color: #999;
-    margin-top: 4px;
-}
-
-body.dark-mode .big-card.info,
-body.dark-mode .dashboard-recap,
-body.dark-mode .action-button {
-    background: #1F2937;
-    border-color: #374151;
-}
-
-body.dark-mode .action-button.primary {
-    background: #4F46E5;
-}
-
-body.dark-mode .recap-item {
-    background: #374151;
-}
-
-body.dark-mode .recap-value {
-    color: #F9FAFB;
-}
-
-body.dark-mode .section-title {
-    color: #F9FAFB;
-}
-</style>
 </head>
 <body>
 
@@ -441,12 +62,10 @@ body.dark-mode .section-title {
     </div>
 
     <div class="sidebar-footer">
-      <!-- ========== MODE SOMBRE ========== -->
       <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;">
         <span id="dark-mode-icon">🌙</span>
         <span id="dark-mode-label">Mode sombre</span>
       </button>
-      
       <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
       <button class="btn-logout" onclick="logout()">Déconnexion</button>
     </div>
@@ -454,8 +73,8 @@ body.dark-mode .section-title {
 
   <main class="main">
     <div class="welcome-header">
-    <h1 id="welcome-name">Bonjour 👋</h1>
-    <p id="welcome-company">Voici ce qui se passe dans votre boutique.</p>
+      <h1 id="welcome-name">Bonjour 👋</h1>
+      <p id="welcome-company">Voici ce qui se passe dans votre boutique.</p>
     </div>
 
     <div class="dashboard-big-cards">
@@ -548,10 +167,7 @@ body.dark-mode .section-title {
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
 <script>
-// ============================================================================
-// MENU MOBILE + MODE SOMBRE
-// ============================================================================
-
+// Fonctions globales déjà dans app.js, mais redéclarées pour compatibilité
 function toggleSidebar() {
     const sidebar = document.querySelector('.sidebar');
     const overlay = document.querySelector('.sidebar-overlay');
@@ -591,42 +207,30 @@ function initDarkMode() {
 }
 
 // ============================================================================
-// LOGIQUE DU TABLEAU DE BORD + MESSAGE D'ACCUEIL
+// LOGIQUE DU TABLEAU DE BORD
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', async () => {
     initDarkMode();
-    
     const session = await requireAuth();
     if (!session) return;
-
-    await loadWelcomeMessage();   // Charger le message personnalisé
-    await loadDashboardData();    // Charger les statistiques
+    await loadWelcomeMessage();
+    await loadDashboardData();
 });
 
-// Message d'accueil personnalisé
 async function loadWelcomeMessage() {
     try {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) return;
-
         const { data: profile } = await supabaseClient
             .from('profiles')
             .select('*, entreprises(nom, gerant_nom)')
             .eq('id', session.user.id)
             .single();
-
         if (!profile) return;
-
-        // Récupération en cascade : base -> metadata -> fallback
-        const gerantNom =
-            profile.entreprises?.gerant_nom ||
-            session.user?.user_metadata?.gerant_nom ||
-            'Gérant';
-
+        const gerantNom = profile.entreprises?.gerant_nom || session.user?.user_metadata?.gerant_nom || 'Gérant';
         const boutiqueNom = profile.entreprises?.nom || 'votre boutique';
         const prenom = gerantNom.split(' ')[0] || 'Gérant';
-
         document.getElementById('welcome-name').textContent = `Bonjour ${prenom} 👋`;
         document.getElementById('welcome-company').textContent = `Voici ce qui se passe dans votre boutique ${boutiqueNom}.`;
     } catch (error) {
@@ -634,23 +238,18 @@ async function loadWelcomeMessage() {
     }
 }
 
-// Charger les données du tableau de bord
 async function loadDashboardData() {
     const { items: pieces, offline, savedAt } = await loadWithCache('pieces', () =>
         fetchAllRows(() => supabaseClient.from('pieces').select('*').eq('actif', true).order('id'))
     );
 
     document.getElementById('stat-pieces').textContent = pieces.length;
-    
     const valeur = pieces.reduce((sum, p) => sum + (p.quantite_stock * Number(p.prix_achat)), 0);
     document.getElementById('stat-valeur').textContent = fmtMoney(valeur);
-
     const alertes = pieces.filter(p => p.quantite_stock <= p.seuil_alerte);
     document.getElementById('stat-alertes').textContent = alertes.length;
 
-    if (offline && savedAt) {
-        showToast(`Hors ligne : données du ${fmtDateTime(savedAt)}.`, 'info');
-    }
+    if (offline && savedAt) showToast(`Hors ligne : données du ${fmtDateTime(savedAt)}.`, 'info');
 
     await loadActiviteCommerciale();
 }
@@ -658,22 +257,18 @@ async function loadDashboardData() {
 async function loadActiviteCommerciale() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
     const debutSemaine = new Date(today);
     const jourSemaine = (debutSemaine.getDay() + 6) % 7;
     debutSemaine.setDate(debutSemaine.getDate() - jourSemaine);
-
     const debutMois = new Date(today.getFullYear(), today.getMonth(), 1);
 
     try {
         const debutChargement = debutSemaine < debutMois ? debutSemaine : debutMois;
-
         const { data: ventes, error } = await supabaseClient
             .from('factures')
             .select('id, montant_total, validated_at')
             .eq('statut', 'VALIDEE')
             .gte('validated_at', debutChargement.toISOString());
-
         if (error) throw error;
 
         const ventesMois = (ventes || []).filter(f => new Date(f.validated_at) >= debutMois);
@@ -691,7 +286,6 @@ async function loadActiviteCommerciale() {
         const caMois = ventesMois.reduce((s, f) => s + Number(f.montant_total), 0);
         document.getElementById('stat-ca-mois').textContent = fmtMoney(caMois);
         document.getElementById('stat-nb-mois').textContent = `${ventesMois.length} vente${ventesMois.length > 1 ? 's' : ''}`;
-
     } catch (error) {
         console.error('Erreur chargement activité:', error);
         document.getElementById('stat-ca-jour').textContent = '—';
@@ -705,18 +299,14 @@ async function loadActiviteCommerciale() {
             .select('montant_restant')
             .neq('statut', 'ANNULEE')
             .gt('montant_restant', 0);
-
         if (error) throw error;
-
         const total = (creances || []).reduce((s, f) => s + Number(f.montant_restant), 0);
         document.getElementById('stat-creances').textContent = fmtMoney(total);
-
     } catch (error) {
         console.error('Erreur chargement créances:', error);
         document.getElementById('stat-creances').textContent = '—';
     }
 }
-</script>
 </script>
 </body>
 </html>

@@ -13,404 +13,6 @@
 <meta name="apple-mobile-web-app-title" content="Ma Boutique">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="stylesheet" href="assets/style.css">
-
-<style>
-/* ============================================================================
-   MENU MOBILE + MODE SOMBRE GLOBAL
-   ============================================================================ */
-
-.mobile-menu-btn {
-    display: none;
-    position: fixed;
-    top: 12px;
-    left: 12px;
-    z-index: 1001;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    border: none;
-    background: #4F46E5;
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
-}
-
-.sidebar-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 999;
-}
-
-.sidebar-overlay.active {
-    display: block;
-}
-
-@media (max-width: 768px) {
-    .mobile-menu-btn {
-        display: flex;
-    }
-    .sidebar {
-        position: fixed;
-        top: 0;
-        left: -280px;
-        width: 280px;
-        height: 100vh;
-        transition: left 0.3s ease;
-        z-index: 1000;
-        overflow-y: auto;
-    }
-    .sidebar.open {
-        left: 0;
-    }
-    .main {
-        padding-left: 16px;
-        padding-right: 16px;
-        padding-top: 60px;
-    }
-}
-
-body.dark-mode {
-    --surface: #1F2937;
-    --surface-2: #374151;
-    --surface-3: #4B5563;
-    --border: #4B5563;
-    --border-soft: #374151;
-    --text: #F9FAFB;
-    --text-muted: #9CA3AF;
-    --text-light: #6B7280;
-    background: #111827;
-    color: #F9FAFB;
-}
-
-body.dark-mode .card,
-body.dark-mode .sidebar,
-body.dark-mode .modal {
-    background: #1F2937;
-    border-color: #374151;
-}
-
-body.dark-mode .nav-link {
-    color: #9CA3AF;
-}
-
-body.dark-mode .nav-link.active {
-    background: #4F46E5;
-    color: white;
-}
-
-body.dark-mode input,
-body.dark-mode select,
-body.dark-mode textarea {
-    background: #374151;
-    border-color: #4B5563;
-    color: #F9FAFB;
-}
-
-body.dark-mode label {
-    color: #F9FAFB;
-}
-
-body.dark-mode .btn-secondary {
-    background: #374151;
-    border-color: #4B5563;
-    color: #F9FAFB;
-}
-
-body.dark-mode .empty-state {
-    color: #9CA3AF;
-}
-
-body.dark-mode .hint {
-    color: #9CA3AF;
-}
-
-/* ============================================================================
-   PAGE ABONNEMENT
-   ============================================================================ */
-
-.page-header-simple {
-    margin-bottom: 24px;
-}
-
-.page-header-simple h1 {
-    font-size: 28px;
-    font-weight: 800;
-    margin-bottom: 4px;
-}
-
-.page-header-simple p {
-    color: #888;
-    font-size: 15px;
-}
-
-.subscription-page {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.subscription-heading {
-    text-align: center;
-    margin-bottom: 32px;
-}
-
-.subscription-heading h1 {
-    font-size: 32px;
-    font-weight: 800;
-    margin-bottom: 8px;
-}
-
-.subscription-heading p {
-    color: #888;
-    font-size: 16px;
-    margin-bottom: 16px;
-}
-
-.eyebrow {
-    display: inline-block;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #4F46E5;
-    background: #EEF2FF;
-    padding: 4px 12px;
-    border-radius: 20px;
-    margin-bottom: 12px;
-}
-
-.subscription-card {
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    border: 1px solid #eee;
-    margin-bottom: 20px;
-}
-
-.subscription-benefits {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 24px;
-}
-
-.subscription-benefits li {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 12px 0;
-    border-bottom: 1px solid #f3f4f6;
-}
-
-.subscription-benefits li:last-child {
-    border-bottom: none;
-}
-
-.subscription-benefits li strong {
-    display: block;
-    font-size: 15px;
-    margin-bottom: 2px;
-}
-
-.subscription-benefits li span {
-    font-size: 13px;
-    color: #888;
-}
-
-.subscription-price {
-    text-align: center;
-    padding: 20px;
-    background: #EEF2FF;
-    border-radius: 12px;
-    margin-bottom: 20px;
-}
-
-.subscription-price strong {
-    font-size: 32px;
-    color: #4F46E5;
-    display: block;
-}
-
-.subscription-price span {
-    font-size: 14px;
-    color: #888;
-}
-
-.wave-instructions {
-    text-align: center;
-    margin-bottom: 20px;
-    padding: 16px;
-    background: #F0FDF4;
-    border-radius: 12px;
-    border: 1px solid #10B981;
-}
-
-.wave-instructions p {
-    margin: 8px 0 0;
-    font-size: 15px;
-    color: #065F46;
-}
-
-.subscription-form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.subscription-form label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 6px;
-}
-
-.subscription-form input[type="file"],
-.subscription-form input[type="text"] {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s;
-    background: white;
-    color: #333;
-}
-
-.subscription-form input:focus {
-    border-color: #4F46E5;
-}
-
-.subscription-form small {
-    display: block;
-    font-size: 12px;
-    color: #888;
-    margin-top: 4px;
-}
-
-.terms-check {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    font-size: 13px;
-    color: #333;
-    cursor: pointer;
-}
-
-.terms-check input[type="checkbox"] {
-    width: auto;
-    margin-top: 3px;
-}
-
-.subscription-message {
-    font-size: 14px;
-    font-weight: 600;
-    margin-top: 12px;
-}
-
-.subscription-message.success {
-    color: #059669;
-}
-
-.subscription-message.error {
-    color: #DC2626;
-}
-
-.btn {
-    padding: 14px 24px;
-    border-radius: 12px;
-    border: none;
-    background: #4F46E5;
-    color: white;
-    font-weight: 700;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.2s;
-    width: 100%;
-}
-
-.btn:hover {
-    background: #4338CA;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
-}
-
-.btn-secondary {
-    background: #f3f4f6;
-    color: #333;
-    border: 1px solid #e5e7eb;
-}
-
-.btn-secondary:hover {
-    background: #e5e7eb;
-}
-
-.btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: #888;
-    text-decoration: none;
-    font-size: 14px;
-    margin-bottom: 16px;
-}
-
-.btn-back:hover {
-    color: #4F46E5;
-}
-
-body.dark-mode .subscription-card {
-    background: #1F2937;
-    border-color: #374151;
-}
-
-body.dark-mode .subscription-benefits li {
-    border-color: #374151;
-}
-
-body.dark-mode .subscription-benefits li span {
-    color: #9CA3AF;
-}
-
-body.dark-mode .subscription-price {
-    background: #312E81;
-}
-
-body.dark-mode .subscription-price strong {
-    color: #A5B4FC;
-}
-
-body.dark-mode .wave-instructions {
-    background: #064E3B;
-    border-color: #10B981;
-}
-
-body.dark-mode .wave-instructions p {
-    color: #A7F3D0;
-}
-
-body.dark-mode .subscription-form input[type="file"],
-body.dark-mode .subscription-form input[type="text"] {
-    background: #374151;
-    border-color: #4B5563;
-    color: #F9FAFB;
-}
-
-body.dark-mode .terms-check {
-    color: #F9FAFB;
-}
-
-body.dark-mode .eyebrow {
-    background: #312E81;
-    color: #A5B4FC;
-}
-</style>
 </head>
 <body>
 
@@ -502,18 +104,18 @@ body.dark-mode .eyebrow {
           </li>
           <li>
             <strong>💡 Outil 100% Rentable</strong>
-            <span>À 15 000 FCFA/mois, une seule facture recouvrée rembourse largement votre abonnement.</span>
+            <span>À 10 000 FCFA/mois, une seule facture recouvrée rembourse largement votre abonnement.</span>
           </li>
         </ul>
 
         <div class="subscription-price">
-          <strong>15 000 FCFA</strong>
+          <strong>10 000 FCFA</strong>
           <span>/ mois, sans engagement</span>
         </div>
 
         <div class="wave-instructions">
           <strong>Paiement Wave Sénégal</strong>
-          <p>Effectuez votre transfert Wave de <strong>15 000 FCFA au numéro : +221 77 033 80 30</strong></p>
+          <p>Effectuez votre transfert Wave de <strong>10 000 FCFA au numéro : +221 77 033 80 30</strong></p>
         </div>
 
         <form id="subscription-form" class="subscription-form">
@@ -551,7 +153,8 @@ body.dark-mode .eyebrow {
 <script src="assets/app.js"></script>
 <script>
 // ============================================================================
-// MENU MOBILE + MODE SOMBRE
+// MENU MOBILE + MODE SOMBRE (fonctions globales déjà dans app.js, mais on les
+// redéclare pour compatibilité si app.js n'est pas chargé en premier)
 // ============================================================================
 
 function toggleSidebar() {
@@ -591,7 +194,7 @@ function initDarkMode() {
 }
 
 // ============================================================================
-// ABONNEMENT - LOGIQUE
+// ABONNEMENT - LOGIQUE (mise à jour tarifs 10 000 FCFA)
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -658,7 +261,7 @@ async function submitSubscription(e) {
             
         if (uploadError) throw uploadError;
         
-        // Soumettre la demande d'abonnement
+        // Soumettre la demande d'abonnement (montant 10 000)
         const { error: dbError } = await supabaseClient
             .from('demandes_abonnement')
             .insert({
@@ -666,6 +269,7 @@ async function submitSubscription(e) {
                 reference_wave: reference,
                 preuve_paiement_path: filePath,
                 submitted_by: session.user.id,
+                montant: 10000,
             });
             
         if (dbError) throw dbError;
