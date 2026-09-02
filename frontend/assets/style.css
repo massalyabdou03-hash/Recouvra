@@ -3271,3 +3271,44 @@ body.dark-mode .support-link:hover {
         display: none !important;
     }
 }
+/* ============================================================
+   FORCER L'AFFICHAGE DU CONTENU DE LA SIDEBAR SUR MOBILE
+   ============================================================ */
+@media (max-width: 768px) {
+    .sidebar {
+        display: flex !important;
+        flex-direction: column !important;
+        left: -280px;
+        width: 280px !important;
+        min-width: 280px !important;
+        max-width: 280px !important;
+        position: fixed !important;
+        top: 0 !important;
+        height: 100vh !important;
+        transition: left 0.3s ease;
+        z-index: 1000;
+        overflow-y: auto;
+        background: #fff !important;
+    }
+
+    .sidebar.open {
+        left: 0 !important;
+    }
+
+    /* On force l'affichage des sections et du footer */
+    .sidebar .nav-section,
+    .sidebar .sidebar-footer,
+    .sidebar .brand {
+        display: flex !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    .sidebar .nav-link,
+    .sidebar .support-link,
+    .sidebar .dark-mode-toggle,
+    .sidebar .btn-logout {
+        display: flex !important;
+        visibility: visible !important;
+    }
+}
