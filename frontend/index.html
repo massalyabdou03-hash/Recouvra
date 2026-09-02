@@ -145,13 +145,26 @@
       </div>
     </div>
 
-  <!-- GRAPHIQUE TENDANCES -->
-  <div class="dashboard-recap">
-    <div class="section-title">Tendances de ventes (30 jours)</div>
-    <div style="height: 300px; position: relative;">
-      <canvas id="salesChart"></canvas>
-    </div>
+<!-- GRAPHIQUE TENDANCES -->
+<div class="dashboard-recap">
+  <div class="section-title">📈 Ventes des 30 derniers jours</div>
+  <p class="hint" style="margin-bottom:10px;">Montant total des factures validées chaque jour. Une tendance à la hausse signifie plus de ventes.</p>
+  <div style="height: 300px; position: relative;">
+    <canvas id="salesChart"></canvas>
   </div>
+</div>
+<div class="recap-grid" style="margin-top:15px;">
+  <div class="recap-item">
+    <div class="recap-icon">🔥</div>
+    <div class="recap-label">Meilleur jour</div>
+    <div class="recap-value" id="best-day">—</div>
+  </div>
+  <div class="recap-item">
+    <div class="recap-icon">📊</div>
+    <div class="recap-label">Total 30 jours</div>
+    <div class="recap-value" id="total-30">—</div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
 <script src="assets/config.js"></script>
@@ -279,6 +292,7 @@ async function loadSalesChart() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    // Créer les tableaux pour les 30 derniers jours
     for (let i = 29; i >= 0; i--) {
         const d = new Date(today);
         d.setDate(today.getDate() - i);
@@ -286,6 +300,7 @@ async function loadSalesChart() {
         totals.push(0);
     }
 
+    // Charger les ventes depuis Supabase
     try {
         const { data: ventes, error } = await supabaseClient
             .from('factures')
@@ -295,6 +310,7 @@ async function loadSalesChart() {
 
         if (error) throw error;
 
+        // Remplir les totaux
         (ventes || []).forEach(f => {
             const dateVente = new Date(f.validated_at);
             const diffDays = Math.floor((today - dateVente) / (1000 * 60 * 60 * 24));
@@ -305,6 +321,17 @@ async function loadSalesChart() {
         console.error('Erreur chargement graphique:', error);
     }
 
+    // Calculer le meilleur jour et le total après le remplissage
+    const maxVal = Math.max(...totals);
+    const maxIdx = totals.indexOf(maxVal);
+    if (maxIdx >= 0) {
+        const bestDayEl = document.getElementById('best-day');
+        if (bestDayEl) bestDayEl.textContent = fmtMoney(maxVal) + ' (' + days[maxIdx] + ')';
+    }
+    const total30El = document.getElementById('total-30');
+    if (total30El) total30El.textContent = fmtMoney(totals.reduce((a, b) => a + b, 0));
+
+    // Créer le graphique
     new Chart(ctx, {
         type: 'line',
         data: {
@@ -323,14 +350,32 @@ async function loadSalesChart() {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Ventes : ' + context.parsed.y.toLocaleString('fr-FR') + ' FCFA';
+                        }
+                    }
+                }
             },
             scales: {
-                y: { beginAtZero: true }
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString('fr-FR') + ' F';
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        maxTicksLimit: 7,
+                        maxRotation: 0,
+                        autoSkip: true
+                    }
+                }
             }
         }
     });
 }
-</script>
-</body>
-</html>
