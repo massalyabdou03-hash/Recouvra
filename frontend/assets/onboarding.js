@@ -1,7 +1,21 @@
 // Parcours en 5 étapes affiché une seule fois après l'inscription
 let selectedCommerce = null;
 const selectedBesoins = new Set();
-let selectedPlan = 'standard'; // Par défaut : Pack Standard
+let selectedPlan = 'simple'; // Par défaut : Simple
+
+// --- Tarification dynamique ---
+function getSetupFee() {
+  const heavy = ['quincaillerie', 'pieces_auto', 'garage'];
+  return heavy.includes(selectedCommerce) ? 25000 : 10000;
+}
+
+function getMonthlyFee() {
+  return selectedPlan === 'recouvrement' ? 15000 : 10000;
+}
+
+function getTotalInitial() {
+  return getSetupFee() + getMonthlyFee();
+}
 
 function goToStep(n) {
   document.querySelectorAll(".onboarding-step").forEach(s => { s.hidden = Number(s.dataset.step) !== n; });
@@ -21,6 +35,8 @@ document.getElementById("commerce-choices").addEventListener("click", (e) => {
   btn.classList.add("selected");
   selectedCommerce = btn.dataset.value;
   document.getElementById("step2-next").disabled = false;
+  // Mettre à jour le bouton de paiement dès que le commerce est choisi
+  updatePaymentButton();
 });
 
 document.getElementById("besoins-choices").addEventListener("click", (e) => {
@@ -48,19 +64,51 @@ function renderValueStep() {
   `).join("");
 }
 
-function selectPlan(plan, element) {
+// --- Sélection du plan mensuel ---
+function selectMonthlyPlan(plan, element) {
   selectedPlan = plan;
-  document.querySelectorAll('#offer-choices .pricing-option').forEach(card => {
+  document.querySelectorAll('#plan-choices .pricing-option').forEach(card => {
     card.classList.remove('selected');
   });
-  element.classList.add('selected');
-  
-  const amounts = {
-    simple: "10 000 FCFA",
-    standard: "50 000 FCFA",
-    premium: "100 000 FCFA"
-  };
-  document.getElementById('selected-amount').textContent = amounts[plan];
+  if (element) element.classList.add('selected');
+  updatePaymentButton();
+}
+
+// --- Mise à jour du bouton Wave avec total dynamique ---
+function updatePaymentButton() {
+  const total = getTotalInitial();
+  const waveBtn = document.getElementById('pay-wave-btn');
+  if (waveBtn) {
+    waveBtn.textContent = `Payer ${total.toLocaleString('fr-FR')} FCFA avec Wave`;
+  }
+  // Mettre à jour le texte de détail éventuel
+  const detail = document.getElementById('payment-detail');
+  if (detail) {
+    detail.textContent = `Frais de mise en place : ${getSetupFee().toLocaleString('fr-FR')} FCFA + 1er mois : ${getMonthlyFee().toLocaleString('fr-FR')} FCFA`;
+  }
+}
+
+// --- Recommandation de plan selon commerce ---
+function recommendPlan() {
+  const heavy = ['quincaillerie', 'pieces_auto', 'garage'];
+  return heavy.includes(selectedCommerce) ? 'recouvrement' : 'simple';
+}
+
+// --- Initialiser l'étape 5 ---
+function initPlanRecommendation() {
+  const rec = recommendPlan();
+  const recCard = document.getElementById('recommendation-text');
+  if (recCard) {
+    recCard.textContent = rec === 'recouvrement'
+      ? "Pour votre type de commerce, le plan Recouvrement est fortement recommandé (articles illimités, relances WhatsApp)."
+      : "Le plan Simple est généralement suffisant pour votre activité.";
+  }
+  const planEl = document.querySelector(`#plan-choices [data-plan="${rec}"]`);
+  if (planEl && !planEl.classList.contains('selected')) {
+    selectMonthlyPlan(rec, planEl);
+  } else {
+    updatePaymentButton();
+  }
 }
 
 async function finishOnboarding() {
@@ -84,6 +132,7 @@ async function finishOnboarding() {
     return;
   }
 
+  // Mettre à jour l'entreprise avec le type de commerce et besoins
   const { error: updateError } = await supabaseClient
     .from("entreprises")
     .update({
@@ -100,6 +149,7 @@ async function finishOnboarding() {
     return;
   }
 
+  // Upload de la preuve de paiement (si fournie)
   let proofPath = null;
   const proofFile = document.getElementById("payment-proof")?.files?.[0];
   if (proofFile) {
@@ -116,16 +166,20 @@ async function finishOnboarding() {
     }
   }
 
-  const montants = { simple: 10000, standard: 50000, premium: 100000 };
+  // Montant total = Frais de mise en place + 1er mois
+  const amount = getTotalInitial();
   const reference = document.getElementById("payment-reference")?.value.trim() || null;
-  
+
+  // Insérer le paiement initial
   const { error: paymentError } = await supabaseClient
     .from("subscription_payments")
     .insert({
       entreprise_id: profile.entreprise_id,
       submitted_by: userData.user.id,
-      payment_type: selectedPlan,
-      amount: montants[selectedPlan],
+      payment_type: 'setup',                // ou 'initial'
+      payment_tier: selectedCommerce,       // on peut stocker le type de commerce
+      monthly_plan: selectedPlan,           // 'simple' ou 'recouvrement'
+      amount: amount,
       payment_reference: reference,
       proof_path: proofPath,
       status: 'pending'
@@ -142,7 +196,7 @@ async function finishOnboarding() {
 
   document.getElementById("payment-section").hidden = true;
   document.getElementById("payment-step-pending").hidden = false;
-  
+
   pollSubscriptionActivation(profile.entreprise_id);
 }
 
@@ -150,17 +204,28 @@ function pollSubscriptionActivation(entrepriseId) {
   const interval = setInterval(async () => {
     const { data } = await supabaseClient
       .from("subscriptions")
-      .select("status")
+      .select("status, plan_id, plans(code, nom, prix_mensuel, max_articles, max_users, has_recouvra)")
       .eq("entreprise_id", entrepriseId)
       .maybeSingle();
     if (data?.status === "active") {
       clearInterval(interval);
+      // Enregistrer le plan dans le localStorage (clé mise à jour)
+      localStorage.setItem('recouvra_plan', JSON.stringify(data.plans));
       window.location.href = "index.html";
     }
   }, 4000);
 }
 
-(async () => {
+// Initialisation du parcours
+document.addEventListener('DOMContentLoaded', async () => {
   const session = await requireAuth();
   if (!session) return;
-})();
+
+  // Observer l'étape 5 pour initialiser la recommandation
+  document.querySelectorAll('.onboarding-step[data-step="5"]').forEach(step => {
+    const observer = new MutationObserver(() => {
+      if (!step.hidden) initPlanRecommendation();
+    });
+    observer.observe(step, { attributes: true, attributeFilter: ['hidden'] });
+  });
+});

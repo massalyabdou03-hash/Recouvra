@@ -1039,3 +1039,80 @@ document.addEventListener('DOMContentLoaded', () => {
         }));
     });
 });
+// ============================================================================
+// GESTION DES PLANS ET LIMITES
+// ============================================================================
+
+// Récupère le plan actuel de l'entreprise (depuis la base ou le cache local)
+async function getCurrentPlan() {
+  // 1. Essayer le cache local (mis à jour après onboarding)
+  const cachedPlan = readLocal('recouvra_plan', null);   // ✅ changé de sylla_plan à recouvra_plan
+  if (cachedPlan && cachedPlan.code) return cachedPlan;
+
+  // 2. Sinon, aller chercher en base via la relation subscriptions
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) return null;
+
+  const { data: profile } = await supabaseClient
+    .from('profiles')
+    .select('entreprises(subscriptions(status, plans(code, prix_mensuel, max_articles, max_users, has_recouvra)))')
+    .eq('id', session.user.id)
+    .maybeSingle();
+
+  const sub = profile?.entreprises?.subscriptions;
+  if (!sub || sub.status !== 'active') return null;
+
+  // Mettre en cache
+  if (sub.plans) writeLocal('recouvra_plan', sub.plans);   // ✅ aussi ici
+  return sub.plans || null;
+}
+
+// Vérifie si on peut ajouter un article (selon le plan)
+async function canAddArticle() {
+  const plan = await getCurrentPlan();
+  if (!plan) return { ok: false, message: "Abonnement inactif." };
+  if (plan.max_articles === null || plan.max_articles === undefined) return { ok: true };
+
+  const { data, error } = await supabaseClient
+    .from('pieces')
+    .select('id', { count: 'exact', head: true })
+    .eq('actif', true);
+  if (error) return { ok: false, message: error.message };
+  const count = data?.length || 0;
+  if (count >= plan.max_articles) {
+    return {
+      ok: false,
+      message: `Vous avez atteint la limite de ${plan.max_articles} articles du plan ${plan.nom}. Passez au plan supérieur pour en ajouter.`
+    };
+  }
+  return { ok: true };
+}
+
+// Vérifie le nombre d'utilisateurs autorisés
+async function canAddUser() {
+  const plan = await getCurrentPlan();
+  if (!plan) return { ok: false, message: "Abonnement inactif." };
+  if (plan.max_users === null || plan.max_users === undefined) return { ok: true };
+
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) return { ok: false, message: "Non connecté." };
+
+  const { data: profile } = await supabaseClient
+    .from('profiles')
+    .select('entreprise_id')
+    .eq('id', session.user.id)
+    .single();
+
+  const { count } = await supabaseClient
+    .from('profiles')
+    .select('id', { count: 'exact', head: true })
+    .eq('entreprise_id', profile.entreprise_id);
+
+  if (count >= plan.max_users) {
+    return {
+      ok: false,
+      message: `Le plan ${plan.nom} autorise ${plan.max_users} utilisateur(s). Passez au plan supérieur pour ajouter des employés.`
+    };
+  }
+  return { ok: true };
+}
