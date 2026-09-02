@@ -3181,3 +3181,93 @@ body.dark-mode .support-link {
 body.dark-mode .support-link:hover {
     background: #075E54;
 }
+/* ============================================================
+   CORRECTIONS MOBILE - NAVIGATION UNIQUE (SIDEBAR)
+   ============================================================ */
+
+/* On supprime définitivement la navigation globale */
+.global-nav {
+    display: none !important;
+}
+
+/* Bouton hamburger : toujours prêt */
+.mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 1001;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: #4F46E5;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+}
+
+/* Overlay pour fermer la sidebar */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* Sur mobile : sidebar coulissante */
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 280px;
+        height: 100vh;
+        flex-direction: column;
+        transition: left 0.3s ease;
+        z-index: 1000;
+        overflow-y: auto;
+        display: flex !important;
+    }
+
+    .sidebar.open {
+        left: 0;
+    }
+
+    .main {
+        margin-left: 0 !important;
+        padding: 20px 16px 80px;
+    }
+}
+
+/* Sur desktop : sidebar fixe */
+@media (min-width: 769px) {
+    .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        width: 232px;
+        display: flex !important;
+        flex-direction: column;
+    }
+
+    .mobile-menu-btn {
+        display: none !important;
+    }
+
+    .sidebar-overlay {
+        display: none !important;
+    }
+}
