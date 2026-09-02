@@ -163,6 +163,12 @@
 
       <!-- ========== ONGLET UTILISATEURS ========== -->
       <div id="tab-utilisateurs" style="display:none;">
+        <!-- Bouton ajouter -->
+        <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+          <h3 style="margin:0;">Utilisateurs</h3>
+          <button class="btn btn-primary" onclick="openCreateUserModal()">➕ Ajouter un utilisateur</button>
+        </div>
+
         <div class="payments-table-wrap">
           <table class="payments-table">
             <thead>
@@ -309,6 +315,58 @@
   </div>
 </div>
 
+<!-- ========== MODAL CRÉER UTILISATEUR ========== -->
+<div class="modal-backdrop" id="create-user-backdrop">
+  <div class="modal modal-lg">
+    <div class="modal-head">
+      <h3>Créer un utilisateur</h3>
+      <button class="close-x" onclick="closeModal('create-user-backdrop')">×</button>
+    </div>
+    <form id="create-user-form">
+      <label>Email *</label>
+      <input id="create-user-email" type="email" required>
+      <label>Mot de passe *</label>
+      <input id="create-user-password" type="password" required minlength="8">
+      <label>Nom complet</label>
+      <input id="create-user-nom" type="text">
+      <label>Entreprise</label>
+      <select id="create-user-entreprise">
+        <option value="">— Choisir —</option>
+      </select>
+      <label>Rôle</label>
+      <select id="create-user-role">
+        <option value="vendeur">Vendeur</option>
+        <option value="magasinier">Magasinier</option>
+        <option value="admin">Admin</option>
+        <option value="super_admin">Super Admin</option>
+      </select>
+      <label>
+        <input type="checkbox" id="create-user-recouvra"> Accès Recouvra (PRO)
+      </label>
+      <div id="create-user-msg"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('create-user-backdrop')">Annuler</button>
+        <button type="submit" class="btn">Créer l'utilisateur</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========== MODAL CONFIRMATION SUPPRESSION ========== -->
+<div class="modal-backdrop" id="delete-user-backdrop">
+  <div class="modal modal-sm">
+    <div class="modal-head">
+      <h3>Supprimer l'utilisateur</h3>
+      <button class="close-x" onclick="closeModal('delete-user-backdrop')">×</button>
+    </div>
+    <p>Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" onclick="closeModal('delete-user-backdrop')">Annuler</button>
+      <button type="button" class="btn btn-danger" id="confirm-delete-user-btn">Supprimer</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
@@ -329,6 +387,7 @@ let allEntreprises = [];
 let allUsers = [];
 let currentPaymentDetail = null;
 let currentAdminTab = 'paiements';
+let userToDelete = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     initDarkMode();
@@ -341,6 +400,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadEntreprises();
     await loadUsers();
 
+    // Filtres paiements
     document.querySelectorAll('.filter-chip').forEach(chip => {
         chip.addEventListener('click', () => {
             document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
@@ -350,14 +410,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
+    // Rejet
     document.getElementById('reject-reason-select').addEventListener('change', (e) => {
         document.getElementById('reject-other-wrap').hidden = e.target.value !== 'Autre';
     });
-
     document.getElementById('reject-final-btn').addEventListener('click', submitRejection);
+
+    // Formulaires
     document.getElementById('edit-entreprise-form').addEventListener('submit', saveEntreprise);
     document.getElementById('reset-password-form').addEventListener('submit', resetPassword);
     document.getElementById('edit-user-form').addEventListener('submit', saveUser);
+    document.getElementById('create-user-form').addEventListener('submit', createUser);
+    document.getElementById('confirm-delete-user-btn').addEventListener('click', deleteUser);
 });
 
 function showTab(tabName) {
@@ -613,14 +677,20 @@ function renderUsers(search = '') {
     const tbody = document.getElementById('utilisateurs-tbody');
     if (!tbody) return;
     let filtered = allUsers;
-    if (search) filtered = filtered.filter(u => (u.entreprises?.nom || '').toLowerCase().includes(search) || (u.role || '').toLowerCase().includes(search));
+    if (search) filtered = filtered.filter(u => (u.entreprises?.nom || '').toLowerCase().includes(search) || (u.role || '').toLowerCase().includes(search) || (u.email || '').toLowerCase().includes(search));
     if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="payments-empty">Aucun utilisateur trouvé</td></tr>`; return; }
     tbody.innerHTML = filtered.map(u => `<tr>
         <td>${esc(u.email || '—')}</td>
         <td>${esc(u.entreprises?.nom || '—')}</td>
         <td>${esc(u.role || '—')}</td>
         <td>${u.has_recouvra ? '<span class="badge badge-success">✅ PRO</span>' : '<span class="badge badge-muted">—</span>'}</td>
-        <td><div class="admin-actions"><button class="admin-btn info" onclick="openEditUser('${u.id}')">✏️ Modifier</button><button class="admin-btn danger" onclick="resetPassword('${u.id}')">🔑 MDP</button></div></td>
+        <td>
+            <div class="admin-actions">
+                <button class="admin-btn info" onclick="openEditUser('${u.id}')">✏️ Modifier</button>
+                <button class="admin-btn danger" onclick="openDeleteUserModal('${u.id}')">🗑️ Supprimer</button>
+                <button class="admin-btn secondary" onclick="openResetPasswordModal('${u.id}')">🔑 MDP</button>
+            </div>
+        </td>
     </tr>`).join('');
 }
 
@@ -647,16 +717,93 @@ async function saveUser(e) {
     } catch (error) { showToast(friendlyError(error), 'error'); }
 }
 
-async function resetPassword(userId) {
-    const user = allUsers.find(u => u.id === userId);
+function openResetPasswordModal(id) {
+    const user = allUsers.find(u => u.id === id);
     if (!user) return;
-    const newPassword = prompt(`Nouveau mot de passe pour ${user.email} :`);
+    document.getElementById('reset-password-user-id').value = user.id;
+    document.getElementById('reset-password-email').value = user.email || '';
+    document.getElementById('reset-password-new').value = '';
+    document.getElementById('reset-password-backdrop').classList.add('open');
+}
+
+async function resetPassword(e) {
+    e.preventDefault();
+    const userId = document.getElementById('reset-password-user-id').value;
+    const newPassword = document.getElementById('reset-password-new').value;
     if (!newPassword || newPassword.length < 8) { showToast('Le mot de passe doit contenir au moins 8 caractères.', 'error'); return; }
     try {
         const { error } = await supabaseClient.rpc('admin_reset_password', { p_user_id: userId, p_new_password: newPassword });
         if (error) throw error;
         showToast('Mot de passe réinitialisé avec succès.', 'success');
+        closeModal('reset-password-backdrop');
     } catch (error) { showToast(friendlyError(error), 'error'); }
+}
+
+function openCreateUserModal() {
+    document.getElementById('create-user-form').reset();
+    document.getElementById('create-user-msg').textContent = '';
+    const select = document.getElementById('create-user-entreprise');
+    select.innerHTML = '<option value="">— Choisir —</option>';
+    allEntreprises.forEach(e => {
+        select.innerHTML += `<option value="${e.id}">${esc(e.nom || 'Sans nom')}</option>`;
+    });
+    document.getElementById('create-user-backdrop').classList.add('open');
+}
+
+async function createUser(e) {
+    e.preventDefault();
+    const msgEl = document.getElementById('create-user-msg');
+    msgEl.textContent = 'Création...';
+    const email = document.getElementById('create-user-email').value.trim();
+    const password = document.getElementById('create-user-password').value;
+    const nom = document.getElementById('create-user-nom').value.trim();
+    const entrepriseId = document.getElementById('create-user-entreprise').value;
+    const role = document.getElementById('create-user-role').value;
+    const hasRecouvra = document.getElementById('create-user-recouvra').checked;
+    if (!email || !password) {
+        msgEl.textContent = 'Email et mot de passe sont obligatoires.';
+        msgEl.style.color = 'red';
+        return;
+    }
+    try {
+        const { data, error } = await supabaseClient.rpc('admin_create_user', {
+            p_email: email,
+            p_password: password,
+            p_nom: nom || null,
+            p_entreprise_id: entrepriseId || null,
+            p_role: role,
+            p_has_recouvra: hasRecouvra
+        });
+        if (error) throw error;
+        msgEl.textContent = '✅ Utilisateur créé avec succès.';
+        msgEl.style.color = 'green';
+        setTimeout(() => {
+            closeModal('create-user-backdrop');
+            loadUsers();
+        }, 1500);
+    } catch (error) {
+        console.error('Erreur création utilisateur:', error);
+        msgEl.textContent = friendlyError(error);
+        msgEl.style.color = 'red';
+    }
+}
+
+function openDeleteUserModal(userId) {
+    userToDelete = userId;
+    document.getElementById('delete-user-backdrop').classList.add('open');
+}
+
+async function deleteUser() {
+    if (!userToDelete) return;
+    try {
+        const { error } = await supabaseClient.rpc('admin_delete_user', { p_user_id: userToDelete });
+        if (error) throw error;
+        showToast('Utilisateur supprimé.', 'success');
+        closeModal('delete-user-backdrop');
+        await loadUsers();
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
 }
 </script>
 </body>
