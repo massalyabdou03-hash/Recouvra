@@ -2966,16 +2966,52 @@ body.menu-open .mobile-menu-btn { display: none; }
 @media (max-width: 480px) {
     .table-wrapper > table { min-width: 100%; }
 }
-/* Masquer le bouton menu mobile (désactivé) */
 .mobile-menu-btn {
-    display: none !important;
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 1001;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: #4F46E5;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
 }
+
 .sidebar-overlay {
-    display: none !important;
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
 }
-/* Masquer le bouton menu mobile (désactivé) */
-.mobile-menu-btn {
-    display: none !important;
+
+.sidebar-overlay.active { display: block; }
+
+@media (max-width: 768px) {
+    .mobile-menu-btn { display: flex; }
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 280px;
+        height: 100vh;
+        transition: left 0.3s ease;
+        z-index: 1000;
+        overflow-y: auto;
+    }
+    .sidebar.open { left: 0; }
+    .main { padding-left: 16px; padding-right: 16px; padding-top: 60px; }
 }
 .pricing-options {
   display: grid;
@@ -3104,4 +3140,44 @@ body.menu-open .mobile-menu-btn { display: none; }
 .pay-wave-btn::before {
   content: "📲 ";
   font-size: 20px;
+}
+/* ============================================================================
+   LIEN SUPPORT WHATSAPP (sidebar)
+   ============================================================================ */
+
+.support-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    background: #25D366;
+    color: white !important;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.support-link:hover {
+    background: #1DA851;
+    transform: translateY(-2px);
+    color: white !important;
+}
+
+.support-link svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+/* Version dark mode */
+body.dark-mode .support-link {
+    background: #128C7E;
+}
+
+body.dark-mode .support-link:hover {
+    background: #075E54;
 }
