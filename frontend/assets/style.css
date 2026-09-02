@@ -3594,3 +3594,59 @@ body.dark-mode .support-link:hover {
     background: #FEF3C7 !important;
     color: #B45309 !important;
 }
+/* ============================================================
+   FORCER LA SIDEBAR STATIQUE SUR MOBILE (SUPPRIME GLOBAL NAV)
+   ============================================================ */
+.global-nav { display: none !important; }
+
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: -320px !important;
+        width: 320px !important;
+        max-width: 88vw !important;
+        height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        background: #fff !important;
+        transition: left 0.3s ease !important;
+        overflow-y: auto !important;
+        z-index: 1000 !important;
+    }
+
+    .sidebar.open {
+        left: 0 !important;
+    }
+
+    .sidebar-overlay {
+        position: fixed !important;
+        inset: 0 !important;
+        background: rgba(0,0,0,0.5) !important;
+        z-index: 990 !important;
+        display: none !important;
+    }
+
+    .sidebar-overlay.active {
+        display: block !important;
+    }
+
+    .sidebar a,
+    .sidebar button {
+        pointer-events: auto !important;
+        z-index: 1010 !important;
+    }
+
+    body.menu-open .main { display: none !important; }
+    body.menu-open { overflow: hidden !important; }
+}
+
+/* Liens admin */
+.admin-nav-link {
+    color: #F59E0B !important;
+    font-weight: 600;
+}
+.admin-nav-link:hover {
+    background: #FEF3C7 !important;
+    color: #B45309 !important;
+}
