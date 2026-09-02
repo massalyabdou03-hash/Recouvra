@@ -827,3 +827,13 @@ body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FE
         flex-direction: column;
     }
 }
+.sidebar-overlay {
+  position: fixed !important;
+  z-index: 900 !important;
+}
+.sidebar {
+  position: fixed !important;
+  z-index: 950 !important;
+  overflow-y: auto !important;
+  pointer-events: auto !important;
+}
