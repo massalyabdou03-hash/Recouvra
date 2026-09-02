@@ -636,3 +636,107 @@ body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FE
     body { background: #fff; color: #000; }
     .card { border: none; box-shadow: none; }
 }
+/* ============================================================
+   SOLUTION MOBILE : BARRE HORIZONTALE (plus de hamburger)
+   ============================================================ */
+@media (max-width: 768px) {
+    /* On masque le bouton hamburger et l'overlay */
+    .mobile-menu-btn { display: none !important; }
+    .sidebar-overlay { display: none !important; }
+
+    /* La sidebar devient une barre horizontale fixe en haut */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: auto;
+        max-height: none;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        overflow-x: auto;
+        overflow-y: hidden;
+        background: #fff !important;
+        border-right: none;
+        border-bottom: 1px solid var(--border-soft);
+        padding: 8px 10px;
+        z-index: 1000;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    /* On réorganise la marque et les sections */
+    .sidebar .brand {
+        display: none; /* On masque le titre/logo pour gagner de la place */
+    }
+
+    .sidebar .nav-section {
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+        margin: 0;
+        padding: 0;
+    }
+
+    .sidebar .nav-section-title {
+        display: none; /* On masque les titres de section */
+    }
+
+    .sidebar .nav-link {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 10px;
+        margin: 0;
+        font-size: 0.7rem;
+        white-space: nowrap;
+        border-radius: 8px;
+        flex-shrink: 0;
+    }
+
+    .sidebar .nav-emoji {
+        font-size: 20px;
+        width: auto;
+        margin-bottom: 2px;
+    }
+
+    /* Le footer (Support, Dark mode, Déconnexion) devient une ligne horizontale aussi */
+    .sidebar .sidebar-footer {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+        margin-left: auto;
+        padding: 0;
+        border-top: none;
+    }
+
+    .sidebar .support-link,
+    .sidebar .dark-mode-toggle,
+    .sidebar .btn-logout {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: auto;
+        padding: 6px 8px;
+        margin: 0;
+        font-size: 0.7rem;
+        white-space: nowrap;
+    }
+
+    .sidebar .support-link svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* On ajoute un espace en haut de la page pour ne pas cacher le contenu */
+    body {
+        padding-top: 60px; /* Ajuste selon la hauteur de la barre */
+    }
+
+    .main {
+        padding-top: 10px;
+    }
+}
