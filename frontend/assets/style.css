@@ -544,13 +544,21 @@ body.dark-mode .detail-row .k{color:#9CA3AF;}
 body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FEF3C7;}
 
 /* ============================================================
-   MOBILE : BARRE EN BAS (avec défilement horizontal)
+   NAVIGATION GLOBALE (barre du bas) - MOBILE UNIQUEMENT
    ============================================================ */
+/* Sur desktop, la barre du bas est masquée */
+.global-nav {
+    display: none !important;
+}
+
+/* Sur mobile, on affiche la barre du bas */
 @media (max-width: 768px) {
+    /* Masquer la sidebar verticale, le hamburger et l'overlay */
     .mobile-menu-btn { display: none !important; }
     .sidebar-overlay { display: none !important; }
     .sidebar { display: none !important; }
 
+    /* Afficher la barre du bas */
     .global-nav {
         display: flex !important;
         position: fixed !important;
@@ -617,4 +625,11 @@ body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FE
     /* Espace en bas du contenu pour ne pas masquer les éléments */
     body { padding-bottom: 80px !important; }
     .main { padding-bottom: 80px !important; }
+}
+
+@media print {
+    .sidebar, .global-nav, .no-print { display: none !important; }
+    .main { padding: 0; max-width: 100%; }
+    body { background: #fff; color: #000; }
+    .card { border: none; box-shadow: none; }
 }
