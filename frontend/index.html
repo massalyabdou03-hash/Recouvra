@@ -145,26 +145,31 @@
       </div>
     </div>
 
-<!-- GRAPHIQUE TENDANCES -->
-<div class="dashboard-recap">
-  <div class="section-title">📈 Ventes des 30 derniers jours</div>
-  <p class="hint" style="margin-bottom:10px;">Montant total des factures validées chaque jour. Une tendance à la hausse signifie plus de ventes.</p>
-  <div style="height: 300px; position: relative;">
-    <canvas id="salesChart"></canvas>
-  </div>
-</div>
-<div class="recap-grid" style="margin-top:15px;">
-  <div class="recap-item">
-    <div class="recap-icon">🔥</div>
-    <div class="recap-label">Meilleur jour</div>
-    <div class="recap-value" id="best-day">—</div>
-  </div>
-  <div class="recap-item">
-    <div class="recap-icon">📊</div>
-    <div class="recap-label">Total 30 jours</div>
-    <div class="recap-value" id="total-30">—</div>
-  </div>
-</div>
+    <!-- GRAPHIQUE TENDANCES -->
+    <div class="dashboard-recap">
+      <div class="section-title">📈 Ventes des 30 derniers jours</div>
+      <p class="hint" style="margin-bottom:10px;">Montant total des factures validées chaque jour. Une tendance à la hausse signifie plus de ventes.</p>
+      <div style="height: 300px; position: relative;">
+        <canvas id="salesChart"></canvas>
+      </div>
+    </div>
+
+    <!-- INDICATEURS SOUS LE GRAPHIQUE -->
+    <div class="recap-grid" style="margin-top:15px;">
+      <div class="recap-item">
+        <div class="recap-icon">🔥</div>
+        <div class="recap-label">Meilleur jour</div>
+        <div class="recap-value" id="best-day">—</div>
+      </div>
+      <div class="recap-item">
+        <div class="recap-icon">📊</div>
+        <div class="recap-label">Total 30 jours</div>
+        <div class="recap-value" id="total-30">—</div>
+      </div>
+    </div>
+
+  </main>
+</div><!-- fin .app -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
 <script src="assets/config.js"></script>
@@ -184,9 +189,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     initDarkMode();
     const session = await requireAuth();
     if (!session) return;
-    await loadWelcomeMessage();
-    await loadDashboardData();
-    await loadSalesChart();   // <-- Ajout du graphique
+
+    // On isole chaque appel pour que l'erreur de l'un ne bloque pas les autres
+    try { await loadWelcomeMessage(); } catch (e) { console.error('welcome:', e); }
+    try { await loadDashboardData(); } catch (e) { console.error('dashboard:', e); }
+    try { await loadSalesChart(); } catch (e) { console.error('chart:', e); }
 });
 
 async function loadWelcomeMessage() {
@@ -379,3 +386,6 @@ async function loadSalesChart() {
         }
     });
 }
+</script>
+</body>
+</html>
