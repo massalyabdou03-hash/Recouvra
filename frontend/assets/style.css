@@ -729,3 +729,101 @@ body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FE
     .sidebar-overlay { display: none !important; }
     .sidebar { position: sticky; top: 0; height: 100vh; width: 232px; display: flex; flex-direction: column; }
 }
+/* ============================================================
+   CORRECTION MOBILE (viewport ≤ 768px)
+   ============================================================ */
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex;
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        z-index: 1001;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        border: none;
+        background: #4F46E5;
+        color: white;
+        font-size: 24px;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -300px;
+        width: 300px;
+        max-width: 85vw;
+        height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        background: #fff !important;
+        transition: left 0.3s ease;
+        overflow-y: auto !important;   /* ← scroll autorisé */
+        -webkit-overflow-scrolling: touch;
+        z-index: 1000 !important;      /* AU-DESSUS de l'overlay */
+        box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+    }
+
+    .sidebar.open {
+        left: 0 !important;
+    }
+
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 990 !important;       /* EN DESSOUS de la sidebar */
+    }
+
+    .sidebar-overlay.active {
+        display: block !important;
+    }
+
+    /* Tous les liens et boutons doivent être cliquables */
+    .sidebar a,
+    .sidebar button,
+    .sidebar .nav-link,
+    .sidebar .support-link,
+    .sidebar .dark-mode-toggle,
+    .sidebar .btn-logout {
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        z-index: 1010 !important;
+    }
+
+    /* Masque le contenu principal quand le menu est ouvert */
+    body.menu-open .main {
+        display: none !important;
+    }
+
+    body.menu-open {
+        overflow: hidden !important;
+    }
+}
+
+/* Sur desktop, la sidebar reste fixe et le hamburger disparaît */
+@media (min-width: 769px) {
+    .mobile-menu-btn {
+        display: none !important;
+    }
+    .sidebar-overlay {
+        display: none !important;
+    }
+    .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        width: 232px;
+        display: flex;
+        flex-direction: column;
+    }
+}
