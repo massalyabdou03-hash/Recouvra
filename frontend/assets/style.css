@@ -3489,3 +3489,108 @@ body.dark-mode .support-link:hover {
     background: #F59E0B !important;
     color: white !important;
 }
+/* ============================================================
+   CORRECTIF MOBILE : LA SIDEBAR DOIT ÊTRE AU-DESSUS DE L'OVERLAY
+   ============================================================ */
+
+@media (max-width: 768px) {
+    /* L'overlay est en dessous de la sidebar */
+    .sidebar-overlay {
+        z-index: 900 !important; /* plus bas que la sidebar */
+        pointer-events: auto;    /* il reste cliquable pour fermer */
+    }
+
+    /* La sidebar est au-dessus de l'overlay */
+    .sidebar {
+        z-index: 950 !important; /* plus haut que l'overlay */
+        pointer-events: auto;    /* tous les éléments sont cliquables */
+    }
+
+    /* Forcer les liens et boutons à être interactifs */
+    .sidebar a,
+    .sidebar button,
+    .sidebar .nav-link,
+    .sidebar .support-link,
+    .sidebar .dark-mode-toggle,
+    .sidebar .btn-logout {
+        pointer-events: auto !important;
+        position: relative;
+        z-index: 960 !important;
+    }
+
+    /* Quand la sidebar est ouverte, le contenu principal est masqué */
+    body.menu-open .main {
+        display: none; /* ou visibility: hidden */
+    }
+}
+/* ============================================================
+   CORRECTIF MOBILE DEFINITIF - SIDEBAR INTERACTIVE
+   ============================================================ */
+@media (max-width: 768px) {
+    /* Overlay : DOIT être en dessous de la sidebar */
+    .sidebar-overlay {
+        z-index: 990 !important;
+        pointer-events: auto;
+        display: none;
+    }
+    .sidebar-overlay.active {
+        display: block !important;
+    }
+
+    /* Sidebar : AU-DESSUS de l'overlay, cliquable et scrollable */
+    .sidebar {
+        z-index: 1000 !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: -320px !important;
+        width: 320px !important;
+        max-width: 88vw !important;
+        height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        background: #fff !important;
+        transition: left 0.3s ease;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        box-shadow: 2px 0 15px rgba(0,0,0,0.2);
+    }
+    .sidebar.open {
+        left: 0 !important;
+    }
+
+    /* Tous les liens et boutons doivent être cliquables */
+    .sidebar a,
+    .sidebar button,
+    .sidebar .nav-link,
+    .sidebar .support-link,
+    .sidebar .dark-mode-toggle,
+    .sidebar .btn-logout {
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        position: relative !important;
+        z-index: 1010 !important;
+    }
+
+    /* Contenu principal : masqué quand le menu est ouvert */
+    body.menu-open .main {
+        display: none !important;
+    }
+
+    /* Empêcher le scroll de la page derrière */
+    body.menu-open {
+        overflow: hidden !important;
+    }
+
+    /* Le footer doit rester en bas et défiler avec la sidebar */
+    .sidebar .sidebar-footer {
+        margin-top: auto !important;
+    }
+}
+.admin-nav-link {
+    color: #F59E0B !important;
+    font-weight: 600;
+}
+.admin-nav-link:hover {
+    background: #FEF3C7 !important;
+    color: #B45309 !important;
+}

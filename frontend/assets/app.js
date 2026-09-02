@@ -922,20 +922,35 @@ document.addEventListener('DOMContentLoaded', initDarkMode);
 function toggleSidebar() {
     const sidebar = document.querySelector('.sidebar');
     const overlay = document.querySelector('.sidebar-overlay');
-    if (sidebar) sidebar.classList.toggle('open');
-    if (overlay) overlay.classList.toggle('active');
-    document.body.classList.toggle('menu-open', sidebar?.classList.contains('open'));
+    const isOpen = sidebar?.classList.contains('open');
+
+    if (isOpen) {
+        sidebar?.classList.remove('open');
+        overlay?.classList.remove('active');
+        document.body.classList.remove('menu-open');
+    } else {
+        sidebar?.classList.add('open');
+        overlay?.classList.add('active');
+        document.body.classList.add('menu-open');
+        // S'assurer que le scroll fonctionne dans la sidebar
+        setTimeout(() => { sidebar.scrollTop = 0; }, 100);
+    }
 }
 
 // Fermer le menu quand on clique sur un lien
 document.addEventListener('click', (e) => {
-    if (e.target.closest('.nav-link')) {
+    if (e.target.closest('.nav-link, .support-link')) {
         const sidebar = document.querySelector('.sidebar');
         const overlay = document.querySelector('.sidebar-overlay');
-        if (sidebar) sidebar.classList.remove('open');
-        if (overlay) overlay.classList.remove('active');
+        sidebar?.classList.remove('open');
+        overlay?.classList.remove('active');
         document.body.classList.remove('menu-open');
     }
+});
+
+// Empêcher la fermeture quand on clique DANS la sidebar
+document.querySelector('.sidebar')?.addEventListener('click', (e) => {
+    e.stopPropagation();
 });
 
 // ============================================================================
@@ -1167,49 +1182,37 @@ async function addAdminLinkIfSuperAdmin() {
 
 // Appeler cette fonction au chargement de chaque page
 document.addEventListener('DOMContentLoaded', addAdminLinkIfSuperAdmin);
-// ============================================================
-// AJOUTER LE LIEN ADMINISTRATION POUR SUPER_ADMIN
-// ============================================================
-
 async function addAdminLinkIfSuperAdmin() {
     try {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) return;
-
         const { data: profile } = await supabaseClient
             .from('profiles')
             .select('role')
             .eq('id', session.user.id)
             .single();
-
         if (profile?.role !== 'super_admin') return;
 
         const sidebar = document.querySelector('.sidebar');
-        if (!sidebar) return;
+        if (!sidebar || sidebar.querySelector('.admin-nav-link')) return;
 
-        // Vérifier si le lien existe déjà
-        if (sidebar.querySelector('.admin-nav-link')) return;
-
-        // Créer le lien
         const adminLink = document.createElement('a');
         adminLink.href = 'super-admin.html';
         adminLink.className = 'nav-link admin-nav-link';
         adminLink.innerHTML = '<span class="nav-emoji">🔐</span> <span>Administration</span>';
 
-        // Trouver la section "Mon Argent"
         const sections = sidebar.querySelectorAll('.nav-section');
         if (sections.length >= 3) {
             sections[2].appendChild(adminLink);
         } else {
-            // Fallback : ajouter avant le footer
             const footer = sidebar.querySelector('.sidebar-footer');
-            if (footer) footer.parentNode.insertBefore(adminLink, footer);
+            footer?.before(adminLink);
         }
     } catch (error) {
         console.error('Erreur admin link:', error);
     }
 }
-
+document.addEventListener('DOMContentLoaded', addAdminLinkIfSuperAdmin);
 // Appeler après le chargement de la page
 document.addEventListener('DOMContentLoaded', addAdminLinkIfSuperAdmin);
 function toggleSidebar() {
