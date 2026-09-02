@@ -1212,3 +1212,18 @@ async function addAdminLinkIfSuperAdmin() {
 
 // Appeler après le chargement de la page
 document.addEventListener('DOMContentLoaded', addAdminLinkIfSuperAdmin);
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    if (sidebar) sidebar.classList.toggle('open');
+    if (overlay) overlay.classList.toggle('active');
+    document.body.classList.toggle('menu-open', sidebar?.classList.contains('open'));
+    
+    // Ajout : si la sidebar est ouverte, on désactive les clics sur l'overlay pour ne pas fermer le menu quand on clique sur un lien
+    if (sidebar?.classList.contains('open')) {
+        overlay.style.pointerEvents = 'auto';
+    } else {
+        overlay.style.pointerEvents = 'none';
+    }
+}
+overlay.style.pointerEvents = 'auto'; // reste cliquable pour fermer
