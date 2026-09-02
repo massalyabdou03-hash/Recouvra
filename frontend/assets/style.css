@@ -3312,3 +3312,110 @@ body.dark-mode .support-link:hover {
         visibility: visible !important;
     }
 }
+/* ============================================================
+   ESPACE EN HAUT SUR MOBILE POUR NE PAS MASQUER LE CONTENU
+   ============================================================ */
+@media (max-width: 768px) {
+    .main {
+        padding-top: 80px !important; /* 80px pour laisser la place au hamburger */
+    }
+}
+/* ============================================================
+   CORRECTION MOBILE : SIDEBAR PROPRE ET BIEN ORGANISÉE
+   ============================================================ */
+@media (max-width: 768px) {
+    /* Overlay qui couvre tout l'écran */
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 998;
+        display: none;
+    }
+
+    .sidebar-overlay.active {
+        display: block !important;
+    }
+
+    /* Sidebar : pleine hauteur, largeur fixe, contenu empilé verticalement */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -300px; /* hors écran par défaut */
+        width: 300px !important;
+        max-width: 85vw;
+        height: 100vh;
+        display: flex !important;
+        flex-direction: column !important;
+        background: #fff !important;
+        transition: left 0.3s ease;
+        z-index: 999;
+        overflow-y: auto;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+    }
+
+    .sidebar.open {
+        left: 0 !important;
+    }
+
+    /* Tous les enfants de la sidebar doivent être empilés verticalement */
+    .sidebar .brand,
+    .sidebar .nav-section,
+    .sidebar .sidebar-footer {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        padding: 10px 15px !important;
+    }
+
+    /* Les liens de navigation : en colonne, pleine largeur */
+    .sidebar .nav-link {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        width: 100% !important;
+        padding: 12px 10px !important;
+        margin: 2px 0 !important;
+        font-size: 15px !important;
+        text-align: left !important;
+    }
+
+    /* Les titres de sections */
+    .sidebar .nav-section-title {
+        padding: 10px 0 5px !important;
+        font-size: 12px !important;
+    }
+
+    /* Footer (Support, Dark mode, Déconnexion) */
+    .sidebar .sidebar-footer {
+        margin-top: auto !important;
+        border-top: 1px solid #eee !important;
+        padding-top: 15px !important;
+    }
+
+    /* Boutons du footer : pleine largeur */
+    .sidebar .support-link,
+    .sidebar .dark-mode-toggle,
+    .sidebar .btn-logout {
+        width: 100% !important;
+        margin-bottom: 8px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    /* Contenu principal : masqué ou décalé quand la sidebar est ouverte */
+    body.menu-open .main {
+        margin-left: 300px !important;
+        transition: margin-left 0.3s ease;
+    }
+
+    /* Empêcher le scroll de la page quand le menu est ouvert */
+    body.menu-open {
+        overflow: hidden !important;
+    }
+}
