@@ -544,7 +544,7 @@ body.dark-mode .detail-row .k{color:#9CA3AF;}
 body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FEF3C7;}
 
 /* ============================================================
-   MOBILE : BARRE EN BAS (design restauré, sans hamburger)
+   MOBILE : BARRE EN BAS (avec défilement horizontal)
    ============================================================ */
 @media (max-width: 768px) {
     .mobile-menu-btn { display: none !important; }
@@ -562,20 +562,24 @@ body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FE
         min-height: 60px !important;
         flex-direction: row !important;
         align-items: center !important;
-        justify-content: space-around !important;
         background: #fff !important;
         border-top: 1px solid var(--border-soft) !important;
         padding: 8px 4px calc(8px + env(safe-area-inset-bottom)) !important;
         z-index: 1000 !important;
         box-shadow: 0 -2px 8px rgba(0,0,0,0.06) !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch;
     }
 
     .global-nav-links {
         display: flex !important;
         flex-direction: row !important;
-        gap: 2px !important;
-        width: 100% !important;
-        justify-content: space-around !important;
+        flex-wrap: nowrap !important;
+        gap: 0 !important;
+        width: auto !important;
+        min-width: 100% !important;
+        justify-content: flex-start !important;
     }
 
     .global-nav-link {
@@ -583,8 +587,9 @@ body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FE
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        flex: 1 !important;
-        padding: 6px 2px !important;
+        flex: 0 0 auto !important;
+        min-width: 64px !important;
+        padding: 6px 8px !important;
         font-size: 0.65rem !important;
         text-align: center !important;
         color: var(--text-muted) !important;
@@ -593,7 +598,6 @@ body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FE
         transition: all 0.2s ease !important;
     }
 
-    .global-nav-link svg,
     .global-nav-icon {
         font-size: 20px !important;
         margin-bottom: 2px !important;

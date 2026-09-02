@@ -1147,37 +1147,26 @@ else applyCompanySettings();
 // ============================================================
 // CRÉATION AUTOMATIQUE DE LA NAVIGATION EN BAS (MOBILE)
 // ============================================================
-function createGlobalNav() {
-    // Si le nav existe déjà, on ne fait rien
-    if (document.querySelector('.global-nav')) return;
+// Ajouter le lien Administration si super admin
+async function addAdminToGlobalNav() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) return;
+    const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', session.user.id).single();
+    if (profile?.role !== 'super_admin') return;
 
-    const nav = document.createElement('nav');
-    nav.className = 'global-nav';
+    const nav = document.querySelector('.global-nav-links');
+    if (!nav || nav.querySelector('.global-nav-link[href="super-admin.html"]')) return;
 
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-
-    const links = [
-        { key: 'index', label: 'Accueil', href: 'index.html', icon: '🏠' },
-        { key: 'factures', label: 'Vendre', href: 'factures.html', icon: '🧾' },
-        { key: 'clients', label: 'Clients', href: 'clients.html', icon: '👥' },
-        { key: 'catalogue', label: 'Articles', href: 'catalogue.html', icon: '📦' },
-        { key: 'stock', label: 'Stock', href: 'stock.html', icon: '📊' },
-        { key: 'credits', label: 'Crédits', href: 'credits.html', icon: '💸' },
-        { key: 'recouvra', label: 'Recouvra', href: 'recouvra.html', icon: '📣' }
-    ];
-
-    nav.innerHTML = `
-        <div class="global-nav-links">
-            ${links.map(link => `
-                <a class="global-nav-link ${link.href === currentPage ? 'active' : ''}" href="${link.href}">
-                    <span class="global-nav-icon">${link.icon}</span>
-                    <span class="global-nav-text">${link.label}</span>
-                </a>
-            `).join('')}
-        </div>
-    `;
-
-    document.body.appendChild(nav);
+    const adminLink = document.createElement('a');
+    adminLink.href = 'super-admin.html';
+    adminLink.className = 'global-nav-link';
+    adminLink.innerHTML = '<span class="global-nav-icon">🔐</span><span class="global-nav-text">Admin</span>';
+    nav.appendChild(adminLink);
 }
+// Appeler après la création du nav
+document.addEventListener('DOMContentLoaded', async () => {
+    createGlobalNav();
+    await addAdminToGlobalNav();
+});
 
 document.addEventListener('DOMContentLoaded', createGlobalNav);
