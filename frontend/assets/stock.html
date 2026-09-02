@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock & Produits — Ma Boutique</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4F46E5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ma Boutique">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+
+<div class="app">
+  <nav class="sidebar">
+    <div class="brand">
+      <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
+      <span data-company-name>Ma Boutique</span>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Quotidien</div>
+      <a href="index.html" class="nav-link"><span class="nav-emoji">🏠</span> Accueil</a>
+      <a href="factures.html" class="nav-link"><span class="nav-emoji">🧾</span> Vendre</a>
+      <a href="clients.html" class="nav-link"><span class="nav-emoji">👥</span> Mes Clients</a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Stock</div>
+      <a href="catalogue.html" class="nav-link"><span class="nav-emoji">📦</span> Mes Articles</a>
+      <a href="stock.html" class="nav-link active"><span class="nav-emoji">📊</span> Stock & Produits</a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Argent</div>
+      <a href="credits.html" class="nav-link"><span class="nav-emoji">💸</span> On me doit</a>
+      <a href="recouvra.html" class="nav-link premium"><span class="nav-emoji">📣</span> Relancer <span class="badge-premium">PRO</span></a>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;"><span id="dark-mode-icon">🌙</span> <span id="dark-mode-label">Mode sombre</span></button>
+      <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
+      <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="stock-header">
+      <div>
+        <h1>📊 Stock & Produits</h1>
+        <p>Vue d'ensemble de votre stock et de vos produits.</p>
+      </div>
+      <div class="stock-header-actions">
+        <a href="rupture-stock.html" class="btn btn-secondary">⚠️ Ruptures</a>
+        <a href="catalogue.html" class="btn">➕ Ajouter un article</a>
+      </div>
+    </div>
+
+    <div class="stock-stats">
+      <div class="stock-stat-card"><span class="stock-stat-value" id="stat-total">—</span><span class="stock-stat-label">Articles</span></div>
+      <div class="stock-stat-card warning"><span class="stock-stat-value" id="stat-faible">—</span><span class="stock-stat-label">Stock faible</span></div>
+      <div class="stock-stat-card danger"><span class="stock-stat-value" id="stat-rupture">—</span><span class="stock-stat-label">En rupture</span></div>
+      <div class="stock-stat-card"><span class="stock-stat-value" id="stat-valeur">—</span><span class="stock-stat-label">Valeur stock</span></div>
+    </div>
+
+    <div class="stock-search"><input type="text" id="search" placeholder="🔍 Rechercher un article..." oninput="filterProducts()"></div>
+
+    <div class="stock-tabs">
+      <button class="stock-tab active" onclick="filterByStatus('all', this)">📋 Tous</button>
+      <button class="stock-tab" onclick="filterByStatus('faible', this)">⚠️ Stock faible</button>
+      <button class="stock-tab" onclick="filterByStatus('rupture', this)">❌ Ruptures</button>
+      <button class="stock-tab" onclick="filterByStatus('ok', this)">✅ En stock</button>
+    </div>
+
+    <div class="products-list" id="products-list">
+      <div class="empty-state">Chargement...</div>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script>
+function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = isDark ? '☀️' : '🌙'; if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre'; }
+function initDarkMode() { if (localStorage.getItem('recouvra_dark_mode') === '1') { document.body.classList.add('dark-mode'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = '☀️'; if (label) label.textContent = 'Mode clair'; } }
+
+let allProducts = [];
+let currentFilter = 'all';
+let currentSearch = '';
+
+document.addEventListener('DOMContentLoaded', async () => {
+    initDarkMode();
+    const session = await requireAuth();
+    if (!session) return;
+    await loadProducts();
+});
+
+async function loadProducts() {
+    const { items, offline, savedAt } = await loadWithCache('pieces', () => fetchAllRows(() => supabaseClient.from('pieces').select('*').eq('actif', true).order('designation')));
+    allProducts = items;
+    if (offline && savedAt) showToast(`Hors ligne : données du ${fmtDateTime(savedAt)}.`, 'info');
+    updateStats();
+    renderProducts();
+}
+
+function updateStats() {
+    const total = allProducts.length;
+    const faible = allProducts.filter(p => p.quantite_stock > 0 && p.quantite_stock <= p.seuil_alerte).length;
+    const rupture = allProducts.filter(p => p.quantite_stock === 0).length;
+    const valeur = allProducts.reduce((s, p) => s + (p.quantite_stock * Number(p.prix_achat)), 0);
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-faible').textContent = faible;
+    document.getElementById('stat-rupture').textContent = rupture;
+    document.getElementById('stat-valeur').textContent = fmtMoney(valeur);
+}
+
+function filterByStatus(status, btn) {
+    currentFilter = status;
+    document.querySelectorAll('.stock-tab').forEach(tab => tab.classList.remove('active'));
+    btn.classList.add('active');
+    renderProducts();
+}
+
+function filterProducts() {
+    currentSearch = document.getElementById('search').value.trim().toLowerCase();
+    renderProducts();
+}
+
+function renderProducts() {
+    const el = document.getElementById('products-list');
+    let filtered = allProducts;
+    if (currentFilter === 'faible') filtered = filtered.filter(p => p.quantite_stock > 0 && p.quantite_stock <= p.seuil_alerte);
+    else if (currentFilter === 'rupture') filtered = filtered.filter(p => p.quantite_stock === 0);
+    else if (currentFilter === 'ok') filtered = filtered.filter(p => p.quantite_stock > p.seuil_alerte);
+
+    if (currentSearch) filtered = filtered.filter(p => (p.designation || '').toLowerCase().includes(currentSearch) || (p.reference_oem || '').toLowerCase().includes(currentSearch) || (p.marque || '').toLowerCase().includes(currentSearch));
+
+    if (filtered.length === 0) { el.innerHTML = `<div class="empty-state">Aucun article trouvé.</div>`; return; }
+
+    el.innerHTML = filtered.map(p => {
+        const stockClass = p.quantite_stock === 0 ? 'danger' : (p.quantite_stock <= p.seuil_alerte ? 'warning' : 'ok');
+        const stockLabel = p.quantite_stock === 0 ? '❌ Rupture' : (p.quantite_stock <= p.seuil_alerte ? `⚠️ ${p.quantite_stock} restant(s)` : `${p.quantite_stock} en stock`);
+        const cardClass = p.quantite_stock === 0 ? 'rupture' : (p.quantite_stock <= p.seuil_alerte ? 'faible' : '');
+        return `<div class="product-card ${cardClass}" onclick="openProductDetail(${p.id})">
+                <div class="product-card-header"><span class="product-emoji">📦</span><span class="product-stock-badge ${stockClass}">${stockLabel}</span></div>
+                <div class="product-name">${esc(p.designation)}</div>
+                <div class="product-ref">${esc(p.reference_oem || '')}</div>
+                <div class="product-price-row"><span class="product-price">${fmtMoney(p.prix_vente)}</span>
+                <div class="product-actions"><button class="icon-btn edit" onclick="event.stopPropagation(); editProduct(${p.id})" title="Modifier">✏️</button><button class="icon-btn delete" onclick="event.stopPropagation(); deleteProduct(${p.id})" title="Supprimer">🗑️</button></div></div>
+            </div>`;
+    }).join('');
+}
+
+function openProductDetail(id) { window.location.href = `catalogue.html?edit=${id}`; }
+function editProduct(id) { window.location.href = `catalogue.html?edit=${id}`; }
+
+async function deleteProduct(id) {
+    const p = allProducts.find(x => x.id === id);
+    if (!p) return;
+    const ok = await confirmDialog(`Supprimer "${p.designation}" ?`, { title: 'Supprimer l\'article', confirmLabel: 'Supprimer', danger: true });
+    if (!ok) return;
+    const { error } = await supabaseClient.from('pieces').update({ actif: false }).eq('id', id);
+    if (error) { showToast(friendlyError(error), 'error'); return; }
+    showToast('Article supprimé.', 'success'); await loadProducts();
+}
+</script>
+<!-- ========== NAVIGATION MOBILE (BARRE EN BAS) ========== -->
+<nav class="global-nav">
+  <a href="index.html" class="global-nav-link">
+    <span class="global-nav-icon">🏠</span>
+    <span class="global-nav-text">Accueil</span>
+  </a>
+  <a href="factures.html" class="global-nav-link">
+    <span class="global-nav-icon">🧾</span>
+    <span class="global-nav-text">Vendre</span>
+  </a>
+  <a href="clients.html" class="global-nav-link">
+    <span class="global-nav-icon">👥</span>
+    <span class="global-nav-text">Clients</span>
+  </a>
+  <a href="stock.html" class="global-nav-link">
+    <span class="global-nav-icon">📊</span>
+    <span class="global-nav-text">Stock</span>
+  </a>
+  <a href="credits.html" class="global-nav-link">
+    <span class="global-nav-icon">💸</span>
+    <span class="global-nav-text">Crédits</span>
+  </a>
+</nav>
+</body>
+</html>

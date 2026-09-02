@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abonnement — Ma Boutique</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4F46E5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ma Boutique">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<!-- ========== MENU MOBILE ========== -->
+
+<div class="app">
+  <nav class="sidebar">
+    <div class="brand">
+      <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
+      <span data-company-name>Ma Boutique</span>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Quotidien</div>
+      <a href="index.html" class="nav-link"><span class="nav-emoji">🏠</span> Accueil</a>
+      <a href="factures.html" class="nav-link"><span class="nav-emoji">🧾</span> Vendre</a>
+      <a href="clients.html" class="nav-link"><span class="nav-emoji">👥</span> Mes Clients</a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Stock</div>
+      <a href="catalogue.html" class="nav-link"><span class="nav-emoji">📦</span> Mes Articles</a>
+      <a href="stock.html" class="nav-link"><span class="nav-emoji">📊</span> Stock & Produits</a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Argent</div>
+      <a href="credits.html" class="nav-link"><span class="nav-emoji">💸</span> On me doit</a>
+      <a href="recouvra.html" class="nav-link premium"><span class="nav-emoji">📣</span> Relancer <span class="badge-premium">PRO</span></a>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;"><span id="dark-mode-icon">🌙</span> <span id="dark-mode-label">Mode sombre</span></button>
+      <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
+      <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="main">
+    <a href="index.html" class="btn-back"><span class="arrow">←</span> Retour au tableau de bord</a>
+
+    <div class="subscription-page">
+      <div class="subscription-heading">
+        <span class="eyebrow">Module Premium</span>
+        <h1>⚡ Récupérez vos impayés 3x plus vite sur WhatsApp</h1>
+        <p>Activez la relance WhatsApp automatique pour vos factures d'impayés.</p>
+      </div>
+
+      <div class="subscription-card">
+        <h2>Choisissez votre formule</h2>
+
+        <!-- Affichage des frais de mise en place -->
+        <div id="setup-info" style="margin-bottom:20px; padding:15px; background:var(--accent-dim); border-radius:12px;">
+          <p id="setup-text" style="margin:0;"></p>
+        </div>
+
+        <!-- Sélection du plan mensuel -->
+        <h3>Abonnement mensuel</h3>
+        <div class="pricing-options" id="plan-choices">
+          <div class="pricing-option" data-plan="simple" onclick="selectMonthlyPlan('simple', this)">
+            <strong>🛒 Simple</strong>
+            <div class="amount">10 000 FCFA/mois</div>
+            <ul>
+              <li>Jusqu'à 1 000 articles</li>
+              <li>1 utilisateur</li>
+              <li>Gestion stock & ventes</li>
+              <li>Facturation</li>
+            </ul>
+          </div>
+          <div class="pricing-option" data-plan="recouvrement" onclick="selectMonthlyPlan('recouvrement', this)">
+            <strong>📣 Recouvrement</strong>
+            <div class="amount">15 000 FCFA/mois</div>
+            <ul>
+              <li>Articles illimités</li>
+              <li>3 utilisateurs</li>
+              <li>Tout le plan Simple</li>
+              <li>Relances WhatsApp & suivi des créances</li>
+            </ul>
+            <span class="badge badge-success">Recommandé</span>
+          </div>
+        </div>
+
+        <!-- Détail du paiement initial (si nécessaire) -->
+        <div id="payment-detail-box" style="margin-top:20px; padding:15px; border:1px solid var(--border); border-radius:12px;">
+          <p id="payment-detail" style="margin:0;"></p>
+        </div>
+
+        <!-- Formulaire de paiement -->
+        <div id="payment-section" style="margin-top:20px;">
+          <h3>Payer maintenant</h3>
+          <ol class="payment-steps">
+            <li>Cliquez sur « Payer avec Wave »</li>
+            <li>Effectuez le paiement du montant affiché</li>
+            <li>Revenez ici et cliquez sur « J'ai effectué le paiement »</li>
+            <li>Notre équipe vérifie et active votre compte</li>
+          </ol>
+
+          <a href="https://pay.wave.com/m/M_sn_JSmkfYmhcg2h/c/sn/" target="_blank" rel="noopener" class="pay-wave-btn" id="pay-wave-btn">
+            Payer 20 000 FCFA avec Wave
+          </a>
+
+          <label>Référence / commentaire du paiement (facultatif)
+            <input id="payment-reference" type="text" maxlength="200" placeholder="Ex : référence de la transaction">
+          </label>
+          <label>Capture d'écran du paiement (facultatif)
+            <input id="payment-proof" type="file" accept="image/jpeg,image/png,application/pdf">
+          </label>
+
+          <div id="subscription-message" aria-live="polite"></div>
+          <button class="btn" style="width:100%; margin-top:10px;" id="submit-btn" onclick="submitPayment()">J'ai effectué le paiement</button>
+        </div>
+
+        <!-- Case CGU -->
+        <label class="terms-check" style="margin-top:20px;">
+          <input id="terms" type="checkbox" required>
+          <span>J'accepte les <button type="button" class="text-button" id="terms-link">Conditions Générales d'Utilisation</button> du service Recouvra.</span>
+        </label>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modale CGU -->
+<div class="terms-modal" id="terms-modal" hidden>
+  <div class="terms-dialog">
+    <button class="terms-close" aria-label="Fermer">&times;</button>
+    <h2>Conditions Générales d'Utilisation</h2>
+    <div class="terms-content">
+      <p><strong>1. Abonnement mensuel :</strong> Simple 10 000 FCFA / Recouvrement 15 000 FCFA.</p>
+      <p><strong>2. Frais de mise en place :</strong> 10 000 FCFA (boutique) ou 25 000 FCFA (gros commerce), payés une seule fois si nouveau.</p>
+      <p><strong>3. Paiement :</strong> via Wave au numéro indiqué.</p>
+      <p><strong>4. Activation :</strong> après vérification du paiement.</p>
+      <p><strong>5. Résiliation :</strong> possible à tout moment.</p>
+      <p><strong>6. Données :</strong> conservées même en cas d'expiration.</p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script>
+// Fonctions globales (redéclarées)
+function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = isDark ? '☀️' : '🌙'; if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre'; }
+function initDarkMode() { if (localStorage.getItem('recouvra_dark_mode') === '1') { document.body.classList.add('dark-mode'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = '☀️'; if (label) label.textContent = 'Mode clair'; } }
+
+// Variables globales
+let selectedPlan = 'simple';
+let setupFee = 0;
+let monthlyFee = 10000;
+let alreadyHasSubscription = false;
+
+// Récupérer le type de commerce de l'entreprise
+async function getCommerceType() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) return null;
+    const { data: profile } = await supabaseClient.from('profiles').select('entreprise_id').eq('id', session.user.id).single();
+    if (!profile?.entreprise_id) return null;
+    const { data: entreprise } = await supabaseClient.from('entreprises').select('type_commerce').eq('id', profile.entreprise_id).single();
+    return entreprise?.type_commerce || 'boutique';
+}
+
+// Calculer les frais de mise en place
+function calculateSetupFee(commerceType) {
+    const heavy = ['quincaillerie', 'pieces_auto', 'garage'];
+    return heavy.includes(commerceType) ? 25000 : 10000;
+}
+
+// Mettre à jour les montants affichés
+function updatePaymentUI() {
+    const total = (alreadyHasSubscription ? 0 : setupFee) + monthlyFee;
+    document.getElementById('payment-detail').textContent = alreadyHasSubscription
+        ? `1er mois d'abonnement : ${monthlyFee.toLocaleString('fr-FR')} FCFA`
+        : `Frais de mise en place : ${setupFee.toLocaleString('fr-FR')} FCFA + 1er mois : ${monthlyFee.toLocaleString('fr-FR')} FCFA = ${total.toLocaleString('fr-FR')} FCFA`;
+    document.getElementById('pay-wave-btn').textContent = `Payer ${total.toLocaleString('fr-FR')} FCFA avec Wave`;
+}
+
+// Sélectionner un plan
+function selectMonthlyPlan(plan, element) {
+    selectedPlan = plan;
+    monthlyFee = plan === 'recouvrement' ? 15000 : 10000;
+    document.querySelectorAll('#plan-choices .pricing-option').forEach(card => card.classList.remove('selected'));
+    element.classList.add('selected');
+    updatePaymentUI();
+}
+
+// Vérifier si l'utilisateur a déjà un abonnement actif
+async function checkExistingSubscription() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) return;
+    const { data: profile } = await supabaseClient.from('profiles').select('entreprise_id').eq('id', session.user.id).single();
+    if (!profile?.entreprise_id) return;
+    const { data: subscription } = await supabaseClient.from('subscriptions').select('*').eq('entreprise_id', profile.entreprise_id).maybeSingle();
+    if (subscription && subscription.status === 'active') {
+        alreadyHasSubscription = true;
+        setupFee = 0;
+        // Pré-sélectionner le plan actuel
+        const plan = subscription.plans?.code;
+        if (plan) {
+            selectedPlan = plan;
+            monthlyFee = plan === 'recouvrement' ? 15000 : 10000;
+            const el = document.querySelector(`#plan-choices [data-plan="${plan}"]`);
+            if (el) el.classList.add('selected');
+        }
+    }
+}
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', async () => {
+    initDarkMode();
+    // Gestion CGU
+    const termsModal = document.getElementById('terms-modal');
+    document.getElementById('terms-link').onclick = () => { termsModal.hidden = false; };
+    document.querySelector('.terms-close').onclick = () => { termsModal.hidden = true; };
+    termsModal.onclick = (event) => { if (event.target === termsModal) termsModal.hidden = true; };
+
+    // Charger les données
+    const session = await requireAuth();
+    if (!session) return;
+    const commerceType = await getCommerceType();
+    setupFee = calculateSetupFee(commerceType);
+    document.getElementById('setup-text').textContent = `Frais de mise en place : ${setupFee.toLocaleString('fr-FR')} FCFA (selon votre type de commerce)`;
+    await checkExistingSubscription();
+    updatePaymentUI();
+});
+
+// Soumettre le paiement
+async function submitPayment() {
+    const msgEl = document.getElementById('subscription-message');
+    const reference = document.getElementById('payment-reference').value.trim();
+    const proofFile = document.getElementById('payment-proof').files[0];
+    const termsChecked = document.getElementById('terms').checked;
+    if (!termsChecked) { msgEl.textContent = 'Veuillez accepter les conditions générales.'; msgEl.style.color = 'red'; return; }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true; btn.textContent = 'Envoi...';
+    msgEl.textContent = '';
+
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) throw new Error('Session expirée');
+        const { data: profile } = await supabaseClient.from('profiles').select('entreprise_id').eq('id', session.user.id).single();
+        if (!profile?.entreprise_id) throw new Error('Entreprise non trouvée');
+
+        let proofPath = null;
+        if (proofFile) {
+            const ext = proofFile.name.split('.').pop();
+            proofPath = `${profile.entreprise_id}/preuve-${Date.now()}.${ext}`;
+            const { error: uploadError } = await supabaseClient.storage.from('payment-proofs').upload(proofPath, proofFile, { upsert: true, contentType: proofFile.type });
+            if (uploadError) throw uploadError;
+        }
+
+        const total = (alreadyHasSubscription ? 0 : setupFee) + monthlyFee;
+        const { error } = await supabaseClient.from('subscription_payments').insert({
+            entreprise_id: profile.entreprise_id,
+            submitted_by: session.user.id,
+            payment_type: alreadyHasSubscription ? 'subscription' : 'setup',
+            payment_tier: selectedPlan,
+            monthly_plan: selectedPlan,
+            amount: total,
+            payment_reference: reference || null,
+            proof_path: proofPath,
+            status: 'pending'
+        });
+        if (error) throw error;
+        msgEl.textContent = '✅ Demande envoyée ! Notre équipe vérifiera votre paiement et activera votre abonnement.';
+        msgEl.style.color = 'green';
+    } catch (error) {
+        msgEl.textContent = friendlyError(error);
+        msgEl.style.color = 'red';
+    } finally {
+        btn.disabled = false; btn.textContent = 'J\'ai effectué le paiement';
+    }
+}
+</script>
+<!-- ========== NAVIGATION MOBILE (BARRE EN BAS) ========== -->
+<nav class="global-nav">
+  <a href="index.html" class="global-nav-link">
+    <span class="global-nav-icon">🏠</span>
+    <span class="global-nav-text">Accueil</span>
+  </a>
+  <a href="factures.html" class="global-nav-link">
+    <span class="global-nav-icon">🧾</span>
+    <span class="global-nav-text">Vendre</span>
+  </a>
+  <a href="clients.html" class="global-nav-link">
+    <span class="global-nav-icon">👥</span>
+    <span class="global-nav-text">Clients</span>
+  </a>
+  <a href="stock.html" class="global-nav-link">
+    <span class="global-nav-icon">📊</span>
+    <span class="global-nav-text">Stock</span>
+  </a>
+  <a href="credits.html" class="global-nav-link">
+    <span class="global-nav-icon">💸</span>
+    <span class="global-nav-text">Crédits</span>
+  </a>
+</nav>
+</body>
+</html>

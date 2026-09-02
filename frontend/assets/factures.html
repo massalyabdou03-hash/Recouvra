@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vendre — Ma Boutique</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4F46E5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ma Boutique">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/style.css">
+
+<style>
+/* ============================================================================
+   CORRECTIONS MOBILE GLOBALES (AJOUTÉES)
+   ============================================================================ */
+@media (max-width: 768px) {
+    body { overflow-x: hidden; }
+}
+
+@media (max-width: 600px) {
+    .modal-backdrop { padding: 16px 10px; }
+    .modal { margin: 0 auto; width: calc(100% - 32px); max-height: calc(100vh - 32px); }
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+    width: 100%;
+}
+
+.table-wrapper > table { min-width: 720px; }
+
+@media (max-width: 480px) {
+    .table-wrapper > table { min-width: 100%; }
+}
+
+/* Le mode sombre (variables --surface/--text/etc., .card, .sidebar, .nav-link,
+   table/th/td, inputs, .btn-secondary) est désormais géré globalement dans
+   style.css via body.dark-mode { --surface: ...; } — plus besoin de le
+   redéfinir ici. */
+
+/* ============================================================================
+   PAGE VENDRE - SIMPLIFIÉE
+   ============================================================================ */
+
+.page-header-simple {
+    margin-bottom: 24px;
+}
+
+.page-header-simple h1 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.page-header-simple p {
+    color: #888;
+    font-size: 15px;
+}
+
+.sell-step-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    border: 1px solid #eee;
+}
+
+.sell-step-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.step-number {
+    width: 32px;
+    height: 32px;
+    background: #4F46E5;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.sell-step-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.client-quick-select {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.client-passing {
+    padding: 12px 20px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.client-passing.active {
+    border-color: #4F46E5;
+    background: #EEF2FF;
+    color: #4F46E5;
+}
+
+.client-passing-icon {
+    font-size: 24px;
+}
+
+.client-select-wrap {
+    flex: 1;
+}
+
+.client-select-wrap select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 15px;
+    background: white;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: #4F46E5;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.btn-link:hover {
+    text-decoration: underline;
+}
+
+.sell-search-bar {
+    margin-bottom: 16px;
+}
+
+.sell-search-bar input {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.sell-search-bar input:focus {
+    border-color: #4F46E5;
+}
+
+.sell-products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+.product-button {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.product-button:hover:not(.disabled) {
+    border-color: #4F46E5;
+    background: #EEF2FF;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79,70,229,0.1);
+}
+
+.product-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.product-emoji {
+    font-size: 32px;
+}
+
+.product-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+}
+
+.product-price {
+    font-size: 16px;
+    font-weight: 800;
+    color: #4F46E5;
+}
+
+.product-stock {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.product-stock.success {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.product-stock.warning {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.product-stock.danger {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+#cart-section {
+    border: 2px solid #4F46E5;
+    background: #F8F7FF;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.cart-item-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-item-name {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.cart-item-price {
+    font-size: 12px;
+    color: #888;
+}
+
+.cart-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.qty-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.qty-btn:hover {
+    background: #f3f4f6;
+}
+
+.qty-value {
+    font-weight: 700;
+    font-size: 16px;
+    min-width: 24px;
+    text-align: center;
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.remove-btn:hover {
+    background: #FEE2E2;
+}
+
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-top: 2px solid #eee;
+    margin-top: 16px;
+    font-size: 18px;
+}
+
+.cart-total strong {
+    font-size: 28px;
+    color: #4F46E5;
+}
+
+.payment-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.pay-button {
+    padding: 16px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    transition: all 0.2s;
+}
+
+.pay-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.pay-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.pay-icon {
+    font-size: 28px;
+}
+
+.pay-button.cash {
+    background: #10B981;
+    color: white;
+}
+
+.pay-button.wave {
+    background: #1D4ED8;
+    color: white;
+}
+
+.pay-button.om {
+    background: #FF7900;
+    color: white;
+}
+
+.pay-button.credit {
+    background: #F59E0B;
+    color: white;
+}
+
+.sales-history {
+    margin-top: 32px;
+}
+
+.sales-history .section-title {
+    margin-bottom: 16px;
+}
+
+body.dark-mode .sell-step-card,
+body.dark-mode .cart-item,
+body.dark-mode .product-button {
+    background: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode .product-name {
+    color: #F9FAFB;
+}
+
+body.dark-mode .cart-item {
+    background: #374151;
+}
+
+body.dark-mode .cart-total {
+    border-color: #374151;
+}
+
+/* Modal rapide client */
+.modal-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-backdrop.open {
+    display: flex;
+}
+
+.modal {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-sm {
+    max-width: 400px;
+}
+
+.modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.modal-head h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.close-x {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #888;
+    padding: 4px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #4F46E5;
+}
+
+body.dark-mode .modal {
+    background: #1F2937;
+    border-color: #374151;
+}
+
+body.dark-mode label {
+    color: #F9FAFB;
+}
+</style>
+</head>
+<body>
+
+<!-- ========== MENU MOBILE ========== -->
+
+<div class="app">
+  <nav class="sidebar">
+    <div class="brand">
+      <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
+      <span data-company-name>Ma Boutique</span>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Quotidien</div>
+      <a href="index.html" class="nav-link">
+        <span class="nav-emoji">🏠</span> Accueil
+      </a>
+      <a href="factures.html" class="nav-link active">
+        <span class="nav-emoji">🧾</span> Vendre
+      </a>
+      <a href="clients.html" class="nav-link">
+        <span class="nav-emoji">👥</span> Mes Clients
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Stock</div>
+      <a href="catalogue.html" class="nav-link">
+        <span class="nav-emoji">📦</span> Mes Articles
+      </a>
+      <a href="stock.html" class="nav-link">
+        <span class="nav-emoji">📊</span> Stock & Produits
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Argent</div>
+      <a href="credits.html" class="nav-link">
+        <span class="nav-emoji">💸</span> On me doit
+      </a>
+      <a href="recouvra.html" class="nav-link premium">
+        <span class="nav-emoji">📣</span> Relancer
+        <span class="badge-premium">PRO</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <!-- ========== MODE SOMBRE ========== -->
+      <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;">
+        <span id="dark-mode-icon">🌙</span>
+        <span id="dark-mode-label">Mode sombre</span>
+      </button>
+      
+      <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
+      <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="main">
+    
+    <div class="page-header-simple">
+      <a href="index.html" class="btn-back">
+        <span class="arrow">←</span> Accueil
+      </a>
+      <h1>🧾 Faire une vente</h1>
+      <p>Vendez en 3 étapes simples.</p>
+    </div>
+
+    <!-- ÉTAPE 1 : Qui achète ? -->
+    <div class="sell-step-card">
+      <div class="sell-step-header">
+        <span class="step-number">1</span>
+        <h3>Qui achète ?</h3>
+      </div>
+      
+      <div class="client-quick-select">
+        <button class="client-passing active" onclick="selectClient('passing', this)">
+          <span class="client-passing-icon">🏪</span>
+          <span>Client de passage</span>
+        </button>
+        <div class="client-select-wrap">
+          <select id="client-select" onchange="onClientChange(this.value)">
+            <option value="">Choisir un client...</option>
+          </select>
+        </div>
+      </div>
+      
+      <button class="btn-link" onclick="openQuickClient()">
+        ➕ Nouveau client
+      </button>
+    </div>
+
+    <!-- ÉTAPE 2 : Quoi vendre ? -->
+    <div class="sell-step-card">
+      <div class="sell-step-header">
+        <span class="step-number">2</span>
+        <h3>Qu'est-ce qu'il achète ?</h3>
+      </div>
+
+      <div class="sell-search-bar">
+        <input type="text" id="product-search" placeholder="🔍 Rechercher un article..." oninput="filterProducts()">
+      </div>
+
+      <div class="sell-products-grid" id="products-grid">
+        <div class="empty-state">Chargement des articles...</div>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 3 : Récapitulatif + Paiement -->
+    <div class="sell-step-card" id="cart-section" style="display:none;">
+      <div class="sell-step-header">
+        <span class="step-number">3</span>
+        <h3>Récapitulatif</h3>
+      </div>
+
+      <div id="cart-items"></div>
+
+      <div class="cart-total">
+        <span>Total à payer</span>
+        <strong id="cart-total">0 F</strong>
+      </div>
+
+      <div class="payment-buttons">
+        <button class="pay-button cash" onclick="completeSale('ESPECES')">
+          <span class="pay-icon">💵</span>
+          <span class="pay-label">Espèces</span>
+        </button>
+        <button class="pay-button wave" onclick="completeSale('WAVE')">
+          <span class="pay-icon">📱</span>
+          <span class="pay-label">Wave</span>
+        </button>
+        <button class="pay-button om" onclick="completeSale('OM')">
+          <span class="pay-icon">🟠</span>
+          <span class="pay-label">Orange Money</span>
+        </button>
+        <button class="pay-button credit" onclick="completeSale('CREDIT')">
+          <span class="pay-icon">📝</span>
+          <span class="pay-label">À crédit</span>
+        </button>
+      </div>
+
+      <div id="sale-msg"></div>
+    </div>
+
+    <!-- Historique des ventes du jour -->
+    <div class="sales-history">
+        <div class="section-title">Ventes du mois</div>
+        <div id="today-sales">
+            <div class="empty-state">Chargement des ventes du mois...</div>
+        </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Modal création rapide de client -->
+<div class="modal-backdrop" id="quick-client-backdrop">
+  <div class="modal modal-sm">
+    <div class="modal-head">
+      <h3>Nouveau client</h3>
+      <button class="close-x" onclick="closeQuickClient()">×</button>
+    </div>
+    <form id="quick-client-form">
+      <label>Nom / Raison sociale *</label>
+      <input id="qc-nom" required>
+      <div class="field-row">
+        <div><label>Téléphone</label><input id="qc-telephone"></div>
+        <div><label>Email</label><input id="qc-email" type="email"></div>
+      </div>
+      <div id="quick-client-msg"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeQuickClient()">Annuler</button>
+        <button type="submit" class="btn" id="qc-save-btn">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script>
+// ============================================================================
+// MODE SOMBRE
+// ============================================================================
+
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
+    const icon = document.getElementById('dark-mode-icon');
+    const label = document.getElementById('dark-mode-label');
+    if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+    if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre';
+}
+
+function initDarkMode() {
+    if (localStorage.getItem('recouvra_dark_mode') === '1') {
+        document.body.classList.add('dark-mode');
+        const icon = document.getElementById('dark-mode-icon');
+        const label = document.getElementById('dark-mode-label');
+        if (icon) icon.textContent = '☀️';
+        if (label) label.textContent = 'Mode clair';
+    }
+}
+
+// ============================================================================
+// VENDRE - LOGIQUE SIMPLIFIÉE EN 3 ÉTAPES
+// ============================================================================
+
+let allProducts = [];
+let cart = [];
+let selectedClientId = null;
+let isPassingClient = true;
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const session = await requireAuth();
+    if (!session) return;
+
+    // Charger en parallèle (plus rapide)
+    await Promise.all([
+        loadProducts(),
+        loadClients(),
+        loadTodaySales()
+    ]);
+
+    document.getElementById('quick-client-form').addEventListener('submit', saveQuickClient);
+});
+
+// --- Chargement des produits ---
+async function loadProducts() {
+    const { items, offline, savedAt } = await loadWithCache('pieces', () =>
+        fetchAllRows(() => supabaseClient.from('pieces').select('*').eq('actif', true).order('designation'))
+    );
+    
+    allProducts = items;
+    renderProducts(allProducts);
+    
+    if (offline && savedAt) {
+        showToast(`Hors ligne : données du ${fmtDateTime(savedAt)}.`, 'info');
+    }
+}
+
+function renderProducts(products) {
+    const grid = document.getElementById('products-grid');
+    
+    if (products.length === 0) {
+        grid.innerHTML = `<div class="empty-state">Aucun article. Ajoutez des articles au catalogue.</div>`;
+        return;
+    }
+
+    grid.innerHTML = products.map(p => {
+        const stockClass = p.quantite_stock === 0 ? 'danger' : (p.quantite_stock <= p.seuil_alerte ? 'warning' : 'success');
+        const stockLabel = p.quantite_stock === 0 ? 'Rupture' : `${p.quantite_stock} en stock`;
+        
+        return `
+            <button class="product-button ${p.quantite_stock === 0 ? 'disabled' : ''}" 
+                    onclick="addToCart(${p.id})" 
+                    ${p.quantite_stock === 0 ? 'disabled' : ''}>
+                <span class="product-emoji">📦</span>
+                <span class="product-name">${esc(p.designation)}</span>
+                <span class="product-price">${fmtMoney(p.prix_vente)}</span>
+                <span class="product-stock ${stockClass}">${stockLabel}</span>
+            </button>
+        `;
+    }).join('');
+}
+
+function filterProducts() {
+    const q = document.getElementById('product-search').value.trim().toLowerCase();
+    if (!q) {
+        renderProducts(allProducts);
+        return;
+    }
+    
+    const filtered = allProducts.filter(p =>
+        (p.designation || '').toLowerCase().includes(q) ||
+        (p.reference_oem || '').toLowerCase().includes(q) ||
+        (p.marque || '').toLowerCase().includes(q)
+    );
+    renderProducts(filtered);
+}
+
+// --- Panier ---
+function addToCart(productId) {
+    const product = allProducts.find(p => p.id === productId);
+    if (!product) return;
+    
+    const existing = cart.find(item => item.id === productId);
+    
+    if (existing) {
+        existing.quantity += 1;
+        if (existing.quantity > product.quantite_stock) {
+            existing.quantity = product.quantite_stock;
+            showToast(`Stock maximum atteint pour ${product.designation}`, 'warning');
+        }
+    } else {
+        if (product.quantite_stock < 1) {
+            showToast('Stock insuffisant', 'error');
+            return;
+        }
+        cart.push({
+            id: product.id,
+            designation: product.designation,
+            prix: product.prix_vente,
+            quantity: 1,
+            maxStock: product.quantite_stock,
+        });
+    }
+    
+    renderCart();
+}
+
+function removeFromCart(productId) {
+    cart = cart.filter(item => item.id !== productId);
+    renderCart();
+}
+
+function updateQuantity(productId, delta) {
+    const item = cart.find(i => i.id === productId);
+    if (!item) return;
+    
+    item.quantity += delta;
+    if (item.quantity < 1) {
+        removeFromCart(productId);
+        return;
+    }
+    if (item.quantity > item.maxStock) {
+        item.quantity = item.maxStock;
+        showToast(`Stock maximum atteint`, 'warning');
+    }
+    
+    renderCart();
+}
+
+function renderCart() {
+    const cartSection = document.getElementById('cart-section');
+    const cartItems = document.getElementById('cart-items');
+    
+    if (cart.length === 0) {
+        cartSection.style.display = 'none';
+        return;
+    }
+    
+    cartSection.style.display = 'block';
+    
+    cartItems.innerHTML = cart.map(item => `
+        <div class="cart-item">
+            <div class="cart-item-info">
+                <span class="cart-item-name">${esc(item.designation)}</span>
+                <span class="cart-item-price">${fmtMoney(item.prix)} × ${item.quantity}</span>
+            </div>
+            <div class="cart-item-actions">
+                <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">−</button>
+                <span class="qty-value">${item.quantity}</span>
+                <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                <button class="remove-btn" onclick="removeFromCart(${item.id})">🗑️</button>
+            </div>
+        </div>
+    `).join('');
+    
+    const total = cart.reduce((s, item) => s + (item.prix * item.quantity), 0);
+    document.getElementById('cart-total').textContent = fmtMoney(total);
+}
+
+// --- Clients ---
+async function loadClients() {
+    const { data, error } = await supabaseClient.from('clients').select('id, nom').order('nom');
+    if (error) {
+        console.error('Erreur chargement clients:', error);
+        return;
+    }
+    
+    const select = document.getElementById('client-select');
+    select.innerHTML = `
+        <option value="">Choisir un client...</option>
+        ${data.map(c => `
+            <option value="${c.id}">${esc(c.nom)}</option>
+        `).join('')}
+    `;
+}
+
+function selectClient(type, btn) {
+    if (type === 'passing') {
+        isPassingClient = true;
+        selectedClientId = null;
+        document.getElementById('client-select').value = '';
+    }
+    
+    document.querySelectorAll('.client-passing').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+}
+
+function onClientChange(value) {
+    if (value) {
+        isPassingClient = false;
+        selectedClientId = Number(value);
+        document.querySelectorAll('.client-passing').forEach(b => b.classList.remove('active'));
+    } else {
+        isPassingClient = true;
+        selectedClientId = null;
+        document.querySelector('.client-passing')?.classList.add('active');
+    }
+}
+
+// --- Création rapide client ---
+function openQuickClient() {
+    document.getElementById('quick-client-form').reset();
+    clearMsg(document.getElementById('quick-client-msg'));
+    document.getElementById('quick-client-backdrop').classList.add('open');
+    document.getElementById('qc-nom').focus();
+}
+
+function closeQuickClient() {
+    document.getElementById('quick-client-backdrop').classList.remove('open');
+}
+
+async function saveQuickClient(e) {
+    e.preventDefault();
+    const msgEl = document.getElementById('quick-client-msg');
+    clearMsg(msgEl);
+    
+    const payload = {
+        nom: document.getElementById('qc-nom').value.trim(),
+        telephone: document.getElementById('qc-telephone').value.trim() || null,
+        email: document.getElementById('qc-email').value.trim() || null,
+    };
+    if (!payload.nom) { showMsg(msgEl, 'Le nom est obligatoire.'); return; }
+    
+    const btn = document.getElementById('qc-save-btn');
+    btn.disabled = true;
+    btn.textContent = 'Enregistrement...';
+    
+    const { data, error } = await supabaseClient.from('clients').insert(payload).select().single();
+    
+    btn.disabled = false;
+    btn.textContent = 'Enregistrer';
+    
+    if (error) { showMsg(msgEl, friendlyError(error)); return; }
+    
+    const select = document.getElementById('client-select');
+    const opt = document.createElement('option');
+    opt.value = data.id;
+    opt.textContent = data.nom;
+    select.appendChild(opt);
+    select.value = data.id;
+    onClientChange(data.id);
+    
+    closeQuickClient();
+    showToast('Client créé avec succès.', 'success');
+}
+
+// --- Vente complète ---
+async function completeSale(modePaiement) {
+    if (cart.length === 0) {
+        showToast('Ajoutez des articles au panier.', 'error');
+        return;
+    }
+    
+    if (!isPassingClient && !selectedClientId) {
+        showToast('Sélectionnez un client ou utilisez "Client de passage".', 'error');
+        return;
+    }
+    
+    for (const item of cart) {
+        const product = allProducts.find(p => p.id === item.id);
+        if (product && item.quantity > product.quantite_stock) {
+            showToast(`Stock insuffisant pour ${item.designation}`, 'error');
+            return;
+        }
+    }
+    
+    const total = cart.reduce((s, item) => s + (item.prix * item.quantity), 0);
+    
+    const btn = document.querySelector(`.pay-button.${modePaiement.toLowerCase()}`);
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = '...';
+    }
+    
+    try {
+        let clientId = selectedClientId;
+        
+        if (isPassingClient) {
+            const { data: existing } = await supabaseClient
+                .from('clients')
+                .select('id')
+                .eq('nom', 'Client de passage')
+                .maybeSingle();
+                
+            if (existing) {
+                clientId = existing.id;
+            } else {
+                const { data: created } = await supabaseClient
+                    .from('clients')
+                    .insert({ nom: 'Client de passage' })
+                    .select('id')
+                    .single();
+                clientId = created.id;
+            }
+        }
+        
+        const { data: facture, error: errFacture } = await supabaseClient
+            .from('factures')
+            .insert({ client_id: clientId, montant_total: total })
+            .select('id')
+            .single();
+            
+        if (errFacture) throw errFacture;
+        
+        const lignesPayload = cart.map(item => ({
+            facture_id: facture.id,
+            piece_id: item.id,
+            designation: item.designation,
+            quantite: item.quantity,
+            prix_unitaire: item.prix,
+            montant: item.prix * item.quantity,
+        }));
+        
+        const { error: errLignes } = await supabaseClient
+            .from('factures_lignes')
+            .insert(lignesPayload);
+            
+        if (errLignes) throw errLignes;
+        
+        const { error: errValidation } = await supabaseClient
+            .rpc('valider_facture', {
+                p_facture_id: facture.id,
+                p_mode_paiement: modePaiement,
+            });
+            
+        if (errValidation) throw errValidation;
+        
+        showToast(`✅ Vente de ${fmtMoney(total)} enregistrée !`, 'success');
+        
+        cart = [];
+        renderCart();
+        selectedClientId = null;
+        isPassingClient = true;
+        document.getElementById('client-select').value = '';
+        document.querySelector('.client-passing')?.classList.add('active');
+        
+        await loadProducts();
+        await loadTodaySales();
+        
+    } catch (error) {
+        console.error('Erreur vente:', error);
+        showToast(friendlyError(error), 'error');
+    } finally {
+        const btn = document.querySelector(`.pay-button.${modePaiement.toLowerCase()}`);
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = btn.dataset.originalText || btn.textContent;
+        }
+    }
+}
+
+// --- Ventes du jour ---
+async function loadTodaySales() {
+    const el = document.getElementById('today-sales');
+    
+    try {
+        // Début du mois en cours à 00h00
+        const debutMois = new Date();
+        debutMois.setDate(1);
+        debutMois.setHours(0, 0, 0, 0);
+        
+        // Fin du mois (le mois suivant à 00h00)
+        const finMois = new Date(debutMois);
+        finMois.setMonth(finMois.getMonth() + 1);
+        
+        const { data, error } = await supabaseClient
+            .from('factures')
+            .select('id, numero_facture, montant_total, mode_paiement, created_at, validated_at, clients(nom)')
+            .eq('statut', 'VALIDEE')
+            .gte('validated_at', debutMois.toISOString())
+            .lt('validated_at', finMois.toISOString())
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        // Si aucune facture
+        if (!data || data.length === 0) {
+            el.innerHTML = '<div class="empty-state">Aucune vente validée ce mois-ci.</div>';
+            return;
+        }
+
+        const modeLabels = {
+            ESPECES: '💵 Espèces',
+            WAVE: '📱 Wave',
+            OM: '🟠 Orange Money',
+            CREDIT: '📝 Crédit',
+            CARTE: '💳 Carte',
+            VIREMENT: '🏦 Virement',
+            CHEQUE: '📄 Chèque',
+        };
+
+        el.innerHTML = `
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>N° Facture</th>
+                            <th>Date</th>
+                            <th>Client</th>
+                            <th>Montant</th>
+                            <th>Paiement</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(f => `
+                            <tr onclick="window.location.href='facture-detail.html?id=${f.id}'" style="cursor:pointer;">
+                                <td class="ref">${esc(f.numero_facture || '—')}</td>
+                                <td class="hint">${fmtDate(f.validated_at || f.created_at)}</td>
+                                <td>${esc(f.clients?.nom || '—')}</td>
+                                <td class="num"><strong>${fmtMoney(f.montant_total)}</strong></td>
+                                <td>${modeLabels[f.mode_paiement] || f.mode_paiement}</td>
+                                <td class="actions-cell">
+                                    <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); window.location.href='facture-detail.html?id=${f.id}'">
+                                        Voir
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+            <p class="hint" style="margin-top:12px; text-align:center;">${data.length} facture(s) validée(s) ce mois-ci — Cliquez sur une ligne pour voir le détail.</p>
+        `;
+
+    } catch (error) {
+        console.error('Erreur chargement ventes du mois:', error);
+        el.innerHTML = `<div class="error-msg">${friendlyError(error)}</div>`;
+    }
+}
+</script>
+<!-- ========== NAVIGATION MOBILE (BARRE EN BAS) ========== -->
+<nav class="global-nav">
+  <a href="index.html" class="global-nav-link">
+    <span class="global-nav-icon">🏠</span>
+    <span class="global-nav-text">Accueil</span>
+  </a>
+  <a href="factures.html" class="global-nav-link">
+    <span class="global-nav-icon">🧾</span>
+    <span class="global-nav-text">Vendre</span>
+  </a>
+  <a href="clients.html" class="global-nav-link">
+    <span class="global-nav-icon">👥</span>
+    <span class="global-nav-text">Clients</span>
+  </a>
+  <a href="stock.html" class="global-nav-link">
+    <span class="global-nav-icon">📊</span>
+    <span class="global-nav-text">Stock</span>
+  </a>
+  <a href="credits.html" class="global-nav-link">
+    <span class="global-nav-icon">💸</span>
+    <span class="global-nav-text">Crédits</span>
+  </a>
+</nav>
+</body>
+</html>
