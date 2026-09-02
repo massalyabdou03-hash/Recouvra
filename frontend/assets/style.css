@@ -740,3 +740,69 @@ body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FE
         padding-top: 10px;
     }
 }
+/* ============================================================
+   SOLUTION FINALE MOBILE : BARRE EN HAUT, SIMPLE ET FORCÉE
+   ============================================================ */
+@media (max-width: 768px) {
+    .mobile-menu-btn { display: none !important; }
+    .sidebar-overlay { display: none !important; }
+
+    /* Forcer la sidebar en barre horizontale pleine largeur */
+    .sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        max-height: none !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        background: #fff !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border-soft) !important;
+        padding: 8px 10px !important;
+        z-index: 1000 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+    }
+
+    /* Cacher le titre/logo */
+    .sidebar .brand { display: none !important; }
+
+    /* Mettre tous les liens à plat (supprimer les sections) */
+    .sidebar .nav-section {
+        display: contents !important;
+    }
+
+    /* Cacher les titres de sections */
+    .sidebar .nav-section-title { display: none !important; }
+
+    /* Style des liens : compact, en colonne (icône + texte) */
+    .sidebar .nav-link {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 6px 10px !important;
+        font-size: 0.7rem !important;
+        white-space: nowrap !important;
+        border-radius: 8px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .sidebar .nav-emoji {
+        font-size: 20px !important;
+        width: auto !important;
+        margin-bottom: 2px !important;
+    }
+
+    /* Cacher le footer sur mobile (Support, Dark mode, Déconnexion) */
+    .sidebar .sidebar-footer { display: none !important; }
+
+    /* Ajouter un espace en haut du contenu */
+    body { padding-top: 60px !important; }
+    .main { padding-top: 10px !important; }
+}
