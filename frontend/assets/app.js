@@ -956,9 +956,9 @@ function toggleSidebar() {
     }
 }
 
-// Fermer le menu quand on clique sur un lien
+// Fermer le menu quand on clique sur un lien ou un bouton du footer
 document.addEventListener('click', (e) => {
-    if (e.target.closest('.nav-link, .support-link')) {
+    if (e.target.closest('.nav-link, .support-link, .dark-mode-toggle, .btn-logout')) {
         const sidebar = document.querySelector('.sidebar');
         const overlay = document.querySelector('.sidebar-overlay');
         sidebar?.classList.remove('open');
@@ -967,10 +967,8 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Empêcher la fermeture quand on clique DANS la sidebar
-document.querySelector('.sidebar')?.addEventListener('click', (e) => {
-    e.stopPropagation();
-});
+// REMPLACER les lignes 969-973 par rien (supprimer le stopPropagation)
+// NE PAS bloquer la propagation des clics à l'intérieur de la sidebar.
 
 // ============================================================================
 // AUTRES FONCTIONS GLOBALES (currentProfile, settings, etc.)
