@@ -544,278 +544,13 @@ body.dark-mode .detail-row .k{color:#9CA3AF;}
 body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FEF3C7;}
 
 /* ============================================================
-   CORRECTION MOBILE (viewport ≤ 768px) - FINALE
-   ============================================================ */
-.global-nav { display: none !important; }
-
-@media (max-width: 768px) {
-    .mobile-menu-btn {
-        display: flex;
-        position: fixed;
-        top: 12px;
-        left: 12px;
-        z-index: 1001;
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        border: none;
-        background: #4F46E5;
-        color: white;
-        font-size: 24px;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(79,70,229,0.3);
-    }
-
-    .sidebar {
-        position: fixed;
-        top: 0;
-        left: -300px;
-        width: 300px;
-        max-width: 85vw;
-        height: 100vh !important;
-        display: flex !important;
-        flex-direction: column !important;
-        background: #fff !important;
-        transition: left 0.3s ease;
-        overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch;
-        z-index: 1000 !important;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.2);
-    }
-
-    .sidebar.open {
-        left: 0 !important;
-    }
-
-    .sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0,0,0,0.5);
-        z-index: 990 !important;
-    }
-
-    .sidebar-overlay.active {
-        display: block !important;
-    }
-
-    .sidebar a,
-    .sidebar button,
-    .sidebar .nav-link,
-    .sidebar .support-link,
-    .sidebar .dark-mode-toggle,
-    .sidebar .btn-logout {
-        pointer-events: auto !important;
-        cursor: pointer !important;
-        z-index: 1010 !important;
-    }
-
-    body.menu-open .main {
-        display: none !important;
-    }
-
-    body.menu-open {
-        overflow: hidden !important;
-    }
-}
-
-@media (min-width: 769px) {
-    .mobile-menu-btn { display: none !important; }
-    .sidebar-overlay { display: none !important; }
-    .sidebar { position: sticky; top: 0; height: 100vh; width: 232px; display: flex; flex-direction: column; }
-}
-
-@media print {
-    .sidebar, .global-nav, .no-print { display: none !important; }
-    .main { padding: 0; max-width: 100%; }
-    body { background: #fff; color: #000; }
-    .card { border: none; box-shadow: none; }
-}
-/* ============================================================
-   SOLUTION MOBILE : BARRE HORIZONTALE (plus de hamburger)
+   MOBILE : BARRE EN BAS (design restauré, sans hamburger)
    ============================================================ */
 @media (max-width: 768px) {
-    /* On masque le bouton hamburger et l'overlay */
-    .mobile-menu-btn { display: none !important; }
-    .sidebar-overlay { display: none !important; }
-
-    /* La sidebar devient une barre horizontale fixe en haut */
-    .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        height: auto;
-        max-height: none;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        overflow-x: auto;
-        overflow-y: hidden;
-        background: #fff !important;
-        border-right: none;
-        border-bottom: 1px solid var(--border-soft);
-        padding: 8px 10px;
-        z-index: 1000;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    /* On réorganise la marque et les sections */
-    .sidebar .brand {
-        display: none; /* On masque le titre/logo pour gagner de la place */
-    }
-
-    .sidebar .nav-section {
-        display: flex;
-        flex-direction: row;
-        gap: 4px;
-        margin: 0;
-        padding: 0;
-    }
-
-    .sidebar .nav-section-title {
-        display: none; /* On masque les titres de section */
-    }
-
-    .sidebar .nav-link {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 6px 10px;
-        margin: 0;
-        font-size: 0.7rem;
-        white-space: nowrap;
-        border-radius: 8px;
-        flex-shrink: 0;
-    }
-
-    .sidebar .nav-emoji {
-        font-size: 20px;
-        width: auto;
-        margin-bottom: 2px;
-    }
-
-    /* Le footer (Support, Dark mode, Déconnexion) devient une ligne horizontale aussi */
-    .sidebar .sidebar-footer {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 6px;
-        margin-left: auto;
-        padding: 0;
-        border-top: none;
-    }
-
-    .sidebar .support-link,
-    .sidebar .dark-mode-toggle,
-    .sidebar .btn-logout {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: auto;
-        padding: 6px 8px;
-        margin: 0;
-        font-size: 0.7rem;
-        white-space: nowrap;
-    }
-
-    .sidebar .support-link svg {
-        width: 16px;
-        height: 16px;
-    }
-
-    /* On ajoute un espace en haut de la page pour ne pas cacher le contenu */
-    body {
-        padding-top: 60px; /* Ajuste selon la hauteur de la barre */
-    }
-
-    .main {
-        padding-top: 10px;
-    }
-}
-/* ============================================================
-   SOLUTION FINALE MOBILE : BARRE EN HAUT, SIMPLE ET FORCÉE
-   ============================================================ */
-@media (max-width: 768px) {
-    .mobile-menu-btn { display: none !important; }
-    .sidebar-overlay { display: none !important; }
-
-    /* Forcer la sidebar en barre horizontale pleine largeur */
-    .sidebar {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        width: 100% !important;
-        height: auto !important;
-        max-height: none !important;
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        overflow-x: auto !important;
-        overflow-y: hidden !important;
-        background: #fff !important;
-        border-right: none !important;
-        border-bottom: 1px solid var(--border-soft) !important;
-        padding: 8px 10px !important;
-        z-index: 1000 !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-    }
-
-    /* Cacher le titre/logo */
-    .sidebar .brand { display: none !important; }
-
-    /* Mettre tous les liens à plat (supprimer les sections) */
-    .sidebar .nav-section {
-        display: contents !important;
-    }
-
-    /* Cacher les titres de sections */
-    .sidebar .nav-section-title { display: none !important; }
-
-    /* Style des liens : compact, en colonne (icône + texte) */
-    .sidebar .nav-link {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        padding: 6px 10px !important;
-        font-size: 0.7rem !important;
-        white-space: nowrap !important;
-        border-radius: 8px !important;
-        flex-shrink: 0 !important;
-    }
-
-    .sidebar .nav-emoji {
-        font-size: 20px !important;
-        width: auto !important;
-        margin-bottom: 2px !important;
-    }
-
-    /* Cacher le footer sur mobile (Support, Dark mode, Déconnexion) */
-    .sidebar .sidebar-footer { display: none !important; }
-
-    /* Ajouter un espace en haut du contenu */
-    body { padding-top: 60px !important; }
-    .main { padding-top: 10px !important; }
-}
-/* ============================================================
-   SOLUTION FINALE MOBILE : BARRE EN BAS (design restauré)
-   ============================================================ */
-@media (max-width: 768px) {
-    /* Masquer le hamburger, l'overlay et la sidebar verticale */
     .mobile-menu-btn { display: none !important; }
     .sidebar-overlay { display: none !important; }
     .sidebar { display: none !important; }
 
-    /* Réactiver la navigation globale en bas */
     .global-nav {
         display: flex !important;
         position: fixed !important;
@@ -824,29 +559,21 @@ body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FE
         right: 0 !important;
         width: 100% !important;
         height: auto !important;
-        min-height: 54px !important;
+        min-height: 60px !important;
         flex-direction: row !important;
         align-items: center !important;
         justify-content: space-around !important;
         background: #fff !important;
         border-top: 1px solid var(--border-soft) !important;
-        padding: 6px 8px calc(6px + env(safe-area-inset-bottom)) !important;
+        padding: 8px 4px calc(8px + env(safe-area-inset-bottom)) !important;
         z-index: 1000 !important;
         box-shadow: 0 -2px 8px rgba(0,0,0,0.06) !important;
     }
 
-    /* Cacher les éléments du footer du global-nav (support, user, logout) */
-    .global-nav-brand,
-    .global-nav-footer,
-    .global-nav-user {
-        display: none !important;
-    }
-
-    /* Réorganiser les liens en icônes + texte */
     .global-nav-links {
         display: flex !important;
         flex-direction: row !important;
-        gap: 4px !important;
+        gap: 2px !important;
         width: 100% !important;
         justify-content: space-around !important;
     }
@@ -866,10 +593,15 @@ body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FE
         transition: all 0.2s ease !important;
     }
 
-    .global-nav-link svg {
-        width: 20px !important;
-        height: 20px !important;
+    .global-nav-link svg,
+    .global-nav-icon {
+        font-size: 20px !important;
         margin-bottom: 2px !important;
+        display: block !important;
+    }
+
+    .global-nav-text {
+        display: block !important;
     }
 
     .global-nav-link.active {
@@ -878,7 +610,7 @@ body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FE
         font-weight: 600 !important;
     }
 
-    /* Ajouter de l'espace en bas du contenu pour ne pas cacher les éléments */
+    /* Espace en bas du contenu pour ne pas masquer les éléments */
     body { padding-bottom: 80px !important; }
     .main { padding-bottom: 80px !important; }
 }
