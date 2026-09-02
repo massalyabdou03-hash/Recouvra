@@ -1,132 +1,318 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Promesses de règlement — Recouvra</title>
-  <link rel="stylesheet" href="assets/style.css">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#4F46E5">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Recouvra">
-  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
-  <script src="assets/config.js"></script>
-  <script src="assets/app.js" defer></script>
-  <script src="assets/promesses.js" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Promesses de règlement — Ma Boutique</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4F46E5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ma Boutique">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-  <div class="app">
-    <!-- Navigation latérale -->
-    <nav class="sidebar">
-      <div class="brand">
-        <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
-        <span data-company-name>Entreprise</span>
+
+<button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<div class="app">
+  <nav class="sidebar">
+    <div class="brand">
+      <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
+      <span data-company-name>Ma Boutique</span>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Quotidien</div>
+      <a href="index.html" class="nav-link"><span class="nav-emoji">🏠</span> Accueil</a>
+      <a href="factures.html" class="nav-link"><span class="nav-emoji">🧾</span> Vendre</a>
+      <a href="clients.html" class="nav-link"><span class="nav-emoji">👥</span> Mes Clients</a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Stock</div>
+      <a href="catalogue.html" class="nav-link"><span class="nav-emoji">📦</span> Mes Articles</a>
+      <a href="stock.html" class="nav-link"><span class="nav-emoji">📊</span> Stock & Produits</a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Argent</div>
+      <a href="credits.html" class="nav-link"><span class="nav-emoji">💸</span> On me doit</a>
+      <a href="recouvra.html" class="nav-link premium"><span class="nav-emoji">📣</span> Relancer <span class="badge-premium">PRO</span></a>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;"><span id="dark-mode-icon">🌙</span> <span id="dark-mode-label">Mode sombre</span></button>
+      <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
+      <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="page-header-simple">
+      <a href="index.html" class="btn-back"><span class="arrow">←</span> Retour au tableau de bord</a>
+      <h1>🤝 Promesses de règlement</h1>
+      <p>Enregistrez les engagements de paiement de vos clients.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Créer une promesse</h3>
       </div>
-      <a class="nav-link" href="index.html">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="7" height="9" rx="1.5"/>
-          <rect x="14" y="3" width="7" height="5" rx="1.5"/>
-          <rect x="14" y="12" width="7" height="9" rx="1.5"/>
-          <rect x="3" y="16" width="7" height="5" rx="1.5"/>
-        </svg>
-        Tableau de bord
-      </a>
-      <a class="nav-link" href="catalogue.html">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 8l-9-5-9 5 9 5 9-5z"/>
-          <path d="M3 8v8l9 5 9-5V8"/>
-          <path d="M12 13v8"/>
-        </svg>
-        Catalogue
-      </a>
-      <a class="nav-link" href="stock.html">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M8 3v18"/>
-          <path d="M4 7l4-4 4 4"/>
-          <path d="M16 21V3"/>
-          <path d="M20 17l-4 4-4-4"/>
-        </svg>
-        Mouvements stock
-      </a>
-      <a class="nav-link" href="rupture-stock.html">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 9v4"/>
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-          <path d="M12 17h.01"/>
-        </svg>
-        Ruptures de stock
-      </a>
-      <a class="nav-link" href="factures.html">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 2h12v19l-3-2-3 2-3-2-3 2V2z"/>
-          <path d="M9 8h6M9 12h6"/>
-        </svg>
-        Factures
-      </a>
-      <a class="nav-link" href="credits.html">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="5" width="20" height="14" rx="2"/>
-          <path d="M2 10h20"/>
-        </svg>
-        Emprunts
-      </a>
-      <a class="nav-link" href="clients.html">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-          <circle cx="9" cy="7" r="4"/>
-          <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-        </svg>
-        Clients
-      </a>
-      <div class="sidebar-footer">
-        <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
-        <button class="btn-logout" onclick="logout()">Déconnexion</button>
+      <form id="promise-form" class="form-grid">
+        <label>
+          Facture
+          <select id="invoice" required>
+            <option value="">Chargement...</option>
+          </select>
+        </label>
+        <label>
+          Client
+          <input id="client-display" type="text" readonly placeholder="—">
+          <input type="hidden" id="client-id">
+        </label>
+        <label>
+          Montant promis (FCFA)
+          <input id="amount" type="number" min="1" step="1" required>
+        </label>
+        <label>
+          Date promise
+          <input id="due" type="date" required>
+        </label>
+        <button class="btn recouvra-cta" type="submit">Enregistrer l'engagement</button>
+      </form>
+      <p id="promise-message" aria-live="polite"></p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Promesses en cours</h3>
       </div>
-    </nav>
+      <div id="promises-content">
+        <div class="empty-state">Chargement...</div>
+      </div>
+    </div>
+  </main>
+</div>
 
-    <!-- Contenu principal -->
-    <main class="main">
-      <a href="index.html" class="btn-back" style="margin-bottom:16px;">
-        <span class="arrow">←</span> Retour au tableau de bord
-      </a>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script>
+function toggleSidebar() { const sidebar = document.querySelector('.sidebar'); const overlay = document.querySelector('.sidebar-overlay'); if (sidebar) sidebar.classList.toggle('open'); if (overlay) overlay.classList.toggle('active'); document.body.classList.toggle('menu-open', sidebar?.classList.contains('open')); }
+document.addEventListener('click', (e) => { if (e.target.closest('.nav-link')) { const sidebar = document.querySelector('.sidebar'); const overlay = document.querySelector('.sidebar-overlay'); if (sidebar) sidebar.classList.remove('open'); if (overlay) overlay.classList.remove('active'); document.body.classList.remove('menu-open'); } });
+function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = isDark ? '☀️' : '🌙'; if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre'; }
+function initDarkMode() { if (localStorage.getItem('recouvra_dark_mode') === '1') { document.body.classList.add('dark-mode'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = '☀️'; if (label) label.textContent = 'Mode clair'; } }
 
-      <header class="topbar">
-        <h1>Promesses de règlement</h1>
-        <nav class="subnav">
-          <a href="recouvra.html">Recouvra</a>
-          <a href="paiements.html">Paiements</a>
-          <a href="promesses.html" class="active">Promesses de règlement</a>
-          <a href="relances.html">Relances</a>
-        </nav>
-      </header>
+document.addEventListener('DOMContentLoaded', async () => {
+    initDarkMode();
+    const session = await requireAuth();
+    if (!session) return;
 
-      <!-- Formulaire de création -->
-      <div class="card">
-        <div class="card-head">
-          <h3>Créer une promesse de règlement</h3>
-        </div>
-        <form id="promise-form" class="form-grid">
-          <label>
-            Facture impayée
-            <select id="invoice" required>
-              <option value="">Sélectionner une facture...</option>
-            </select>
-          </label>
-          <label>
-            Client
-            <div class="promise-client-readout" id="client-display">—</div>
-            <input type="hidden" id="client">
-          </label>
-          <label>
-            Montant promis
-            <input id="amount" type="number" min="1" step="1" required>
-          </label>
-          <label>
-            Date promise
-            <input id="due" type="date" required>
-          </label>
-          <button class="button
+    const hasRecouvra = await requireRecouvra();
+    if (!hasRecouvra) return;
+
+    await loadInvoices();
+    await loadPromises();
+
+    document.getElementById('promise-form').addEventListener('submit', handlePromiseSubmit);
+    document.getElementById('invoice').addEventListener('change', updateClientDisplay);
+});
+
+async function loadInvoices() {
+    const select = document.getElementById('invoice');
+    if (!select) return;
+    select.innerHTML = '<option value="">Chargement...</option>';
+    try {
+        const { data, error } = await supabaseClient
+            .from('factures')
+            .select('id, numero_facture, montant_restant, client_id, clients(nom)')
+            .eq('statut', 'VALIDEE')
+            .gt('montant_restant', 0)
+            .order('numero_facture');
+        if (error) throw error;
+        if (!data || data.length === 0) {
+            select.innerHTML = '<option value="">Aucune facture impayée</option>';
+            return;
+        }
+        select.innerHTML = `<option value="">Sélectionner une facture...</option>` +
+            data.map(f => `<option value="${f.id}" data-client="${f.client_id}" data-client-name="${esc(f.clients?.nom || '')}" data-montant="${f.montant_restant}">${f.numero_facture} — ${f.clients?.nom || 'Client'} — ${fmtMoney(f.montant_restant)}</option>`).join('');
+    } catch (error) {
+        console.error('Erreur chargement factures:', error);
+        select.innerHTML = '<option value="">Erreur de chargement</option>';
+    }
+}
+
+function updateClientDisplay() {
+    const select = document.getElementById('invoice');
+    const option = select.selectedOptions[0];
+    const clientDisplay = document.getElementById('client-display');
+    const clientHidden = document.getElementById('client-id');
+    const amount = document.getElementById('amount');
+    if (clientDisplay) clientDisplay.value = option?.dataset.clientName || '';
+    if (clientHidden) clientHidden.value = option?.dataset.client || '';
+    if (amount) amount.value = option?.dataset.montant || '';
+}
+
+async function handlePromiseSubmit(e) {
+    e.preventDefault();
+    const msgEl = document.getElementById('promise-message');
+    clearMsg(msgEl);
+    const factureId = document.getElementById('invoice').value;
+    const clientId = document.getElementById('client-id').value;
+    const montant = Number(document.getElementById('amount').value);
+    const datePromise = document.getElementById('due').value;
+    if (!factureId || !clientId || !montant || !datePromise) {
+        showMsg(msgEl, 'Veuillez remplir tous les champs obligatoires.', 'error');
+        return;
+    }
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = 'Enregistrement...';
+    try {
+        const { error } = await supabaseClient
+            .from('promesses_paiement')
+            .insert({
+                facture_id: Number(factureId),
+                client_id: Number(clientId),
+                montant_promis: montant,
+                date_promise: new Date(datePromise).toISOString(),
+            });
+        if (error) throw error;
+        showMsg(msgEl, '✅ Promesse de règlement enregistrée.', 'success');
+        e.target.reset();
+        updateClientDisplay();
+        await loadPromises();
+    } catch (error) {
+        showMsg(msgEl, friendlyError(error), 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Enregistrer l\'engagement';
+    }
+}
+
+async function loadPromises() {
+    const el = document.getElementById('promises-content');
+    if (!el) return;
+    el.innerHTML = '<div class="empty-state">Chargement...</div>';
+    try {
+        await supabaseClient.rpc('verifier_promesses');
+        const { data, error } = await supabaseClient
+            .from('promesses_paiement')
+            .select('*, clients(nom), factures(numero_facture)')
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        if (!data || data.length === 0) {
+            el.innerHTML = '<div class="empty-state">Aucune promesse enregistrée.</div>';
+            return;
+        }
+        const statusBadge = {
+            'EN_ATTENTE': '<span class="badge badge-warn">En attente</span>',
+            'RESPECTEE': '<span class="badge badge-success">Respectée</span>',
+            'NON_RESPECTEE': '<span class="badge badge-danger">Non respectée</span>',
+            'ANNULEE': '<span class="badge badge-muted">Annulée</span>',
+        };
+        el.innerHTML = `
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Facture</th>
+                            <th>Montant promis</th>
+                            <th>Date promise</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(p => `
+                            <tr>
+                                <td>${esc(p.clients?.nom || '—')}</td>
+                                <td class="ref">${esc(p.factures?.numero_facture || '—')}</td>
+                                <td class="num"><strong>${fmtMoney(p.montant_promis)}</strong></td>
+                                <td class="hint">${fmtDate(p.date_promise)}</td>
+                                <td>${statusBadge[p.statut] || p.statut}</td>
+                                <td class="actions-cell">
+                                    ${p.statut === 'EN_ATTENTE' ? `
+                                        <button class="btn btn-sm btn-secondary" onclick="markPromiseRespected('${p.id}')">✓ Respectée</button>
+                                        <button class="btn btn-sm btn-secondary" onclick="markPromiseNotRespected('${p.id}')">✗ Non respectée</button>
+                                    ` : ''}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>`;
+    } catch (error) {
+        console.error('Erreur chargement promesses:', error);
+        el.innerHTML = `<div class="error-msg">${friendlyError(error)}</div>`;
+    }
+}
+
+async function markPromiseRespected(id) {
+    try {
+        const { error } = await supabaseClient
+            .from('promesses_paiement')
+            .update({ statut: 'RESPECTEE', updated_at: new Date().toISOString() })
+            .eq('id', id);
+        if (error) throw error;
+        showToast('Promesse marquée comme respectée.', 'success');
+        await loadPromises();
+    } catch (error) { showToast(friendlyError(error), 'error'); }
+}
+
+async function markPromiseNotRespected(id) {
+    try {
+        const { error } = await supabaseClient
+            .from('promesses_paiement')
+            .update({ statut: 'NON_RESPECTEE', updated_at: new Date().toISOString() })
+            .eq('id', id);
+        if (error) throw error;
+        showToast('Promesse marquée comme non respectée.', 'info');
+        await loadPromises();
+    } catch (error) { showToast(friendlyError(error), 'error'); }
+}
+</script>
+<!-- ========== NAVIGATION MOBILE (BARRE EN BAS) ========== -->
+<nav class="global-nav">
+  <a href="index.html" class="global-nav-link">
+    <span class="global-nav-icon">🏠</span>
+    <span class="global-nav-text">Accueil</span>
+  </a>
+  <a href="factures.html" class="global-nav-link">
+    <span class="global-nav-icon">🧾</span>
+    <span class="global-nav-text">Vendre</span>
+  </a>
+  <a href="clients.html" class="global-nav-link">
+    <span class="global-nav-icon">👥</span>
+    <span class="global-nav-text">Clients</span>
+  </a>
+  <a href="catalogue.html" class="global-nav-link">
+    <span class="global-nav-icon">📦</span>
+    <span class="global-nav-text">Articles</span>
+  </a>
+  <a href="stock.html" class="global-nav-link">
+    <span class="global-nav-icon">📊</span>
+    <span class="global-nav-text">Stock</span>
+  </a>
+  <a href="credits.html" class="global-nav-link">
+    <span class="global-nav-icon">💸</span>
+    <span class="global-nav-text">Crédits</span>
+  </a>
+  <a href="recouvra.html" class="global-nav-link">
+    <span class="global-nav-icon">📣</span>
+    <span class="global-nav-text">Recouvra</span>
+  </a>
+  <!-- Lien Admin (à garder si tu es super admin, sinon supprime) -->
+  <a href="super-admin.html" class="global-nav-link">
+    <span class="global-nav-icon">🔐</span>
+    <span class="global-nav-text">Admin</span>
+  </a>
+</nav>
+</body>
+</html>

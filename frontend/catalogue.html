@@ -13,501 +13,6 @@
 <meta name="apple-mobile-web-app-title" content="Ma Boutique">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="stylesheet" href="assets/style.css">
-
-<style>
-/* ============================================================================
-   MENU MOBILE + MODE SOMBRE GLOBAL
-   ============================================================================ */
-
-.mobile-menu-btn {
-    display: none;
-    position: fixed;
-    top: 12px;
-    left: 12px;
-    z-index: 1001;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    border: none;
-    background: #4F46E5;
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
-}
-
-.sidebar-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 999;
-}
-
-.sidebar-overlay.active {
-    display: block;
-}
-
-@media (max-width: 768px) {
-    .mobile-menu-btn {
-        display: flex;
-    }
-    .sidebar {
-        position: fixed;
-        top: 0;
-        left: -280px;
-        width: 280px;
-        height: 100vh;
-        transition: left 0.3s ease;
-        z-index: 1000;
-        overflow-y: auto;
-    }
-    .sidebar.open {
-        left: 0;
-    }
-    .main {
-        padding-left: 16px;
-        padding-right: 16px;
-        padding-top: 60px;
-    }
-}
-
-/* ============================================================================
-   CORRECTIONS MOBILE GLOBALES
-   ============================================================================ */
-@media (max-width: 768px) {
-    body { overflow-x: hidden; }
-}
-
-body.menu-open .mobile-menu-btn { display: none; }
-
-@media (max-width: 600px) {
-    .modal-backdrop { padding: 16px 10px; }
-    .modal { margin: 0 auto; width: calc(100% - 32px); max-height: calc(100vh - 32px); }
-}
-
-.table-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    display: block;
-    width: 100%;
-}
-
-.table-wrapper > table { min-width: 720px; }
-
-@media (max-width: 480px) {
-    .table-wrapper > table { min-width: 100%; }
-}
-
-body.dark-mode {
-    --surface: #1F2937;
-    --surface-2: #374151;
-    --surface-3: #4B5563;
-    --border: #4B5563;
-    --border-soft: #374151;
-    --text: #F9FAFB;
-    --text-muted: #9CA3AF;
-    --text-light: #6B7280;
-    background: #111827;
-    color: #F9FAFB;
-}
-
-body.dark-mode .card,
-body.dark-mode .sidebar {
-    background: #1F2937;
-    border-color: #374151;
-}
-
-body.dark-mode .nav-link {
-    color: #9CA3AF;
-}
-
-body.dark-mode .nav-link.active {
-    background: #4F46E5;
-    color: white;
-}
-
-body.dark-mode table {
-    background: #1F2937;
-}
-
-body.dark-mode th {
-    background: #374151;
-    color: #9CA3AF;
-}
-
-body.dark-mode td {
-    border-color: #374151;
-}
-
-body.dark-mode input,
-body.dark-mode select,
-body.dark-mode textarea {
-    background: #374151;
-    border-color: #4B5563;
-    color: #F9FAFB;
-}
-
-body.dark-mode .btn-secondary {
-    background: #374151;
-    border-color: #4B5563;
-    color: #F9FAFB;
-}
-
-body.dark-mode .empty-state {
-    color: #9CA3AF;
-}
-
-body.dark-mode .hint {
-    color: #9CA3AF;
-}
-
-/* ============================================================================
-   PAGE MES ARTICLES - GRILLE DE PRODUITS
-   ============================================================================ */
-
-.page-header-simple {
-    margin-bottom: 24px;
-}
-
-.page-header-simple h1 {
-    font-size: 28px;
-    font-weight: 800;
-    margin-bottom: 4px;
-}
-
-.page-header-simple p {
-    color: #888;
-    font-size: 15px;
-}
-
-.catalogue-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.catalogue-stat-card {
-    background: white;
-    border-radius: 12px;
-    padding: 16px;
-    text-align: center;
-    border: 1px solid #eee;
-}
-
-.catalogue-stat-card.warning {
-    background: #FEF3C7;
-    border-color: #F59E0B;
-}
-
-.catalogue-stat-value {
-    font-size: 28px;
-    font-weight: 800;
-    display: block;
-    margin-bottom: 4px;
-}
-
-.catalogue-stat-label {
-    font-size: 12px;
-    color: #888;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.search-bar-big {
-    margin-bottom: 16px;
-}
-
-.search-bar-big input {
-    width: 100%;
-    padding: 14px;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    font-size: 16px;
-    outline: none;
-    transition: border-color 0.2s;
-}
-
-.search-bar-big input:focus {
-    border-color: #4F46E5;
-}
-
-.btn-primary-big {
-    width: 100%;
-    padding: 16px;
-    background: #4F46E5;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-primary-big:hover {
-    background: #4338CA;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
-}
-
-.products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 16px;
-}
-
-.product-card {
-    background: white;
-    border-radius: 12px;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid #eee;
-    text-align: center;
-}
-
-.product-card:hover {
-    border-color: #4F46E5;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    transform: translateY(-2px);
-}
-
-.product-image {
-    font-size: 40px;
-    margin-bottom: 8px;
-}
-
-.product-details {
-    width: 100%;
-}
-
-.product-name {
-    font-weight: 700;
-    font-size: 14px;
-    margin-bottom: 2px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.product-ref {
-    font-size: 11px;
-    color: #888;
-    margin-bottom: 8px;
-}
-
-.product-price {
-    font-size: 18px;
-    font-weight: 800;
-    color: #4F46E5;
-    margin-bottom: 8px;
-}
-
-.product-stock-badge {
-    font-size: 11px;
-    padding: 4px 8px;
-    border-radius: 20px;
-    font-weight: 600;
-    display: inline-block;
-}
-
-.product-stock-badge.success {
-    background: #D1FAE5;
-    color: #065F46;
-}
-
-.product-stock-badge.warning {
-    background: #FEF3C7;
-    color: #92400E;
-}
-
-.product-stock-badge.danger {
-    background: #FEE2E2;
-    color: #991B1B;
-}
-
-/* --- Modal --- */
-.modal-backdrop {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 2000;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal-backdrop.open {
-    display: flex;
-}
-
-.modal {
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    width: 100%;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.modal-lg {
-    max-width: 700px;
-}
-
-.modal-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-}
-
-.modal-head h3 {
-    font-size: 18px;
-    font-weight: 700;
-    margin: 0;
-}
-
-.close-x {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #888;
-    padding: 4px;
-}
-
-.modal-actions {
-    display: flex;
-    gap: 8px;
-    justify-content: flex-end;
-    margin-top: 20px;
-}
-
-.field-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 12px;
-}
-
-.field-row-3 {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 12px;
-}
-
-label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 6px;
-}
-
-input, select, textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s;
-}
-
-input:focus, select:focus, textarea:focus {
-    border-color: #4F46E5;
-}
-
-.btn {
-    padding: 10px 20px;
-    border-radius: 8px;
-    border: none;
-    background: #4F46E5;
-    color: white;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn:hover {
-    background: #4338CA;
-}
-
-.btn-secondary {
-    background: #f3f4f6;
-    color: #333;
-    border: 1px solid #e5e7eb;
-}
-
-.btn-secondary:hover {
-    background: #e5e7eb;
-}
-
-.btn-danger {
-    background: #EF4444;
-    color: white;
-}
-
-.btn-danger:hover {
-    background: #DC2626;
-}
-
-body.dark-mode .modal {
-    background: #1F2937;
-    border-color: #374151;
-}
-
-body.dark-mode label {
-    color: #F9FAFB;
-}
-
-body.dark-mode .product-card {
-    background: #1F2937;
-    border-color: #374151;
-}
-
-body.dark-mode .catalogue-stat-card {
-    background: #1F2937;
-    border-color: #374151;
-}
-
-body.dark-mode .product-name {
-    color: #F9FAFB;
-}
-
-body.dark-mode .btn-secondary {
-    background: #374151;
-    border-color: #4B5563;
-    color: #F9FAFB;
-}
-
-/* --- Responsive --- */
-@media (max-width: 600px) {
-    .products-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 10px;
-    }
-
-    .field-row-3 {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
 </head>
 <body>
 
@@ -598,7 +103,7 @@ body.dark-mode .btn-secondary {
 
     <!-- Bouton ajouter -->
     <div style="margin-bottom: 20px;">
-      <button class="btn-primary-big" onclick="openModal()">
+      <button class="btn-primary-big" onclick="openModalWithCheck()">
         ➕ Ajouter un article
       </button>
     </div>
@@ -708,7 +213,7 @@ body.dark-mode .btn-secondary {
 <script src="assets/app.js"></script>
 <script>
 // ============================================================================
-// MENU MOBILE + MODE SOMBRE
+// MENU MOBILE + MODE SOMBRE (fonctions globales, déjà dans app.js mais redéclarées)
 // ============================================================================
 
 function toggleSidebar() {
@@ -904,6 +409,25 @@ function closeProductDetail() {
     document.getElementById('product-detail-backdrop').classList.remove('open');
 }
 
+// ============================================================================
+// PLAN LIMITE - Vérification avant ajout
+// ============================================================================
+
+async function checkPlanBeforeAdd() {
+    const canAdd = await canAddArticle();
+    if (!canAdd.ok) {
+        showToast(canAdd.message, 'error');
+        setTimeout(() => window.location.href = 'abonnement.html', 2000);
+        return false;
+    }
+    return true;
+}
+
+async function openModalWithCheck() {
+    const ok = await checkPlanBeforeAdd();
+    if (ok) openModal();
+}
+
 function openModal() {
     document.getElementById('piece-form').reset();
     document.getElementById('piece-id').value = '';
@@ -956,6 +480,15 @@ async function saveProduct(e) {
     clearMsg(msgEl);
     
     const id = document.getElementById('piece-id').value;
+    
+    // Vérifier la limite si c'est un nouvel article
+    if (!id) {
+        const canAdd = await canAddArticle();
+        if (!canAdd.ok) {
+            showMsg(msgEl, canAdd.message);
+            return;
+        }
+    }
     
     // Générer automatiquement les références si elles sont vides
     const refOem = document.getElementById('reference_oem').value.trim() || generateCode();
@@ -1026,5 +559,41 @@ async function deleteProduct(id) {
     await loadProducts();
 }
 </script>
+<!-- ========== NAVIGATION MOBILE (BARRE EN BAS) ========== -->
+<nav class="global-nav">
+  <a href="index.html" class="global-nav-link">
+    <span class="global-nav-icon">🏠</span>
+    <span class="global-nav-text">Accueil</span>
+  </a>
+  <a href="factures.html" class="global-nav-link">
+    <span class="global-nav-icon">🧾</span>
+    <span class="global-nav-text">Vendre</span>
+  </a>
+  <a href="clients.html" class="global-nav-link">
+    <span class="global-nav-icon">👥</span>
+    <span class="global-nav-text">Clients</span>
+  </a>
+  <a href="catalogue.html" class="global-nav-link">
+    <span class="global-nav-icon">📦</span>
+    <span class="global-nav-text">Articles</span>
+  </a>
+  <a href="stock.html" class="global-nav-link">
+    <span class="global-nav-icon">📊</span>
+    <span class="global-nav-text">Stock</span>
+  </a>
+  <a href="credits.html" class="global-nav-link">
+    <span class="global-nav-icon">💸</span>
+    <span class="global-nav-text">Crédits</span>
+  </a>
+  <a href="recouvra.html" class="global-nav-link">
+    <span class="global-nav-icon">📣</span>
+    <span class="global-nav-text">Recouvra</span>
+  </a>
+  <!-- Lien Admin (à garder si tu es super admin, sinon supprime) -->
+  <a href="super-admin.html" class="global-nav-link">
+    <span class="global-nav-icon">🔐</span>
+    <span class="global-nav-text">Admin</span>
+  </a>
+</nav>
 </body>
 </html>

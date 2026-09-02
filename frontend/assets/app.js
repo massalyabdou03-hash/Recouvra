@@ -967,9 +967,6 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// REMPLACER les lignes 969-973 par rien (supprimer le stopPropagation)
-// NE PAS bloquer la propagation des clics à l'intérieur de la sidebar.
-
 // ============================================================================
 // AUTRES FONCTIONS GLOBALES (currentProfile, settings, etc.)
 // ============================================================================
@@ -1144,9 +1141,33 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================================================================
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", applyCompanySettings);
 else applyCompanySettings();
-// ============================================================
+
+// ============================================================================
 // CRÉATION AUTOMATIQUE DE LA NAVIGATION EN BAS (MOBILE)
-// ============================================================
+// ============================================================================
+
+function createGlobalNav() {
+    if (document.querySelector('.global-nav')) return;
+    const nav = document.createElement('nav');
+    nav.className = 'global-nav';
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const links = [
+        { key: 'index', label: 'Accueil', href: 'index.html', icon: '🏠' },
+        { key: 'factures', label: 'Vendre', href: 'factures.html', icon: '🧾' },
+        { key: 'clients', label: 'Clients', href: 'clients.html', icon: '👥' },
+        { key: 'catalogue', label: 'Articles', href: 'catalogue.html', icon: '📦' },
+        { key: 'stock', label: 'Stock', href: 'stock.html', icon: '📊' },
+        { key: 'credits', label: 'Crédits', href: 'credits.html', icon: '💸' },
+        { key: 'recouvra', label: 'Recouvra', href: 'recouvra.html', icon: '📣' }
+    ];
+    nav.innerHTML = `<div class="global-nav-links">${links.map(link => `
+        <a class="global-nav-link ${link.href === currentPage ? 'active' : ''}" href="${link.href}">
+            <span class="global-nav-icon">${link.icon}</span>
+            <span class="global-nav-text">${link.label}</span>
+        </a>`).join('')}</div>`;
+    document.body.appendChild(nav);
+}
+
 // Ajouter le lien Administration si super admin
 async function addAdminToGlobalNav() {
     const { data: { session } } = await supabaseClient.auth.getSession();
@@ -1163,10 +1184,9 @@ async function addAdminToGlobalNav() {
     adminLink.innerHTML = '<span class="global-nav-icon">🔐</span><span class="global-nav-text">Admin</span>';
     nav.appendChild(adminLink);
 }
-// Appeler après la création du nav
+
+// Appel unique pour créer la nav et ajouter le lien admin
 document.addEventListener('DOMContentLoaded', async () => {
     createGlobalNav();
     await addAdminToGlobalNav();
 });
-
-document.addEventListener('DOMContentLoaded', createGlobalNav);

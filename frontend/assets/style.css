@@ -633,3 +633,71 @@ body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FE
     body { background: #fff; color: #000; }
     .card { border: none; box-shadow: none; }
 }
+/* ============================================================
+   NAVIGATION EN BAS - MOBILE UNIQUEMENT
+   ============================================================ */
+.global-nav {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .global-nav {
+    display: flex !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 60px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    background: #fff !important;
+    border-top: 1px solid var(--border-soft) !important;
+    padding: 8px 4px calc(8px + env(safe-area-inset-bottom)) !important;
+    z-index: 1000 !important;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.06) !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .global-nav-link {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+    min-width: 64px !important;
+    padding: 6px 8px !important;
+    font-size: 0.65rem !important;
+    text-align: center !important;
+    color: var(--text-muted) !important;
+    text-decoration: none !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .global-nav-icon {
+    font-size: 20px !important;
+    margin-bottom: 2px !important;
+    display: block !important;
+  }
+
+  .global-nav-text {
+    display: block !important;
+  }
+
+  .global-nav-link.active {
+    background: var(--accent-dim) !important;
+    color: var(--accent-hi) !important;
+    font-weight: 600 !important;
+  }
+
+  .sidebar { display: none !important; }
+  .mobile-menu-btn { display: none !important; }
+  .sidebar-overlay { display: none !important; }
+
+  body { padding-bottom: 80px !important; }
+  .main { padding-bottom: 80px !important; }
+}
