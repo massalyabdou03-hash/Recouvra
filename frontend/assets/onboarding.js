@@ -236,3 +236,33 @@ function initOnboarding() {
     // Le bouton "Continuer" de l'étape 2 est désactivé tant qu'un choix n'est pas fait
     // déjà géré plus haut
 }
+// ============================================================
+// ONBOARDING — Script complet avec animations
+// ============================================================
+
+document.addEventListener('DOMContentLoaded', async () => {
+    // Vérifier si l'utilisateur a déjà complété l'onboarding
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            const { data: profile, error } = await supabaseClient
+                .from('profiles')
+                .select('onboarding_complete')
+                .eq('id', session.user.id)
+                .single();
+            if (profile?.onboarding_complete === true) {
+                // Déjà fait → rediriger vers l'accueil
+                window.location.href = 'index.html';
+                return;
+            }
+        }
+    } catch (e) {
+        // En cas d'erreur, on reste sur la page (pas de redirection)
+        console.warn('Erreur vérification onboarding:', e);
+    }
+
+    // Si on arrive ici, l'onboarding n'a pas été complété
+    initOnboarding();
+});
+
+// ... le reste du code (initOnboarding, goToStep, startTrial, etc.)
