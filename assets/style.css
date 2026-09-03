@@ -938,6 +938,7 @@ tbody tr:hover {
     letter-spacing: 0.02em;
 }
 
+.badge-warning,
 .badge-warn {
     background: var(--warn-dim);
     color: var(--warn-hi);
