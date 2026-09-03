@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil — Recouvra</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Recouvra">
+    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+    <link rel="stylesheet" href="assets/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<div class="app">
+    <!-- Sidebar (généré dynamiquement pour les liens admin/support par app.js) -->
+    <nav class="sidebar">
+        <div class="brand">
+            <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
+            <span data-company-name>Recouvra</span>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Quotidien</div>
+            <a href="index.html" class="nav-link active"><span class="nav-emoji">🏠</span> Accueil</a>
+            <a href="factures.html" class="nav-link"><span class="nav-emoji">🧾</span> Vendre</a>
+            <a href="clients.html" class="nav-link"><span class="nav-emoji">👥</span> Mes Clients</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Stock</div>
+            <a href="stock.html" class="nav-link"><span class="nav-emoji">📊</span> Stock & Produits</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Argent</div>
+            <a href="credits.html" class="nav-link"><span class="nav-emoji">💸</span> On me doit</a>
+            <a href="recouvra.html" class="nav-link premium"><span class="nav-emoji">📣</span> Relancer <span class="badge-premium">PRO</span></a>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;">
+                <span id="dark-mode-icon">🌙</span> <span id="dark-mode-label">Mode sombre</span>
+            </button>
+            <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
+            <button class="btn-logout" onclick="logout()">Déconnexion</button>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="main">
+        <div class="welcome-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <h1 id="welcome-name">Bonjour 👋</h1>
+                <p id="welcome-company">Voici ce qui se passe dans votre boutique.</p>
+            </div>
+            <button class="btn btn-secondary" onclick="reloadDashboard()" style="font-size:0.8rem;">🔄 Actualiser</button>
+        </div>
+
+        <!-- Grandes cartes -->
+        <div class="dashboard-big-cards" id="big-cards">
+            <div class="big-card primary" onclick="window.location.href='factures.html'">
+                <div class="big-card-icon">💰</div>
+                <div class="big-card-content">
+                    <div class="big-card-label">J'ai gagné aujourd'hui</div>
+                    <div class="big-card-value" id="stat-ca-jour"><span class="spinner-small"></span></div>
+                    <div class="big-card-hint" id="stat-nb-jour"></div>
+                </div>
+                <div class="big-card-arrow">→</div>
+            </div>
+            <div class="big-card warning" onclick="window.location.href='credits.html'">
+                <div class="big-card-icon">⚠️</div>
+                <div class="big-card-content">
+                    <div class="big-card-label">On me doit de l'argent</div>
+                    <div class="big-card-value" id="stat-creances"><span class="spinner-small"></span></div>
+                    <div class="big-card-hint">Clients à relancer</div>
+                </div>
+                <div class="big-card-arrow">→</div>
+            </div>
+            <div class="big-card info" onclick="window.location.href='rupture-stock.html'">
+                <div class="big-card-icon">📦</div>
+                <div class="big-card-content">
+                    <div class="big-card-label">Articles à commander</div>
+                    <div class="big-card-value" id="stat-alertes"><span class="spinner-small"></span></div>
+                    <div class="big-card-hint">Stock faible ou épuisé</div>
+                </div>
+                <div class="big-card-arrow">→</div>
+            </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="dashboard-actions">
+            <div class="section-title">Que voulez-vous faire ?</div>
+            <div class="action-grid">
+                <button class="action-button primary" onclick="window.location.href='factures.html'">
+                    <span class="action-emoji">🧾</span>
+                    <span class="action-text">Faire une vente</span>
+                </button>
+                <button class="action-button" onclick="window.location.href='stock.html'">
+                    <span class="action-emoji">➕</span>
+                    <span class="action-text">Ajouter un article</span>
+                </button>
+                <button class="action-button" onclick="window.location.href='clients.html'">
+                    <span class="action-emoji">👥</span>
+                    <span class="action-text">Nouveau client</span>
+                </button>
+                <button class="action-button" onclick="window.location.href='recouvra.html'">
+                    <span class="action-emoji">📣</span>
+                    <span class="action-text">Relancer un client</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Récapitulatif hebdomadaire et mensuel -->
+        <div class="dashboard-recap">
+            <div class="section-title">Ma semaine en un coup d'œil</div>
+            <div class="recap-grid">
+                <div class="recap-item">
+                    <div class="recap-icon">📅</div>
+                    <div class="recap-label">Cette semaine</div>
+                    <div class="recap-value" id="stat-ca-semaine"><span class="spinner-small"></span></div>
+                    <div class="recap-hint" id="stat-nb-semaine"></div>
+                </div>
+                <div class="recap-item">
+                    <div class="recap-icon">🗓️</div>
+                    <div class="recap-label">Ce mois</div>
+                    <div class="recap-value" id="stat-ca-mois"><span class="spinner-small"></span></div>
+                    <div class="recap-hint" id="stat-nb-mois"></div>
+                </div>
+                <div class="recap-item">
+                    <div class="recap-icon">📦</div>
+                    <div class="recap-label">Articles</div>
+                    <div class="recap-value" id="stat-pieces"><span class="spinner-small"></span></div>
+                    <div class="recap-hint">En catalogue</div>
+                </div>
+                <div class="recap-item">
+                    <div class="recap-icon">💰</div>
+                    <div class="recap-label">Valeur stock</div>
+                    <div class="recap-value" id="stat-valeur"><span class="spinner-small"></span></div>
+                    <div class="recap-hint">Prix d'achat</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Graphique des ventes -->
+        <div class="dashboard-recap">
+            <div class="section-title">📈 Ventes des 30 derniers jours</div>
+            <p class="hint" style="margin-bottom:10px;">Montant total des factures validées chaque jour.</p>
+            <div style="height: 300px; position: relative;">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+        <div class="recap-grid" style="margin-top:15px;">
+            <div class="recap-item">
+                <div class="recap-icon">🔥</div>
+                <div class="recap-label">Meilleur jour</div>
+                <div class="recap-value" id="best-day">—</div>
+            </div>
+            <div class="recap-item">
+                <div class="recap-icon">📊</div>
+                <div class="recap-label">Total 30 jours</div>
+                <div class="recap-value" id="total-30">—</div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script>
+// ============================================================================
+// DASHBOARD - LOGIQUE (utilise les fonctions de assets/app.js)
+// ============================================================================
+
+let chartInstance = null;
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', async () => {
+    const session = await requireAuth();
+    if (!session) return;
+
+    await loadWelcomeMessage();
+    await loadDashboardData();
+    await loadSalesChart();
+});
+
+// Rechargement manuel
+async function reloadDashboard() {
+    ['stat-ca-jour', 'stat-creances', 'stat-alertes', 'stat-ca-semaine', 'stat-ca-mois', 'stat-pieces', 'stat-valeur'].forEach(id => {
+        document.getElementById(id).innerHTML = '<span class="spinner-small"></span>';
+    });
+    await loadDashboardData();
+    await loadSalesChart();
+    showToast('Données actualisées.', 'info');
+}
+
+// Message de bienvenue
+async function loadWelcomeMessage() {
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) return;
+        const { data: profile } = await supabaseClient
+            .from('profiles')
+            .select('*, entreprises(nom, gerant_nom)')
+            .eq('id', session.user.id)
+            .single();
+        if (!profile) return;
+        const gerantNom = profile.entreprises?.gerant_nom || session.user?.user_metadata?.gerant_nom || 'Gérant';
+        const boutiqueNom = profile.entreprises?.nom || 'votre boutique';
+        const prenom = gerantNom.split(' ')[0] || 'Gérant';
+        document.getElementById('welcome-name').textContent = `Bonjour ${prenom} 👋`;
+        document.getElementById('welcome-company').textContent = `Voici ce qui se passe dans votre boutique ${boutiqueNom}.`;
+    } catch (error) {
+        console.error('Erreur chargement message accueil:', error);
+    }
+}
+
+// Chargement des données du dashboard
+async function loadDashboardData() {
+    try {
+        const { items: pieces, offline, savedAt } = await loadWithCache('pieces', () =>
+            fetchAllRows(() => supabaseClient.from('pieces').select('*').eq('actif', true).order('id'))
+        );
+        document.getElementById('stat-pieces').textContent = pieces.length;
+        const valeur = pieces.reduce((sum, p) => sum + (p.quantite_stock * Number(p.prix_achat)), 0);
+        document.getElementById('stat-valeur').textContent = fmtMoney(valeur);
+        const alertes = pieces.filter(p => p.quantite_stock <= p.seuil_alerte);
+        document.getElementById('stat-alertes').textContent = alertes.length;
+        if (offline && savedAt) showToast(`Hors ligne : données du ${fmtDateTime(savedAt)}.`, 'info');
+    } catch (error) {
+        document.getElementById('stat-pieces').textContent = '⚠️';
+        document.getElementById('stat-valeur').textContent = '⚠️';
+        document.getElementById('stat-alertes').textContent = '⚠️';
+        showToast('Erreur chargement du stock.', 'error');
+    }
+
+    await loadActiviteCommerciale();
+}
+
+// Activité commerciale (CA jour/semaine/mois, créances)
+async function loadActiviteCommerciale() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const debutSemaine = new Date(today);
+    const jourSemaine = (debutSemaine.getDay() + 6) % 7;
+    debutSemaine.setDate(debutSemaine.getDate() - jourSemaine);
+    const debutMois = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    try {
+        const debutChargement = debutSemaine < debutMois ? debutSemaine : debutMois;
+        const { data: ventes, error } = await supabaseClient
+            .from('factures')
+            .select('id, montant_total, validated_at')
+            .eq('statut', 'VALIDEE')
+            .gte('validated_at', debutChargement.toISOString());
+        if (error) throw error;
+
+        const ventesMois = (ventes || []).filter(f => new Date(f.validated_at) >= debutMois);
+        const ventesSemaine = (ventes || []).filter(f => new Date(f.validated_at) >= debutSemaine);
+        const ventesJour = (ventes || []).filter(f => new Date(f.validated_at) >= today);
+
+        const caJour = ventesJour.reduce((s, f) => s + Number(f.montant_total), 0);
+        document.getElementById('stat-ca-jour').textContent = fmtMoney(caJour);
+        document.getElementById('stat-nb-jour').textContent = `${ventesJour.length} vente${ventesJour.length > 1 ? 's' : ''}`;
+
+        const caSemaine = ventesSemaine.reduce((s, f) => s + Number(f.montant_total), 0);
+        document.getElementById('stat-ca-semaine').textContent = fmtMoney(caSemaine);
+        document.getElementById('stat-nb-semaine').textContent = `${ventesSemaine.length} vente${ventesSemaine.length > 1 ? 's' : ''}`;
+
+        const caMois = ventesMois.reduce((s, f) => s + Number(f.montant_total), 0);
+        document.getElementById('stat-ca-mois').textContent = fmtMoney(caMois);
+        document.getElementById('stat-nb-mois').textContent = `${ventesMois.length} vente${ventesMois.length > 1 ? 's' : ''}`;
+    } catch (error) {
+        console.error('Erreur chargement activité:', error);
+        document.getElementById('stat-ca-jour').textContent = '⚠️';
+        document.getElementById('stat-ca-semaine').textContent = '⚠️';
+        document.getElementById('stat-ca-mois').textContent = '⚠️';
+    }
+
+    try {
+        const { data: creances, error } = await supabaseClient
+            .from('factures')
+            .select('montant_restant')
+            .neq('statut', 'ANNULEE')
+            .gt('montant_restant', 0);
+        if (error) throw error;
+        const total = (creances || []).reduce((s, f) => s + Number(f.montant_restant), 0);
+        document.getElementById('stat-creances').textContent = fmtMoney(total);
+    } catch (error) {
+        console.error('Erreur chargement créances:', error);
+        document.getElementById('stat-creances').textContent = '⚠️';
+    }
+}
+
+// Graphique des ventes 30 jours
+async function loadSalesChart() {
+    const ctx = document.getElementById('salesChart')?.getContext('2d');
+    if (!ctx) return;
+
+    if (chartInstance) {
+        chartInstance.destroy();
+        chartInstance = null;
+    }
+
+    const days = [];
+    const totals = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let i = 29; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
+        days.push(d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }));
+        totals.push(0);
+    }
+
+    try {
+        const { data: ventes, error } = await supabaseClient
+            .from('factures')
+            .select('validated_at, montant_total')
+            .eq('statut', 'VALIDEE')
+            .gte('validated_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+        if (error) throw error;
+
+        (ventes || []).forEach(f => {
+            const dateVente = new Date(f.validated_at);
+            const diffDays = Math.floor((today - dateVente) / (1000 * 60 * 60 * 24));
+            const idx = 29 - diffDays;
+            if (idx >= 0 && idx < 30) totals[idx] += Number(f.montant_total);
+        });
+    } catch (error) {
+        console.error('Erreur chargement graphique:', error);
+    }
+
+    const maxVal = Math.max(...totals);
+    const maxIdx = totals.indexOf(maxVal);
+    if (maxIdx >= 0) {
+        document.getElementById('best-day').textContent = fmtMoney(maxVal) + ' (' + days[maxIdx] + ')';
+    }
+    document.getElementById('total-30').textContent = fmtMoney(totals.reduce((a, b) => a + b, 0));
+
+    chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: days,
+            datasets: [{
+                label: 'Ventes (FCFA)',
+                data: totals,
+                borderColor: '#4F46E5',
+                backgroundColor: 'rgba(79,70,229,0.1)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Ventes : ' + context.parsed.y.toLocaleString('fr-FR') + ' FCFA';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString('fr-FR') + ' F';
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        maxTicksLimit: 7,
+                        maxRotation: 0,
+                        autoSkip: true
+                    }
+                }
+            }
+        }
+    });
+}
+</script>
+
+<style>
+.spinner-small {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0,0,0,0.1);
+    border-radius: 50%;
+    border-top-color: #4F46E5;
+    animation: spin 0.6s linear infinite;
+}
+body.dark-mode .spinner-small {
+    border: 3px solid rgba(255,255,255,0.1);
+    border-top-color: #818cf8;
+}
+</style>
+
+</body>
+</html>
