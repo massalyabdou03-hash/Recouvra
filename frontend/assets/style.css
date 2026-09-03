@@ -954,3 +954,177 @@ table.payments-table tr:hover{background:var(--surface-2);}
     body { background: #fff; color: #000; }
     .card { border: none; box-shadow: none; }
 }
+/* ============================================================
+   AMÉLIORATIONS MOBILES FINALES (AJOUTÉES)
+   ============================================================ */
+
+/* Empêcher le scroll horizontal */
+body {
+  overflow-x: hidden !important;
+}
+
+/* Forcer une taille de police suffisante sur les inputs pour éviter le zoom iOS */
+input, select, textarea {
+  font-size: 16px !important;
+}
+
+/* Cibles tactiles : au moins 44px de hauteur pour les boutons */
+.btn, .btn-secondary, .btn-danger, .btn-success,
+.action-button, .pay-button, .client-passing,
+.filter-btn, .stock-tab, .admin-tab,
+.qty-btn, .remove-btn, .btn-whatsapp {
+  min-height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Sur mobile, les boutons dans les modales prennent toute la largeur */
+@media (max-width: 480px) {
+  .modal-actions .btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  .modal-actions {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+}
+
+/* Augmenter l'espacement dans les listes (clients, crédits, relances) */
+.client-card, .credit-client-card, .relance-client-card {
+  padding: 16px !important;
+  gap: 12px !important;
+}
+.client-card .client-info {
+  flex: 1;
+}
+.client-debt {
+  min-width: auto !important;
+  padding: 6px 12px !important;
+}
+.credit-invoice-row, .relance-invoice-row {
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  padding: 12px !important;
+}
+.credit-invoice-amount, .relance-invoice-amount {
+  text-align: left !important;
+  min-width: 0 !important;
+}
+.credit-invoice-status, .relance-invoice-actions {
+  text-align: left !important;
+  min-width: 0 !important;
+}
+
+/* Tableaux : réduire la taille de police sur mobile */
+@media (max-width: 600px) {
+  .table-wrapper table {
+    font-size: 0.8rem !important;
+  }
+  .table-wrapper th,
+  .table-wrapper td {
+    padding: 8px 6px !important;
+  }
+  .table-wrapper .num {
+    font-size: 0.75rem !important;
+  }
+}
+
+/* Barre de navigation mobile : plus de contraste et zones tactiles */
+@media (max-width: 768px) {
+  .global-nav-link {
+    min-width: 70px !important;
+    padding: 8px 4px !important;
+    font-size: 0.7rem !important;
+  }
+  .global-nav-icon {
+    font-size: 24px !important;
+  }
+  .global-nav {
+    min-height: 64px !important;
+    background: var(--surface) !important;
+    border-top: 2px solid var(--border-soft) !important;
+  }
+}
+
+/* Cartes du tableau de bord : réduire la taille des icônes et du texte */
+@media (max-width: 480px) {
+  .big-card {
+    padding: 14px 16px !important;
+    gap: 12px !important;
+  }
+  .big-card-icon {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 28px !important;
+  }
+  .big-card-value {
+    font-size: 24px !important;
+  }
+  .big-card-label {
+    font-size: 12px !important;
+  }
+  .big-card-hint {
+    font-size: 11px !important;
+  }
+}
+
+/* Actions rapides (page accueil) */
+.action-button {
+  min-height: 56px !important;
+  padding: 12px 10px !important;
+}
+.action-emoji {
+  font-size: 28px !important;
+}
+.action-text {
+  font-size: 12px !important;
+}
+
+/* Page stock : recherche et filtres */
+.stock-toolbar .search-wrap input {
+  font-size: 16px !important;
+  padding: 14px 16px 14px 40px !important;
+}
+.stock-tab {
+  padding: 10px 14px !important;
+  font-size: 0.8rem !important;
+}
+
+/* Page vente : boutons de paiement */
+.pay-button {
+  padding: 14px 8px !important;
+  font-size: 12px !important;
+}
+.pay-icon {
+  font-size: 22px !important;
+}
+
+/* En-têtes */
+.page-header-simple h1 {
+  font-size: 22px !important;
+}
+.page-header-simple p {
+  font-size: 13px !important;
+}
+.stock-header h1 {
+  font-size: 22px !important;
+}
+.stock-header p {
+  font-size: 13px !important;
+}
+
+/* Modales : réduire le padding et le texte */
+.modal {
+  padding: 16px 18px !important;
+}
+.modal-head h3 {
+  font-size: 18px !important;
+}
+.modal-box {
+  padding: 20px !important;
+}
+.modal-box .form-row {
+  grid-template-columns: 1fr !important;
+}
