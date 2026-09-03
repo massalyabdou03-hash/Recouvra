@@ -536,23 +536,27 @@ async function confirmPayment(paymentId) {
         if (fetchError) throw fetchError;
         if (!payment) throw new Error('Paiement non trouvé');
 
+        console.log('✅ Activation de l\'entreprise ID :', payment.entreprise_id); // ← LOG DE DEBUG
+
         const now = new Date();
         const end = new Date(now);
         end.setMonth(end.getMonth() + 1); // +1 mois
 
-        // 2. Mettre à jour la table subscriptions (statut + période)
+        // 2. UPSERT dans subscriptions (crée la ligne si absente, ou met à jour)
         const { error: updateSubError } = await supabaseClient
             .from('subscriptions')
-            .update({
+            .upsert({
+                entreprise_id: payment.entreprise_id,
                 status: 'active',
                 current_period_start: now.toISOString(),
                 current_period_end: end.toISOString(),
                 updated_at: now.toISOString()
-            })
-            .eq('entreprise_id', payment.entreprise_id);
+            }, {
+                onConflict: 'entreprise_id'   // ← CLÉ UNIQUE !
+            });
         if (updateSubError) throw updateSubError;
 
-        // 3. Donner l'accès Recouvra à tous les utilisateurs de l'entreprise
+        // 3. Donner l'accès Recouvra à TOUS les utilisateurs de l'entreprise
         const { error: updateProfilesError } = await supabaseClient
             .from('profiles')
             .update({ has_recouvra: true, updated_at: now.toISOString() })
@@ -562,11 +566,12 @@ async function confirmPayment(paymentId) {
         showToast('✅ Paiement confirmé — entreprise activée.', 'success');
         closeModal('payment-detail-backdrop');
 
-        // 4. Recharger les deux listes pour voir les changements immédiatement
+        // 4. Recharger les deux listes pour un affichage immédiat
         await loadPayments();
-        await loadEntreprises();   // ← AJOUT INDISPENSABLE
+        await loadEntreprises();
 
     } catch (error) {
+        console.error('❌ Erreur dans confirmPayment :', error); // ← AFFICHE L'ERREUR DANS LA CONSOLE
         showToast(friendlyError(error), 'error');
     }
 }
