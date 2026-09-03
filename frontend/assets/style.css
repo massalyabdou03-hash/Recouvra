@@ -898,154 +898,294 @@ body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FE
   position: static !important;
   margin-top: 0 !important;
 }
-/* ==========================================================================
-   REFONTE TOTALE DU DESIGN DES CARTES DE PRODUITS / STOCK
-   ========================================================================== */
+/* ============================================================
+   ONBOARDING — Page d'accueil / prise en main
+   ============================================================ */
 
-/* 1. Grille moderne pour afficher les articles */
-.articles-list,
-.products-grid,
-.stock-list {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
-  gap: 20px !important;
-  margin-top: 20px !important;
+.onboarding-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px 16px;
+  background: var(--bg);
 }
 
-/* 2. Style de chaque carte produit */
-.article-card,
-.product-card,
-.stock-card {
-  background: #ffffff !important;
-  border: 1px solid #e5e7eb !important;
-  border-radius: 16px !important;
-  padding: 20px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  position: relative !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
-  transition: all 0.25s ease !important;
+.onboarding-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 36px 32px 32px;
+  max-width: 640px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-soft);
+  animation: onboardingFadeIn 0.4s ease;
 }
 
-.article-card:hover,
-.product-card:hover,
-.stock-card:hover {
-  transform: translateY(-4px) !important;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08) !important;
-  border-color: #6366f1 !important;
+@keyframes onboardingFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* En-tête de la carte : Icône/Image + Badge Quantité */
-.product-card-header,
-.article-header {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  margin-bottom: 16px !important;
+/* ---- Barre de progression ---- */
+.onboarding-progress {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+.onboarding-progress i {
+  flex: 1;
+  height: 5px;
+  border-radius: 4px;
+  background: var(--surface-3);
+  transition: background 0.3s ease;
+}
+.onboarding-progress i.done {
+  background: var(--accent);
+}
+.onboarding-progress i.active {
+  background: var(--accent);
+  opacity: 0.5;
 }
 
-/* Conteneur de l'icône/carton */
-.product-icon,
-.article-icon {
-  width: 48px !important;
-  height: 48px !important;
-  background: #f3f4f6 !important;
-  border-radius: 12px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-size: 1.4rem !important;
+/* ---- Étapes ---- */
+.onboarding-step {
+  animation: stepFade 0.3s ease;
 }
 
-/* Badge de statut / quantité */
-.stock-badge {
-  padding: 4px 10px !important;
-  border-radius: 20px !important;
-  font-size: 0.75rem !important;
-  font-weight: 700 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px !important;
+@keyframes stepFade {
+  from { opacity: 0; transform: translateX(8px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
-/* Couleurs selon l'état du stock */
-.stock-badge.in-stock,
-.badge-success {
-  background: #d1fae5 !important;
-  color: #065f46 !important;
+.onboarding-eyebrow {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
 }
 
-.stock-badge.low-stock,
-.badge-warning {
-  background: #fef3c7 !important;
-  color: #92400e !important;
+.onboarding-step h1 {
+  font-size: 1.65rem;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: var(--text);
+  letter-spacing: -0.01em;
 }
 
-.stock-badge.out-stock,
-.badge-danger {
-  background: #fee2e2 !important;
-  color: #991b1b !important;
+.onboarding-step .lead {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin: 0 0 18px;
+  line-height: 1.5;
 }
 
-/* Informations sur le produit */
-.article-title,
-.product-name {
-  font-size: 1.1rem !important;
-  font-weight: 700 !important;
-  color: #111827 !important;
-  margin: 0 0 4px 0 !important;
+/* ---- Grille de choix (type de commerce / besoins) ---- */
+.onboarding-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 14px 0 20px;
 }
 
-.article-code,
-.product-sku {
-  font-size: 0.8rem !important;
-  color: #9ca3af !important;
-  font-family: monospace !important;
-  margin-bottom: 16px !important;
+.onboarding-choice {
+  padding: 12px 8px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+  font-family: var(--font-body);
 }
 
-/* Prix du produit */
-.article-price,
-.product-price {
-  font-size: 1.4rem !important;
-  font-weight: 800 !important;
-  color: #4f46e5 !important;
-  margin-bottom: 16px !important;
+.onboarding-choice:hover {
+  border-color: var(--accent);
+  background: var(--surface-2);
 }
 
-/* Actions (Boutons Modifier / Supprimer) */
-.article-actions,
-.product-actions {
-  display: flex !important;
-  gap: 8px !important;
-  border-top: 1px solid #f3f4f6 !important;
-  padding-top: 12px !important;
-  justify-content: flex-end !important;
+.onboarding-choice.selected {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--accent-hi);
 }
 
-.btn-icon-action {
-  width: 36px !important;
-  height: 36px !important;
-  border-radius: 8px !important;
-  border: 1px solid #e5e7eb !important;
-  background: #f9fafb !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  font-size: 0.9rem !important;
+/* ---- Prix / Plans ---- */
+.onboarding-step h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 20px 0 8px;
+  color: var(--text);
 }
 
-.btn-icon-action:hover {
-  background: #eef2ff !important;
-  color: #4f46e5 !important;
-  border-color: #c7d2fe !important;
+.pricing-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 6px 0 8px;
 }
 
-.btn-icon-action.delete:hover {
-  background: #fef2f2 !important;
-  color: #ef4444 !important;
-  border-color: #fca5a5 !important;
+@media (max-width: 480px) {
+  .pricing-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pricing-option {
+  padding: 16px 14px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  background: var(--surface);
+}
+
+.pricing-option:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.pricing-option.selected {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.pricing-option strong {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.pricing-option .amount {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--accent-hi);
+  margin: 4px 0 6px;
+}
+
+.pricing-option ul {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.pricing-option ul li {
+  padding: 2px 0;
+  padding-left: 16px;
+  position: relative;
+}
+.pricing-option ul li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--success);
+  font-weight: 700;
+}
+
+.pricing-option .badge {
+  position: absolute;
+  top: -10px;
+  right: -8px;
+  background: var(--success);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.03em;
+}
+
+/* ---- Navigation ---- */
+.onboarding-nav {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.onboarding-nav .btn {
+  min-width: 140px;
+}
+
+.onboarding-nav .btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 8px 4px;
+  transition: color 0.15s ease;
+}
+.onboarding-nav .btn-back:hover {
+  color: var(--text);
+}
+.onboarding-nav .btn-back .arrow {
+  font-size: 1.1rem;
+  transition: transform 0.15s ease;
+}
+.onboarding-nav .btn-back:hover .arrow {
+  transform: translateX(-3px);
+}
+
+/* ---- Zone de reassurance ---- */
+.reassurance-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--info-dim);
+  border-radius: var(--radius-sm);
+  margin: 16px 0 10px;
+  border-left: 3px solid var(--info);
+}
+
+.reassurance-box .icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.reassurance-box span {
+  font-size: 0.85rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.reassurance-box span strong {
+  font-weight: 700;
+}
+
+/* ---- Messages ---- */
+#onboarding-msg {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  min-height: 1.4em;
+}
+
+/* ---- Mode sombre (déjà géré par les variables) ---- */
+body.dark-mode .onboarding-choice {
+  background: var(--surface-2);
+}
+body.dark-mode .pricing-option {
+  background: var(--surface-2);
+}
+body.dark-mode .reassurance-box {
+  background: var(--surface-2);
+  border-left-color: var(--info);
 }
