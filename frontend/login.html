@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion — Recouvra</title>
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4F46E5">
     <meta name="mobile-web-app-capable" content="yes">
@@ -12,141 +12,293 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Recouvra">
     <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+    <link rel="stylesheet" href="assets/style.css">
     <style>
-        /* ============================================================
-           LOGIN — Page de connexion (CSS intégré pour sécurité)
-           ============================================================ */
+        /* ========== PAGE LOGIN AMÉLIORÉE ========== */
+
+        /* Fond animé (dégradé + cercles) */
         .login-shell {
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             padding: 24px 16px;
-            background: var(--bg);
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            overflow: hidden;
         }
 
-        .login-card {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            padding: 36px 32px 32px;
-            max-width: 420px;
+        .login-shell::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 30%, rgba(79,70,229,0.2) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 70%, rgba(236,72,153,0.15) 0%, transparent 50%);
+            animation: bgPulse 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgPulse {
+            0% { opacity: 0.6; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.05); }
+        }
+
+        /* Cercles flottants */
+        .floating-circles {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-circles span {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(79,70,229,0.08);
+            animation: floatCircle 20s infinite ease-in-out;
+        }
+
+        .floating-circles span:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            top: -50px;
+            left: -50px;
+            animation-delay: 0s;
+        }
+        .floating-circles span:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            bottom: -100px;
+            right: -80px;
+            animation-delay: -5s;
+            background: rgba(236,72,153,0.06);
+        }
+        .floating-circles span:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            top: 40%;
+            left: 60%;
+            animation-delay: -10s;
+            background: rgba(56,189,248,0.06);
+        }
+
+        @keyframes floatCircle {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -40px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        /* Carte de connexion */
+        .login-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            max-width: 1000px;
             width: 100%;
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border-soft);
-            animation: loginFadeIn 0.5s ease;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 2;
+            animation: cardFadeIn 0.8s ease forwards;
         }
 
-        @keyframes loginFadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        .login-card .brand {
-            text-align: center;
-            margin-bottom: 28px;
+        /* Partie gauche : présentation */
+        .login-brand {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-right: 20px;
+            color: #fff;
         }
 
-        .login-card .brand h1 {
+        .login-brand .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .login-brand .logo svg {
+            width: 48px;
+            height: 48px;
+        }
+
+        .login-brand .logo span {
             font-size: 1.8rem;
             font-weight: 700;
-            margin: 8px 0 2px;
-            color: var(--text);
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .login-card .brand p {
-            color: var(--text-muted);
+        .login-brand h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 0 8px;
+            color: #fff;
+        }
+
+        .login-brand p {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.6;
+            margin: 0 0 24px;
+        }
+
+        .login-brand .features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .login-brand .features .feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.06);
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .login-brand .features .feature span {
+            font-size: 1.2rem;
+        }
+
+        /* Partie droite : formulaire */
+        .login-form-wrapper {
+            background: rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid rgba(255,255,255,0.06);
+            backdrop-filter: blur(10px);
+        }
+
+        .login-form-wrapper .form-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #fff;
+            margin: 0 0 6px;
+        }
+
+        .login-form-wrapper .form-subtitle {
+            color: rgba(255,255,255,0.6);
             font-size: 0.9rem;
-            margin: 0;
+            margin: 0 0 24px;
         }
 
-        .login-card .form-group {
+        .login-form-wrapper .form-group {
             margin-bottom: 18px;
         }
 
-        .login-card .form-group label {
+        .login-form-wrapper .form-group label {
             display: block;
             font-size: 0.8rem;
             font-weight: 600;
-            color: var(--text-muted);
+            color: rgba(255,255,255,0.7);
             margin-bottom: 4px;
         }
 
-        .login-card .form-group input {
+        .login-form-wrapper .form-group input {
             width: 100%;
             padding: 12px 14px;
-            border: 2px solid var(--border);
-            border-radius: var(--radius-sm);
-            background: var(--surface-2);
-            color: var(--text);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.08);
+            color: #fff;
             font-size: 1rem;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        .login-card .form-group input:focus {
+        .login-form-wrapper .form-group input:focus {
             outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 4px var(--accent-glow);
-            background: var(--surface);
+            border-color: #818cf8;
+            box-shadow: 0 0 0 4px rgba(79,70,229,0.2);
+            background: rgba(255,255,255,0.12);
         }
 
-        .login-card .btn-login {
+        .login-form-wrapper .form-group input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+
+        .login-form-wrapper .btn-login {
             width: 100%;
             padding: 14px;
-            background: linear-gradient(155deg, var(--accent-hi), var(--accent));
+            background: linear-gradient(135deg, #4F46E5, #7C3AED);
             color: #fff;
             border: none;
-            border-radius: var(--radius-sm);
+            border-radius: 10px;
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
             transition: transform 0.15s, box-shadow 0.15s;
-            box-shadow: 0 4px 14px -4px rgba(79, 70, 229, 0.5);
+            box-shadow: 0 4px 14px rgba(79,70,229,0.4);
         }
 
-        .login-card .btn-login:hover:not(:disabled) {
+        .login-form-wrapper .btn-login:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px -6px rgba(79, 70, 229, 0.55);
+            box-shadow: 0 8px 20px rgba(79,70,229,0.5);
         }
 
-        .login-card .btn-login:disabled {
+        .login-form-wrapper .btn-login:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
         }
 
-        .login-card .login-footer {
+        .login-form-wrapper .login-footer {
             margin-top: 20px;
             text-align: center;
             font-size: 0.85rem;
-            color: var(--text-muted);
+            color: rgba(255,255,255,0.6);
         }
 
-        .login-card .login-footer a {
-            color: var(--accent);
+        .login-form-wrapper .login-footer a {
+            color: #818cf8;
             font-weight: 600;
             text-decoration: none;
+            transition: color 0.2s;
         }
 
-        .login-card .login-footer a:hover {
+        .login-form-wrapper .login-footer a:hover {
+            color: #a5b4fc;
             text-decoration: underline;
         }
 
-        .login-card .error-msg {
-            background: var(--danger-dim);
-            color: var(--danger-hi);
+        .login-form-wrapper .error-msg {
+            background: rgba(239,68,68,0.15);
+            color: #f87171;
             padding: 10px 14px;
-            border-radius: var(--radius-sm);
-            border-left: 3px solid var(--danger);
+            border-radius: 10px;
+            border-left: 3px solid #ef4444;
             margin-bottom: 16px;
             font-size: 0.85rem;
             display: none;
         }
 
-        .login-card .error-msg.show {
+        .login-form-wrapper .error-msg.show {
             display: block;
+            animation: shake 0.3s ease;
         }
 
-        /* Spinner dans le bouton */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
         .spinner {
             display: inline-block;
             width: 20px;
@@ -163,42 +315,104 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Mode sombre */
-        body.dark-mode .login-card .form-group input {
-            background: var(--surface-2);
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-wrapper {
+                grid-template-columns: 1fr;
+                padding: 24px;
+                gap: 24px;
+            }
+            .login-brand {
+                padding-right: 0;
+                text-align: center;
+            }
+            .login-brand .features {
+                grid-template-columns: 1fr 1fr;
+            }
+            .login-brand .logo {
+                justify-content: center;
+            }
+            .login-form-wrapper {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-wrapper {
+                padding: 16px;
+            }
+            .login-brand .features {
+                grid-template-columns: 1fr;
+            }
+            .login-brand h2 {
+                font-size: 1.5rem;
+            }
+            .login-form-wrapper {
+                padding: 16px;
+            }
+        }
+
+        /* Mode sombre — déjà géré par les variables, mais on ajoute une petite correction */
+        body.dark-mode .login-wrapper {
+            background: rgba(0,0,0,0.3);
+        }
+        body.dark-mode .login-form-wrapper {
+            background: rgba(0,0,0,0.2);
         }
     </style>
 </head>
 <body>
 
     <main class="login-shell">
-        <div class="login-card">
-            <div class="brand">
-                <!-- Logo SVG comme dans les autres pages -->
-                <svg viewBox="0 0 24 24" width="48" height="48" style="display:block; margin:0 auto 8px;">
-                    <rect width="24" height="24" rx="6" fill="#4F46E5"/>
-                    <path d="M7 12h10M12 7v10" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
-                </svg>
-                <h1>Recouvra</h1>
-                <p>Connectez-vous à votre espace</p>
+        <!-- Cercles flottants -->
+        <div class="floating-circles">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <div class="login-wrapper">
+            <!-- Partie gauche : présentation -->
+            <div class="login-brand">
+                <div class="logo">
+                    <svg viewBox="0 0 24 24">
+                        <rect width="24" height="24" rx="6" fill="#4F46E5"/>
+                        <path d="M7 12h10M12 7v10" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+                    </svg>
+                    <span>Recouvra</span>
+                </div>
+                <h2>Bienvenue dans votre gestion commerciale</h2>
+                <p>Vendez, suivez votre stock, gérez vos crédits et relancez vos clients automatiquement.</p>
+                <div class="features">
+                    <div class="feature"><span>🧾</span> Ventes</div>
+                    <div class="feature"><span>📦</span> Stock</div>
+                    <div class="feature"><span>💸</span> Crédits</div>
+                    <div class="feature"><span>📣</span> Relances</div>
+                </div>
             </div>
 
-            <div id="login-error" class="error-msg"></div>
+            <!-- Partie droite : formulaire -->
+            <div class="login-form-wrapper">
+                <div class="form-title">Connexion</div>
+                <div class="form-subtitle">Accédez à votre espace</div>
 
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" placeholder="votre@email.com" required autofocus>
-                </div>
-                <div class="form-group">
-                    <label for="password">Mot de passe</label>
-                    <input type="password" id="password" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn-login">Se connecter</button>
-            </form>
+                <div id="login-error" class="error-msg"></div>
 
-            <div class="login-footer">
-                Pas encore de compte ? <a href="onboarding.html">S'inscrire</a>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="votre@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Mot de passe</label>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-login">Se connecter</button>
+                </form>
+
+                <div class="login-footer">
+                    Pas encore de compte ? <a href="onboarding.html">S'inscrire</a>
+                </div>
             </div>
         </div>
     </main>
@@ -214,13 +428,9 @@
             const errorMsg = document.getElementById('login-error');
             const btn = document.querySelector('.btn-login');
 
-            // Gestion du mode sombre (si besoin, on reprend celui de app.js)
-            // La fonction toggleDarkMode est déjà dans app.js
-
             if (form) {
                 form.addEventListener('submit', async function(e) {
                     e.preventDefault();
-                    // Réinitialiser le message d'erreur
                     errorMsg.classList.remove('show');
                     errorMsg.textContent = '';
 
@@ -233,7 +443,6 @@
                         return;
                     }
 
-                    // Désactiver le bouton et afficher le spinner
                     btn.disabled = true;
                     btn.innerHTML = '<span class="spinner"></span> Connexion...';
 
@@ -245,27 +454,7 @@
 
                         if (error) throw error;
 
-                        // Vérifier si l'utilisateur a déjà complété l'onboarding
-                        try {
-                            const { data: profile, error: profileError } = await supabaseClient
-                                .from('profiles')
-                                .select('onboarding_complete')
-                                .eq('id', data.user.id)
-                                .single();
-
-                            if (profileError) throw profileError;
-
-                            // Redirection vers l'accueil (ou onboarding si non complété)
-                            if (profile?.onboarding_complete === true) {
-                                window.location.href = 'index.html';
-                            } else {
-                                window.location.href = 'onboarding.html';
-                            }
-                        } catch (err) {
-                            console.warn('Erreur vérification onboarding:', err);
-                            // En cas d'erreur, on va quand même sur l'accueil
-                            window.location.href = 'index.html';
-                        }
+                        window.location.href = 'index.html';
 
                     } catch (err) {
                         console.error('Erreur connexion:', err);
