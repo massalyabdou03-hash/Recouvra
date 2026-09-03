@@ -580,19 +580,44 @@ async function confirmPayment(paymentId) {
         const end = new Date(now);
         end.setMonth(end.getMonth() + 1);
 
-        // 2. UPSERT dans subscriptions (crée la ligne si absente, ou met à jour)
-        const { error: updateSubError } = await supabaseClient
+        // 2. Vérifier si une ligne existe déjà dans subscriptions
+        const { data: existing, error: selectError } = await supabaseClient
             .from('subscriptions')
-            .upsert({
-                entreprise_id: payment.entreprise_id,
-                status: 'active',
-                current_period_start: now.toISOString(),
-                current_period_end: end.toISOString(),
-                updated_at: now.toISOString()
-            }, {
-                onConflict: 'entreprise_id'
-            });
-        if (updateSubError) throw updateSubError;
+            .select('id')
+            .eq('entreprise_id', payment.entreprise_id)
+            .maybeSingle();
+
+        if (selectError) throw selectError;
+
+        let updateError;
+        if (existing) {
+            // Mise à jour
+            console.log('📝 Mise à jour de subscriptions pour entreprise_id:', payment.entreprise_id);
+            const { error } = await supabaseClient
+                .from('subscriptions')
+                .update({
+                    status: 'active',
+                    current_period_start: now.toISOString(),
+                    current_period_end: end.toISOString(),
+                    updated_at: now.toISOString()
+                })
+                .eq('entreprise_id', payment.entreprise_id);
+            updateError = error;
+        } else {
+            // Insertion
+            console.log('📝 Insertion dans subscriptions pour entreprise_id:', payment.entreprise_id);
+            const { error } = await supabaseClient
+                .from('subscriptions')
+                .insert({
+                    entreprise_id: payment.entreprise_id,
+                    status: 'active',
+                    current_period_start: now.toISOString(),
+                    current_period_end: end.toISOString(),
+                    updated_at: now.toISOString()
+                });
+            updateError = error;
+        }
+        if (updateError) throw updateError;
 
         // 3. Donner l'accès Recouvra à TOUS les utilisateurs de l'entreprise
         const { error: updateProfilesError } = await supabaseClient
@@ -604,7 +629,7 @@ async function confirmPayment(paymentId) {
         showToast('✅ Paiement confirmé — entreprise activée.', 'success');
         closeModal('payment-detail-backdrop');
 
-        // 4. Recharger les deux listes pour un affichage immédiat
+        // 4. Recharger les deux listes
         await loadPayments();
         await loadEntreprises();
 
