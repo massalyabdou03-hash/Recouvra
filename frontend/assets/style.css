@@ -898,3 +898,154 @@ body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FE
   position: static !important;
   margin-top: 0 !important;
 }
+/* ==========================================================================
+   REFONTE TOTALE DU DESIGN DES CARTES DE PRODUITS / STOCK
+   ========================================================================== */
+
+/* 1. Grille moderne pour afficher les articles */
+.articles-list,
+.products-grid,
+.stock-list {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+  gap: 20px !important;
+  margin-top: 20px !important;
+}
+
+/* 2. Style de chaque carte produit */
+.article-card,
+.product-card,
+.stock-card {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 16px !important;
+  padding: 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  position: relative !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+  transition: all 0.25s ease !important;
+}
+
+.article-card:hover,
+.product-card:hover,
+.stock-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08) !important;
+  border-color: #6366f1 !important;
+}
+
+/* En-tête de la carte : Icône/Image + Badge Quantité */
+.product-card-header,
+.article-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 16px !important;
+}
+
+/* Conteneur de l'icône/carton */
+.product-icon,
+.article-icon {
+  width: 48px !important;
+  height: 48px !important;
+  background: #f3f4f6 !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.4rem !important;
+}
+
+/* Badge de statut / quantité */
+.stock-badge {
+  padding: 4px 10px !important;
+  border-radius: 20px !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+/* Couleurs selon l'état du stock */
+.stock-badge.in-stock,
+.badge-success {
+  background: #d1fae5 !important;
+  color: #065f46 !important;
+}
+
+.stock-badge.low-stock,
+.badge-warning {
+  background: #fef3c7 !important;
+  color: #92400e !important;
+}
+
+.stock-badge.out-stock,
+.badge-danger {
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+}
+
+/* Informations sur le produit */
+.article-title,
+.product-name {
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  margin: 0 0 4px 0 !important;
+}
+
+.article-code,
+.product-sku {
+  font-size: 0.8rem !important;
+  color: #9ca3af !important;
+  font-family: monospace !important;
+  margin-bottom: 16px !important;
+}
+
+/* Prix du produit */
+.article-price,
+.product-price {
+  font-size: 1.4rem !important;
+  font-weight: 800 !important;
+  color: #4f46e5 !important;
+  margin-bottom: 16px !important;
+}
+
+/* Actions (Boutons Modifier / Supprimer) */
+.article-actions,
+.product-actions {
+  display: flex !important;
+  gap: 8px !important;
+  border-top: 1px solid #f3f4f6 !important;
+  padding-top: 12px !important;
+  justify-content: flex-end !important;
+}
+
+.btn-icon-action {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 8px !important;
+  border: 1px solid #e5e7eb !important;
+  background: #f9fafb !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  font-size: 0.9rem !important;
+}
+
+.btn-icon-action:hover {
+  background: #eef2ff !important;
+  color: #4f46e5 !important;
+  border-color: #c7d2fe !important;
+}
+
+.btn-icon-action.delete:hover {
+  background: #fef2f2 !important;
+  color: #ef4444 !important;
+  border-color: #fca5a5 !important;
+}
