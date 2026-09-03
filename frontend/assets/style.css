@@ -820,3 +820,81 @@ body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FE
 .stat-card[data-type="value"] {
   border-left: 4px solid #10b981;
 }
+/* ==========================================================================
+   CORRECTION DESIGN PAGE STOCK & PRODUITS (ALIGNÉ SUR MES CLIENTS)
+   ========================================================================== */
+
+/* 1. Correction de l'en-tête pour éviter les chevauchements */
+.stock-header,
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* 2. Cartes de statistiques (KPIs) identiques à la page Mes Clients */
+.stock-stats,
+.stats-grid,
+.summary-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 16px !important;
+  margin-bottom: 24px !important;
+}
+
+@media (max-width: 992px) {
+  .stock-stats,
+  .stats-grid,
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+.stock-stat-card,
+.stat-card,
+.summary-card {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  padding: 24px 16px !important;
+  text-align: center !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Valeur principale en grand et gras au-dessus */
+.stock-stat-card .val,
+.stat-card .val,
+.summary-card .value {
+  font-size: 1.8rem !important;
+  font-weight: 800 !important;
+  color: #111827 !important;
+  line-height: 1.2 !important;
+  order: 1 !important;
+}
+
+/* Libellé secondaire en dessous */
+.stock-stat-card .lbl,
+.stat-card .lbl,
+.summary-card .label {
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  color: #6b7280 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  margin-top: 6px !important;
+  order: 2 !important;
+}
+
+/* 3. Bouton "Ajouter un article" violet pleine largeur sous la recherche */
+.btn-primary,
+.btn-add-article {
+  position: static !important;
+  margin-top: 0 !important;
+}
