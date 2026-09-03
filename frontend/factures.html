@@ -16,11 +16,75 @@
 
 <style>
 /* ============================================================================
+   MENU MOBILE + MODE SOMBRE GLOBAL
+   ============================================================================ */
+
+.mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 1001;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: #4F46E5;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex;
+    }
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 280px;
+        height: 100vh;
+        transition: left 0.3s ease;
+        z-index: 1000;
+        overflow-y: auto;
+    }
+    .sidebar.open {
+        left: 0;
+    }
+    .main {
+        padding-left: 16px;
+        padding-right: 16px;
+        padding-top: 60px;
+    }
+}
+
+/* ============================================================================
    CORRECTIONS MOBILE GLOBALES (AJOUTÉES)
    ============================================================================ */
 @media (max-width: 768px) {
     body { overflow-x: hidden; }
 }
+
+body.menu-open .mobile-menu-btn { display: none; }
 
 @media (max-width: 600px) {
     .modal-backdrop { padding: 16px 10px; }
@@ -140,7 +204,7 @@ body.dark-mode .hint {
 .step-number {
     width: 32px;
     height: 32px;
-    background: linear-gradient(135deg,#4F46E5,#6366F1);
+    background: #4F46E5;
     color: white;
     border-radius: 50%;
     display: flex;
@@ -148,7 +212,6 @@ body.dark-mode .hint {
     justify-content: center;
     font-weight: 700;
     font-size: 16px;
-    box-shadow: 0 3px 8px rgba(79,70,229,0.3);
 }
 
 .sell-step-header h3 {
@@ -380,19 +443,15 @@ body.dark-mode .hint {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 22px;
+    padding: 16px 0;
+    border-top: 2px solid #eee;
     margin-top: 16px;
-    font-size: 16px;
-    font-weight: 600;
-    background: linear-gradient(135deg,#4F46E5,#6366F1);
-    color: #fff;
-    border-radius: 14px;
-    border-top: none;
+    font-size: 18px;
 }
 
 .cart-total strong {
-    font-size: 30px;
-    color: #fff;
+    font-size: 28px;
+    color: #4F46E5;
 }
 
 .payment-buttons {
@@ -579,6 +638,8 @@ body.dark-mode label {
 <body>
 
 <!-- ========== MENU MOBILE ========== -->
+<button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
 <div class="app">
   <nav class="sidebar">
@@ -758,8 +819,26 @@ body.dark-mode label {
 <script src="assets/app.js"></script>
 <script>
 // ============================================================================
-// MODE SOMBRE
+// MENU MOBILE + MODE SOMBRE
 // ============================================================================
+
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    if (sidebar) sidebar.classList.toggle('open');
+    if (overlay) overlay.classList.toggle('active');
+    document.body.classList.toggle('menu-open', sidebar?.classList.contains('open'));
+}
+
+document.addEventListener('click', (e) => {
+    if (e.target.closest('.nav-link')) {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+        document.body.classList.remove('menu-open');
+    }
+});
 
 function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
