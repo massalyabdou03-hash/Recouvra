@@ -742,3 +742,81 @@ body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FE
   border-color: var(--accent);
   box-shadow: 0 4px 12px var(--accent-glow);
 }
+/* ==========================================================================
+   STYLISATION DES CARTES DE STATISTIQUES / SUMMARY (PAGE STOCK)
+   ========================================================================== */
+
+/* Grille réactive pour disposer les cartes d'indicateurs */
+.stock-stats,
+.stats-grid,
+.summary-grid,
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+/* Style de chaque carte individuelle */
+.stock-stat-card,
+.stat-card,
+.summary-card,
+.kpi-card {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--radius, 12px);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stock-stat-card:hover,
+.stat-card:hover,
+.summary-card:hover,
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Chiffre / Valeur principale */
+.stock-stat-card .val,
+.stat-card .val,
+.summary-card .value,
+.kpi-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text, #0f172a);
+}
+
+/* Libellé / Texte explicatif sous la valeur */
+.stock-stat-card .lbl,
+.stat-card .lbl,
+.summary-card .label,
+.kpi-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted, #64748b);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Couleurs d'accentuation selon l'état des cartes */
+.stat-card.warn,
+.stat-card[data-type="low-stock"] {
+  border-left: 4px solid #f59e0b;
+}
+
+.stat-card.danger,
+.stat-card[data-type="out-of-stock"] {
+  border-left: 4px solid #ef4444;
+}
+
+.stat-card.success,
+.stat-card[data-type="value"] {
+  border-left: 4px solid #10b981;
+}
