@@ -2,7 +2,27 @@
 // ONBOARDING — Script complet avec animations
 // ============================================================
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Vérifier si l'utilisateur a déjà complété l'onboarding
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            const { data: profile, error } = await supabaseClient
+                .from('profiles')
+                .select('onboarding_complete')
+                .eq('id', session.user.id)
+                .single();
+            if (profile?.onboarding_complete === true) {
+                // Déjà fait → rediriger vers l'accueil
+                window.location.href = 'index.html';
+                return;
+            }
+        }
+    } catch (e) {
+        console.warn('Erreur vérification onboarding:', e);
+    }
+
+    // Si on arrive ici, l'onboarding n'a pas été complété
     initOnboarding();
 });
 
@@ -10,8 +30,6 @@ function initOnboarding() {
     // Éléments DOM
     const steps = document.querySelectorAll('.onboarding-step');
     const progressDots = document.querySelectorAll('.onboarding-progress i');
-    const choices = document.querySelectorAll('.onboarding-choice');
-    const planOptions = document.querySelectorAll('.pricing-option');
     const finishBtn = document.getElementById('finish-btn');
     const msgEl = document.getElementById('onboarding-msg');
 
@@ -23,12 +41,10 @@ function initOnboarding() {
     // ---------- Fonction pour changer d'étape avec animation ----------
     window.goToStep = function(step) {
         if (step < 1 || step > steps.length) return;
-        // Validation : étape 2 nécessite un commerce
         if (step === 3 && !selectedCommerce) {
             showMessage('Veuillez sélectionner votre type de commerce.', 'warning');
             return;
         }
-        // Animation de sortie
         const currentEl = document.querySelector(`.onboarding-step[data-step="${currentStep}"]`);
         if (currentEl) {
             currentEl.style.transition = 'opacity 0.25s ease, transform 0.3s ease';
@@ -36,14 +52,12 @@ function initOnboarding() {
             currentEl.style.transform = 'translateX(-20px)';
         }
 
-        // Mise à jour de la progression
         progressDots.forEach((dot, idx) => {
             dot.className = '';
             if (idx + 1 === step) dot.classList.add('active');
             else if (idx + 1 < step) dot.classList.add('done');
         });
 
-        // Afficher la nouvelle étape après un court délai
         setTimeout(() => {
             steps.forEach(s => s.hidden = true);
             const newEl = document.querySelector(`.onboarding-step[data-step="${step}"]`);
@@ -68,7 +82,6 @@ function initOnboarding() {
             this.classList.add('selected');
             selectedCommerce = this.dataset.value;
             document.getElementById('step2-next').disabled = false;
-            // Animation : ajout d'un check
             this.style.transition = 'background 0.2s';
             this.style.background = 'var(--accent-dim)';
             setTimeout(() => this.style.background = '', 300);
@@ -82,7 +95,6 @@ function initOnboarding() {
             const val = this.dataset.value;
             if (this.classList.contains('selected')) {
                 if (!selectedBesoins.includes(val)) selectedBesoins.push(val);
-                // Animation
                 this.style.transition = 'transform 0.15s';
                 this.style.transform = 'scale(0.95)';
                 setTimeout(() => this.style.transform = '', 150);
@@ -98,7 +110,6 @@ function initOnboarding() {
         document.querySelectorAll('.pricing-option').forEach(el => el.classList.remove('selected'));
         element.classList.add('selected');
         selectedPlan = plan;
-        // Animation : effet d'échelle
         element.style.transition = 'transform 0.2s';
         element.style.transform = 'scale(1.02)';
         setTimeout(() => element.style.transform = '', 200);
@@ -107,6 +118,10 @@ function initOnboarding() {
     // ---------- Affichage des besoins sélectionnés (étape 3) ----------
     function updateValueBlocks() {
         const container = document.getElementById('value-blocks');
+        if (!container) {
+            console.error('❌ #value-blocks introuvable');
+            return;
+        }
         if (selectedBesoins.length === 0) {
             container.innerHTML = '';
             return;
@@ -121,7 +136,7 @@ function initOnboarding() {
         };
         container.innerHTML = `
             <div style="display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 12px;">
-                ${selectedBesoins.map(b => `<span class="badge" style="background:var(--accent-dim);color:var(--accent-hi);padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:600;">${labels[b] || b}</span>`).join('')}
+                ${selectedBesoins.map(b => `<span class="badge besoin-badge">${labels[b] || b}</span>`).join('')}
             </div>
         `;
         // Animation d'apparition
@@ -164,14 +179,13 @@ function initOnboarding() {
         btn.textContent = '⏳ Activation...';
 
         try {
-            // Vérification de la session
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
                 window.location.href = 'login.html';
                 return;
             }
 
-            // Mise à jour du profil utilisateur
+            // Mise à jour du profil
             const { error: profileError } = await supabaseClient
                 .from('profiles')
                 .update({
@@ -182,28 +196,61 @@ function initOnboarding() {
                     updated_at: new Date().toISOString()
                 })
                 .eq('id', session.user.id);
-
             if (profileError) throw profileError;
 
-            // Créer un paiement en attente pour l'abonnement
-            const { error: paymentError } = await supabaseClient
-                .from('subscription_payments')
-                .insert({
-                    entreprise_id: session.user.entreprise_id, // à vérifier
-                    status: 'pending',
-                    amount: selectedPlan === 'recouvrement' ? 15000 : 10000,
-                    payment_type: 'subscription',
-                    submitted_by: session.user.id,
-                });
-            // Si erreur, on log mais on ne bloque pas (peut-être pas de table)
-            if (paymentError) console.warn('Erreur paiement (non bloquante) :', paymentError);
+            // Récupérer l'entreprise_id
+            const { data: profile, error: fetchError } = await supabaseClient
+                .from('profiles')
+                .select('entreprise_id')
+                .eq('id', session.user.id)
+                .single();
+            if (fetchError) throw fetchError;
 
-            // Animation de succès
+            if (profile?.entreprise_id) {
+                const now = new Date();
+                const end = new Date(now);
+                end.setMonth(end.getMonth() + 1);
+
+                const { data: existingSub } = await supabaseClient
+                    .from('subscriptions')
+                    .select('id')
+                    .eq('entreprise_id', profile.entreprise_id)
+                    .maybeSingle();
+
+                if (existingSub) {
+                    await supabaseClient
+                        .from('subscriptions')
+                        .update({
+                            status: 'active',
+                            plan: selectedPlan === 'recouvrement' ? 'recouvra_pro' : 'simple',
+                            current_period_start: now.toISOString(),
+                            current_period_end: end.toISOString(),
+                            updated_at: now.toISOString()
+                        })
+                        .eq('entreprise_id', profile.entreprise_id);
+                } else {
+                    await supabaseClient
+                        .from('subscriptions')
+                        .insert({
+                            entreprise_id: profile.entreprise_id,
+                            plan: selectedPlan === 'recouvrement' ? 'recouvra_pro' : 'simple',
+                            status: 'active',
+                            current_period_start: now.toISOString(),
+                            current_period_end: end.toISOString(),
+                            updated_at: now.toISOString()
+                        });
+                }
+
+                await supabaseClient
+                    .from('profiles')
+                    .update({ has_recouvra: true, updated_at: now.toISOString() })
+                    .eq('entreprise_id', profile.entreprise_id);
+            }
+
             btn.textContent = '✅ C\'est parti !';
             btn.style.background = 'var(--success)';
             btn.style.color = '#fff';
 
-            // Redirection vers la page d'accueil après 1.5s
             setTimeout(() => {
                 window.location.href = 'index.html';
             }, 1500);
@@ -217,7 +264,6 @@ function initOnboarding() {
     };
 
     // ---------- Initialisation : première étape ----------
-    // S'assurer que seule l'étape 1 est visible au départ
     steps.forEach((s, idx) => {
         if (idx === 0) {
             s.hidden = false;
@@ -227,42 +273,7 @@ function initOnboarding() {
             s.hidden = true;
         }
     });
-    // Progression
     progressDots.forEach((dot, idx) => {
         dot.className = idx === 0 ? 'active' : '';
     });
-
-    // Écouter les événements de changement d'étape (pour désactiver le bouton "Continuer" si besoin)
-    // Le bouton "Continuer" de l'étape 2 est désactivé tant qu'un choix n'est pas fait
-    // déjà géré plus haut
 }
-// ============================================================
-// ONBOARDING — Script complet avec animations
-// ============================================================
-
-document.addEventListener('DOMContentLoaded', async () => {
-    // Vérifier si l'utilisateur a déjà complété l'onboarding
-    try {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session) {
-            const { data: profile, error } = await supabaseClient
-                .from('profiles')
-                .select('onboarding_complete')
-                .eq('id', session.user.id)
-                .single();
-            if (profile?.onboarding_complete === true) {
-                // Déjà fait → rediriger vers l'accueil
-                window.location.href = 'index.html';
-                return;
-            }
-        }
-    } catch (e) {
-        // En cas d'erreur, on reste sur la page (pas de redirection)
-        console.warn('Erreur vérification onboarding:', e);
-    }
-
-    // Si on arrive ici, l'onboarding n'a pas été complété
-    initOnboarding();
-});
-
-// ... le reste du code (initOnboarding, goToStep, startTrial, etc.)
