@@ -1,123 +1,95 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Connexion — Gestion Stock & Recouvra</title>
-<link rel="stylesheet" href="assets/style.css">
-<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#4F46E5"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Recouvra"><link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion — Recouvra</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <!-- Autres métas et liens -->
 </head>
 <body>
-  <main class="auth-layout">
-    <section class="auth-showcase">
-      <div class="auth-brand"><span class="auth-mark">R</span><div><strong>Recouvra</strong><span>Gestion Stock &amp; Facturation</span></div></div>
-      <p class="auth-mobile-pitch">De la vente au recouvrement, Recouvra vous aide à garder le contrôle.</p>
-      <h1 class="auth-headline">Gérez votre commerce. Suivez votre stock. Facturez. Récupérez votre argent.</h1>
-      <ul class="auth-benefits">
-        <li>Gérez votre stock en temps réel</li>
-        <li>Créez des factures professionnelles</li>
-        <li>Suivez les paiements et les impayés</li>
-        <li>Relancez vos clients facilement via WhatsApp</li>
-        <li>Gardez toute votre activité au même endroit</li>
-      </ul>
-      <p class="auth-tagline-strong">Ne perdez plus le contrôle de votre stock et de vos créances.</p>
-      <p class="auth-tagline">Recouvra accompagne votre commerce de la vente au recouvrement.</p>
-    </section>
+    <main class="login-shell">
+        <div class="login-card">
+            <div class="brand">
+                <img src="assets/img/logo.png" alt="Recouvra" height="48">
+                <h1>Recouvra</h1>
+                <p>Connectez-vous à votre espace</p>
+            </div>
 
-    <div class="auth-card-wrap">
-      <section class="auth-card">
-        <div class="auth-tabs"><button type="button" class="auth-tab" data-auth-tab="login">Se connecter</button><button type="button" class="auth-tab active" data-auth-tab="signup">Créer un compte</button></div>
+            <div id="login-error" class="error-msg"></div>
 
-        <form id="login-form" class="auth-form" hidden>
-          <h2 class="auth-form-title">Bon retour</h2>
-          <label>Email<input id="login-email" type="email" required autocomplete="email"></label>
-          <label>Mot de passe<input id="login-password" type="password" required autocomplete="current-password"></label>
-          <button type="submit" class="button">Se connecter</button>
-          <p class="auth-switch">Pas encore de compte ? <button type="button" class="text-button" data-auth-tab="signup">Créer un compte</button></p>
-        </form>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="votre@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-login">Se connecter</button>
+            </form>
 
-        <form id="signup-form" class="auth-form">
-          <h2 class="auth-form-title">Créez votre compte Recouvra</h2>
-          <p class="auth-form-sub">Commencez à organiser votre commerce simplement.</p>
-          <label>Nom complet<input id="signup-manager" required maxlength="150" autocomplete="name"></label>
-          <label>Nom de l'entreprise<input id="signup-company" required maxlength="150"></label>
-          <label>Téléphone WhatsApp<input id="signup-phone" required maxlength="30" inputmode="tel"></label>
-          <label>Email<input id="signup-email" type="email" required autocomplete="email"></label>
-          <label>Mot de passe<input id="signup-password" type="password" required minlength="8" autocomplete="new-password"></label>
-          <label>Confirmer le mot de passe<input id="signup-password-confirm" type="password" required minlength="8" autocomplete="new-password"></label>
-          <button type="submit" class="button">Créer mon compte</button>
-          <p class="auth-switch">Vous avez déjà un compte ? <button type="button" class="text-button" data-auth-tab="login">Se connecter</button></p>
-        </form>
+            <div class="login-footer">
+                Pas encore de compte ? <a href="signup.html">S'inscrire</a>
+            </div>
+        </div>
+    </main>
 
-        <p id="auth-message" class="auth-message" aria-live="polite"></p>
-      </section>
-    </div>
-  </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
-<script src="assets/config.js"></script>
-<script src="assets/app.js"></script>
-<script>
-  const authMessage = document.getElementById("auth-message");
-  const setAuthMessage = text => { authMessage.textContent = text; };
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
+    <script src="assets/config.js"></script>
+    <script src="assets/app.js"></script>
+    <script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('login-form');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const errorMsg = document.getElementById('login-error');
+    const btn = document.querySelector('.btn-login');
 
-  // friendlyError() (app.js) traduit "Invalid login credentials" en "Code d'accès
-  // incorrect", pensé pour l'ancienne connexion par code numérique — trompeur ici où
-  // le formulaire est un vrai email/mot de passe. Mapping dédié à cette page.
-  function authErrorMessage(err) {
-    const msg = err?.message || String(err);
-    if (msg.includes("Invalid login credentials")) return "Email ou mot de passe incorrect.";
-    if (msg.includes("User already registered")) return "Un compte existe déjà avec cet email.";
-    if (msg.includes("Password should be at least")) return "Le mot de passe doit contenir au moins 8 caractères.";
-    return msg;
-  }
+    if (form) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            // Réinitialiser le message d'erreur
+            errorMsg.classList.remove('show');
+            errorMsg.textContent = '';
 
-  function showAuthTab(name) {
-    document.querySelectorAll("[data-auth-tab]").forEach(el => el.classList?.toggle("active", el.dataset.authTab === name));
-    document.getElementById("login-form").hidden = name !== "login";
-    document.getElementById("signup-form").hidden = name !== "signup";
-    setAuthMessage("");
-  }
-  document.querySelectorAll("[data-auth-tab]").forEach(el => el.addEventListener("click", () => showAuthTab(el.dataset.authTab)));
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
 
-  document.getElementById("login-form").addEventListener("submit", async event => {
-    event.preventDefault(); setAuthMessage("Connexion...");
-    const { data, error } = await supabaseClient.auth.signInWithPassword({ email: document.getElementById("login-email").value.trim(), password: document.getElementById("login-password").value });
-    if (error) { setAuthMessage(authErrorMessage(error)); return; }
-    await redirectAfterAuth(data.session);
-  });
+            if (!email || !password) {
+                errorMsg.textContent = 'Veuillez remplir tous les champs.';
+                errorMsg.classList.add('show');
+                return;
+            }
 
-  document.getElementById("signup-form").addEventListener("submit", async event => {
-    event.preventDefault();
-    const company = document.getElementById("signup-company").value.trim();
-    const manager = document.getElementById("signup-manager").value.trim();
-    const phone = document.getElementById("signup-phone").value.trim();
-    const email = document.getElementById("signup-email").value.trim();
-    const password = document.getElementById("signup-password").value;
-    const passwordConfirm = document.getElementById("signup-password-confirm").value;
+            // Désactiver le bouton et afficher le spinner
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Connexion...';
 
-    if (password !== passwordConfirm) { setAuthMessage("Les deux mots de passe ne correspondent pas."); return; }
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
 
-    setAuthMessage("Création du compte...");
-    const { data, error } = await supabaseClient.auth.signUp({ email, password, options: { data: { entreprise_nom: company, gerant_nom: manager, telephone: phone } } });
-    if (error) { setAuthMessage(authErrorMessage(error)); return; }
-    if (!data.session) { setAuthMessage("Compte créé. Consultez votre email pour confirmer votre adresse."); return; }
-    setAuthMessage("Compte créé.");
-    await redirectAfterAuth(data.session);
-  });
+                if (error) throw error;
 
-  // L'onboarding (bienvenue -> type de commerce -> besoins -> mise en place) ne doit
-  // s'afficher qu'une seule fois : on vérifie onboarding_completed_at plutôt que de se
-  // fier au seul fait de venir d'un signup, pour couvrir aussi le cas où l'email de
-  // confirmation retarde la première vraie connexion.
-  async function redirectAfterAuth(session) {
-    if (!session) return;
-    const { data: profile } = await supabaseClient
-      .from("profiles").select("entreprises(onboarding_completed_at)").eq("id", session.user.id).maybeSingle();
-    const done = profile?.entreprises?.onboarding_completed_at;
-    window.location.href = done ? "index.html" : "onboarding.html";
-  }
+                // Rediriger vers l'accueil
+                window.location.href = 'index.html';
 
-  supabaseClient.auth.getSession().then(({ data }) => { if (data.session) redirectAfterAuth(data.session); });
+            } catch (err) {
+                console.error('Erreur connexion:', err);
+                errorMsg.textContent = err.message || 'Identifiants incorrects.';
+                errorMsg.classList.add('show');
+                btn.disabled = false;
+                btn.innerHTML = 'Se connecter';
+            }
+        });
+    }
+});
 </script>
+    </script>
 </body>
 </html>
