@@ -17,6 +17,8 @@
 <body>
 
 <!-- ========== MENU MOBILE ========== -->
+<button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
 <div class="app">
   <nav class="sidebar">
@@ -45,7 +47,7 @@
     </div>
 
     <div class="sidebar-footer">
-      <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;"><span class="dark-mode-icon">🌙</span> <span class="dark-mode-label">Mode sombre</span></button>
+      <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;"><span id="dark-mode-icon">🌙</span> <span id="dark-mode-label">Mode sombre</span></button>
       <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
       <button class="btn-logout" onclick="logout()">Déconnexion</button>
     </div>
@@ -64,7 +66,7 @@
           </div>
         </div>
         <div class="admin-header-actions">
-          <button class="dark-mode-toggle" onclick="toggleDarkMode()"><span class="dark-mode-icon">🌙</span> <span class="dark-mode-label">Mode sombre</span></button>
+          <button class="dark-mode-toggle" onclick="toggleDarkMode()"><span id="dark-mode-icon">🌙</span> <span id="dark-mode-label">Mode sombre</span></button>
           <a href="index.html" class="btn-back"><span class="arrow">←</span> Retour</a>
         </div>
       </div>
@@ -370,8 +372,10 @@
 <script src="assets/app.js"></script>
 <script>
 // Fonctions globales (redéclarées)
-function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0'); document.querySelectorAll('.dark-mode-icon').forEach(icon => icon.textContent = isDark ? '☀️' : '🌙'); document.querySelectorAll('.dark-mode-label').forEach(label => label.textContent = isDark ? 'Mode clair' : 'Mode sombre'); }
-function initDarkMode() { if (localStorage.getItem('recouvra_dark_mode') === '1') { document.body.classList.add('dark-mode'); document.querySelectorAll('.dark-mode-icon').forEach(icon => icon.textContent = '☀️'); document.querySelectorAll('.dark-mode-label').forEach(label => label.textContent = 'Mode clair'); } }
+function toggleSidebar() { const sidebar = document.querySelector('.sidebar'); const overlay = document.querySelector('.sidebar-overlay'); if (sidebar) sidebar.classList.toggle('open'); if (overlay) overlay.classList.toggle('active'); document.body.classList.toggle('menu-open', sidebar?.classList.contains('open')); }
+document.addEventListener('click', (e) => { if (e.target.closest('.nav-link')) { const sidebar = document.querySelector('.sidebar'); const overlay = document.querySelector('.sidebar-overlay'); if (sidebar) sidebar.classList.remove('open'); if (overlay) overlay.classList.remove('active'); document.body.classList.remove('menu-open'); } });
+function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = isDark ? '☀️' : '🌙'; if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre'; }
+function initDarkMode() { if (localStorage.getItem('recouvra_dark_mode') === '1') { document.body.classList.add('dark-mode'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = '☀️'; if (label) label.textContent = 'Mode clair'; } }
 
 // ============================================================================
 // SUPER ADMIN - GESTION COMPLÈTE
@@ -803,27 +807,4 @@ async function deleteUser() {
 }
 </script>
 </body>
-<!-- ========== NAVIGATION MOBILE (BARRE EN BAS) ========== -->
-<nav class="global-nav">
-  <a href="index.html" class="global-nav-link">
-    <span class="global-nav-icon">🏠</span>
-    <span class="global-nav-text">Accueil</span>
-  </a>
-  <a href="factures.html" class="global-nav-link">
-    <span class="global-nav-icon">🧾</span>
-    <span class="global-nav-text">Vendre</span>
-  </a>
-  <a href="clients.html" class="global-nav-link">
-    <span class="global-nav-icon">👥</span>
-    <span class="global-nav-text">Clients</span>
-  </a>
-  <a href="stock.html" class="global-nav-link">
-    <span class="global-nav-icon">📊</span>
-    <span class="global-nav-text">Stock</span>
-  </a>
-  <a href="credits.html" class="global-nav-link">
-    <span class="global-nav-icon">💸</span>
-    <span class="global-nav-text">Crédits</span>
-  </a>
-</nav>
 </html>
