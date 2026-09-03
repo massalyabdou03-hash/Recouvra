@@ -687,3 +687,58 @@ body.dark-mode .admin-reminder{background:#451A03;border-color:#F59E0B;color:#FE
   opacity: 0 !important;
   pointer-events: none !important;
 }
+/* Stylisation de la barre de recherche et des onglets de filtres (page stock) */
+.stock-search {
+  margin-bottom: 16px;
+}
+
+.stock-search input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stock-search input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.stock-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.stock-tab {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 10px 18px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.stock-tab:hover {
+  background: var(--surface-2);
+  color: var(--text);
+  border-color: var(--border-soft);
+}
+
+.stock-tab.active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
