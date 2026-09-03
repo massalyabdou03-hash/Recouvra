@@ -16,8 +16,6 @@
 </head>
 <body>
 
-<button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
-<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
 <div class="app">
   <nav class="sidebar">
@@ -58,10 +56,19 @@
       <p>Tous vos clients et ce qu'ils vous doivent.</p>
     </div>
 
-    <div class="client-stats">
-      <div class="client-stat-card"><span class="client-stat-value" id="stat-total">—</span><span class="client-stat-label">Clients</span></div>
-      <div class="client-stat-card warning"><span class="client-stat-value" id="stat-impayes">—</span><span class="client-stat-label">Avec dette</span></div>
-      <div class="client-stat-card"><span class="client-stat-value" id="stat-total-facture">—</span><span class="client-stat-label">Total facturé</span></div>
+    <div class="hero-stats">
+      <div class="hero-stat primary">
+        <span class="hero-stat-icon">👥</span>
+        <div class="hero-stat-body"><span class="hero-stat-value" id="stat-total">—</span><span class="hero-stat-label">Clients</span></div>
+      </div>
+      <div class="hero-stat warning">
+        <span class="hero-stat-icon">⚠️</span>
+        <div class="hero-stat-body"><span class="hero-stat-value" id="stat-impayes">—</span><span class="hero-stat-label">Avec dette</span></div>
+      </div>
+      <div class="hero-stat neutral">
+        <span class="hero-stat-icon">💰</span>
+        <div class="hero-stat-body"><span class="hero-stat-value" id="stat-total-facture">—</span><span class="hero-stat-label">Total facturé</span></div>
+      </div>
     </div>
 
     <div class="search-bar-big"><input type="text" id="search" placeholder="🔍 Rechercher un client..." oninput="filterClients()"></div>
@@ -110,8 +117,6 @@
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
 <script>
-function toggleSidebar() { const sidebar = document.querySelector('.sidebar'); const overlay = document.querySelector('.sidebar-overlay'); if (sidebar) sidebar.classList.toggle('open'); if (overlay) overlay.classList.toggle('active'); document.body.classList.toggle('menu-open', sidebar?.classList.contains('open')); }
-document.addEventListener('click', (e) => { if (e.target.closest('.nav-link')) { const sidebar = document.querySelector('.sidebar'); const overlay = document.querySelector('.sidebar-overlay'); if (sidebar) sidebar.classList.remove('open'); if (overlay) overlay.classList.remove('active'); document.body.classList.remove('menu-open'); } });
 function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = isDark ? '☀️' : '🌙'; if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre'; }
 function initDarkMode() { if (localStorage.getItem('recouvra_dark_mode') === '1') { document.body.classList.add('dark-mode'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = '☀️'; if (label) label.textContent = 'Mode clair'; } }
 

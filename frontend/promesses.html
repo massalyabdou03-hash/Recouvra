@@ -16,8 +16,6 @@
 </head>
 <body>
 
-<button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
-<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
 <div class="app">
   <nav class="sidebar">
@@ -103,8 +101,6 @@
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
 <script>
-function toggleSidebar() { const sidebar = document.querySelector('.sidebar'); const overlay = document.querySelector('.sidebar-overlay'); if (sidebar) sidebar.classList.toggle('open'); if (overlay) overlay.classList.toggle('active'); document.body.classList.toggle('menu-open', sidebar?.classList.contains('open')); }
-document.addEventListener('click', (e) => { if (e.target.closest('.nav-link')) { const sidebar = document.querySelector('.sidebar'); const overlay = document.querySelector('.sidebar-overlay'); if (sidebar) sidebar.classList.remove('open'); if (overlay) overlay.classList.remove('active'); document.body.classList.remove('menu-open'); } });
 function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = isDark ? '☀️' : '🌙'; if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre'; }
 function initDarkMode() { if (localStorage.getItem('recouvra_dark_mode') === '1') { document.body.classList.add('dark-mode'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = '☀️'; if (label) label.textContent = 'Mode clair'; } }
 
