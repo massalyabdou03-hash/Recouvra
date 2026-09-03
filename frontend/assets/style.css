@@ -1128,3 +1128,333 @@ input, select, textarea {
 .modal-box .form-row {
   grid-template-columns: 1fr !important;
 }
+/* ============================================================
+   AMÉLIORATION DU RENDU MOBILE (CAPTURES)
+   ============================================================ */
+
+/* === Général === */
+body {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* === Dashboard === */
+.big-card {
+  padding: 18px 20px !important;
+  gap: 14px !important;
+  border-radius: 18px !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.05) !important;
+  border: none !important;
+  background: var(--surface) !important;
+}
+.big-card.primary,
+.big-card.warning {
+  color: #fff !important;
+}
+.big-card.primary .big-card-icon,
+.big-card.warning .big-card-icon {
+  background: rgba(255,255,255,0.2) !important;
+}
+.big-card-icon {
+  width: 56px !important;
+  height: 56px !important;
+  font-size: 28px !important;
+  border-radius: 14px !important;
+}
+.big-card-value {
+  font-size: 28px !important;
+}
+.big-card-hint {
+  font-size: 13px !important;
+}
+.big-card-arrow {
+  font-size: 28px !important;
+}
+
+/* Bouton actualiser */
+.welcome-header .btn-secondary {
+  padding: 8px 16px !important;
+  font-size: 0.8rem !important;
+  border-radius: 30px !important;
+}
+
+/* === Vendre (factures) === */
+.sell-step-card {
+  padding: 20px !important;
+  border-radius: 18px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04) !important;
+}
+.product-button {
+  padding: 14px 10px !important;
+  border-radius: 14px !important;
+  background: var(--surface) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+  border: 1px solid var(--border-soft) !important;
+}
+.product-button .product-emoji {
+  font-size: 28px !important;
+}
+.product-button .product-name {
+  font-size: 14px !important;
+}
+.product-button .product-price {
+  font-size: 18px !important;
+}
+.product-stock {
+  font-size: 12px !important;
+  padding: 4px 12px !important;
+}
+.payment-buttons {
+  grid-template-columns: 1fr 1fr !important;
+}
+.pay-button {
+  padding: 16px 8px !important;
+  font-size: 13px !important;
+  border-radius: 14px !important;
+}
+.pay-icon {
+  font-size: 26px !important;
+}
+
+/* === Clients === */
+.client-stats {
+  gap: 10px !important;
+}
+.client-stat-card {
+  padding: 14px 12px !important;
+  border-radius: 14px !important;
+}
+.client-stat-value {
+  font-size: 24px !important;
+}
+.client-stat-label {
+  font-size: 11px !important;
+}
+.client-card {
+  padding: 14px 16px !important;
+  border-radius: 14px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+}
+.client-avatar {
+  width: 44px !important;
+  height: 44px !important;
+  font-size: 14px !important;
+}
+.client-name {
+  font-size: 15px !important;
+}
+.client-phone {
+  font-size: 12px !important;
+}
+.client-total {
+  font-size: 13px !important;
+}
+.client-debt {
+  padding: 4px 12px !important;
+  border-radius: 20px !important;
+  font-size: 12px !important;
+}
+.debt-amount {
+  font-size: 12px !important;
+}
+.client-arrow {
+  font-size: 18px !important;
+}
+
+/* === Stock === */
+.stock-stats {
+  gap: 10px !important;
+}
+.stock-stat-card,
+.stat-card {
+  padding: 14px 12px !important;
+  border-radius: 14px !important;
+}
+.stock-stat-card .val,
+.stat-card .value {
+  font-size: 24px !important;
+}
+.stock-stat-card .lbl,
+.stat-card .label {
+  font-size: 11px !important;
+}
+.products-grid {
+  grid-template-columns: 1fr 1fr !important;
+  gap: 12px !important;
+}
+.product-card {
+  padding: 14px 12px !important;
+  border-radius: 14px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+}
+.product-card .product-emoji {
+  font-size: 28px !important;
+}
+.product-card .product-name {
+  font-size: 14px !important;
+}
+.product-card .product-ref {
+  font-size: 11px !important;
+}
+.product-card .product-price {
+  font-size: 16px !important;
+}
+.product-card .stock-badge {
+  font-size: 10px !important;
+  padding: 2px 8px !important;
+}
+.product-card .card-actions button {
+  font-size: 12px !important;
+  padding: 4px 10px !important;
+}
+
+/* === Crédits === */
+.credit-stats {
+  gap: 10px !important;
+}
+.credit-stat-card {
+  padding: 14px 12px !important;
+  border-radius: 14px !important;
+}
+.credit-stat-value {
+  font-size: 24px !important;
+}
+.credit-stat-label {
+  font-size: 11px !important;
+}
+.credit-client-card {
+  padding: 16px !important;
+  border-radius: 14px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+}
+.credit-client-name {
+  font-size: 16px !important;
+}
+.credit-client-phone {
+  font-size: 12px !important;
+}
+.credit-total-amount {
+  font-size: 20px !important;
+}
+.credit-invoice-row {
+  padding: 12px !important;
+  border-radius: 12px !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+.credit-invoice-num {
+  font-size: 13px !important;
+}
+.credit-invoice-amount {
+  font-size: 15px !important;
+}
+.credit-invoice-status .badge {
+  font-size: 11px !important;
+  padding: 4px 10px !important;
+}
+.btn-success {
+  padding: 8px 16px !important;
+  font-size: 13px !important;
+  border-radius: 10px !important;
+  min-height: 44px !important;
+}
+
+/* === Formulaires (ajout/modification) === */
+.modal-box {
+  padding: 20px 18px !important;
+  border-radius: 18px !important;
+}
+.modal-box label {
+  font-size: 13px !important;
+  margin-top: 14px !important;
+}
+.modal-box input,
+.modal-box select,
+.modal-box textarea {
+  font-size: 16px !important;
+  padding: 12px 14px !important;
+  border-radius: 10px !important;
+}
+.modal-actions .btn {
+  min-height: 48px !important;
+  font-size: 15px !important;
+  border-radius: 12px !important;
+}
+.modal-actions {
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+.modal-actions .btn {
+  width: 100% !important;
+}
+
+/* === Barre de navigation mobile === */
+@media (max-width: 768px) {
+  .global-nav-link {
+    min-width: 56px !important;
+    padding: 6px 4px !important;
+    font-size: 0.6rem !important;
+  }
+  .global-nav-icon {
+    font-size: 22px !important;
+    margin-bottom: 1px !important;
+  }
+  .global-nav {
+    min-height: 56px !important;
+    padding: 6px 2px calc(6px + env(safe-area-inset-bottom)) !important;
+    border-top: 2px solid var(--border-soft) !important;
+    background: var(--surface) !important;
+  }
+}
+
+/* === Tableaux (ventes du mois) === */
+.table-wrapper table {
+  font-size: 0.8rem !important;
+}
+.table-wrapper th,
+.table-wrapper td {
+  padding: 10px 8px !important;
+}
+.table-wrapper .num {
+  font-size: 0.8rem !important;
+}
+.table-wrapper .ref {
+  font-size: 0.75rem !important;
+}
+.actions-cell .btn-sm {
+  min-height: 36px !important;
+  font-size: 0.75rem !important;
+  padding: 4px 12px !important;
+}
+
+/* === Badges et indicateurs === */
+.badge {
+  font-size: 0.7rem !important;
+  padding: 4px 12px !important;
+  border-radius: 20px !important;
+}
+.badge-success,
+.badge-danger,
+.badge-warning,
+.badge-info {
+  font-weight: 700 !important;
+}
+
+/* === Titres de page === */
+.page-header-simple h1 {
+  font-size: 24px !important;
+}
+.page-header-simple p {
+  font-size: 14px !important;
+}
+.stock-header h1 {
+  font-size: 24px !important;
+}
+
+/* === Boutons principaux === */
+.btn-primary-big {
+  font-size: 15px !important;
+  padding: 14px !important;
+  border-radius: 14px !important;
+  min-height: 52px !important;
+}
