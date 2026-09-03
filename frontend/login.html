@@ -449,51 +449,64 @@
     <script src="assets/config.js"></script>
     <script src="assets/app.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('login-form');
-            const emailInput = document.getElementById('email');
-            const passwordInput = document.getElementById('password');
-            const errorMsg = document.getElementById('login-error');
-            const btn = document.querySelector('.btn-login');
+      document.addEventListener('DOMContentLoaded', function() {
+          const form = document.getElementById('login-form');
+          const emailInput = document.getElementById('email');
+          const passwordInput = document.getElementById('password');
+          const errorMsg = document.getElementById('login-error');
+          const btn = document.querySelector('.btn-login');
 
-            if (form) {
-                form.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-                    errorMsg.classList.remove('show');
-                    errorMsg.textContent = '';
+          if (form) {
+              form.addEventListener('submit', async function(e) {
+                  e.preventDefault();
+                  errorMsg.classList.remove('show');
+                  errorMsg.textContent = '';
 
-                    const email = emailInput.value.trim();
-                    const password = passwordInput.value;
+                  const email = emailInput.value.trim();
+                  const password = passwordInput.value;
 
-                    if (!email || !password) {
-                        errorMsg.textContent = 'Veuillez remplir tous les champs.';
-                        errorMsg.classList.add('show');
-                        return;
-                    }
+                  if (!email || !password) {
+                      errorMsg.textContent = 'Veuillez remplir tous les champs.';
+                      errorMsg.classList.add('show');
+                      return;
+                  }
 
-                    btn.disabled = true;
-                    btn.innerHTML = '<span class="spinner"></span> Connexion...';
+                  btn.disabled = true;
+                  btn.innerHTML = '<span class="spinner"></span> Connexion...';
 
-                    try {
-                        const { data, error } = await supabaseClient.auth.signInWithPassword({
-                            email: email,
-                            password: password,
-                        });
+                  try {
+                      const { data, error } = await supabaseClient.auth.signInWithPassword({
+                          email: email,
+                          password: password,
+                      });
 
-                        if (error) throw error;
+                      if (error) throw error;
 
-                        window.location.href = 'index.html';
+                      window.location.href = 'index.html';
 
-                    } catch (err) {
-                        console.error('Erreur connexion:', err);
-                        errorMsg.textContent = err.message || 'Identifiants incorrects.';
-                        errorMsg.classList.add('show');
-                        btn.disabled = false;
-                        btn.innerHTML = 'Se connecter';
-                    }
-                });
-            }
-        });
+                  } catch (err) {
+                      console.error('Erreur connexion:', err);
+
+                      // Personnalisation du message selon l'erreur
+                      let userMessage = 'Identifiants incorrects. Vérifiez votre email et votre mot de passe.';
+                      const msg = err.message || '';
+
+                      if (msg.includes('Email not confirmed')) {
+                          userMessage = 'Votre email n\'a pas encore été confirmé. Vérifiez votre boîte de réception.';
+                      } else if (msg.includes('Invalid login credentials')) {
+                          userMessage = 'Email ou mot de passe incorrect. Réessayez.';
+                      } else if (msg.includes('User not found')) {
+                          userMessage = 'Aucun compte trouvé avec cet email.';
+                      }
+
+                      errorMsg.textContent = userMessage;
+                      errorMsg.classList.add('show');
+                      btn.disabled = false;
+                      btn.innerHTML = 'Se connecter';
+                  }
+              });
+          }
+      });
     </script>
 </body>
 </html>
