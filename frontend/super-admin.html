@@ -520,20 +520,55 @@ function openPaymentDetail(paymentId) {
 }
 
 async function confirmPayment(paymentId) {
-    const ok = await confirmDialog('Confirmer ce paiement ? L\'entreprise sera activée immédiatement.', { title: 'Confirmer le paiement', confirmLabel: 'Confirmer', danger: false });
+    const ok = await confirmDialog(
+        'Confirmer ce paiement ? L\'entreprise sera activée immédiatement.',
+        { title: 'Confirmer le paiement', confirmLabel: 'Confirmer', danger: false }
+    );
     if (!ok) return;
+
     try {
-        const { error } = await supabaseClient.rpc('confirm_subscription_payment', { p_payment_id: paymentId, p_decision: 'confirmed' });
-        if (error) throw error;
-        const { data: payment } = await supabaseClient.from('subscription_payments').select('entreprise_id').eq('id', paymentId).single();
-        if (payment) {
-            const { error: updateError } = await supabaseClient.from('profiles').update({ has_recouvra: true }).eq('entreprise_id', payment.entreprise_id);
-            if (updateError) throw updateError;
-        }
-        showToast('Paiement confirmé — entreprise activée.', 'success');
+        // 1. Récupérer l'entreprise_id depuis le paiement
+        const { data: payment, error: fetchError } = await supabaseClient
+            .from('subscription_payments')
+            .select('entreprise_id')
+            .eq('id', paymentId)
+            .single();
+        if (fetchError) throw fetchError;
+        if (!payment) throw new Error('Paiement non trouvé');
+
+        const now = new Date();
+        const end = new Date(now);
+        end.setMonth(end.getMonth() + 1); // +1 mois
+
+        // 2. Mettre à jour la table subscriptions (statut + période)
+        const { error: updateSubError } = await supabaseClient
+            .from('subscriptions')
+            .update({
+                status: 'active',
+                current_period_start: now.toISOString(),
+                current_period_end: end.toISOString(),
+                updated_at: now.toISOString()
+            })
+            .eq('entreprise_id', payment.entreprise_id);
+        if (updateSubError) throw updateSubError;
+
+        // 3. Donner l'accès Recouvra à tous les utilisateurs de l'entreprise
+        const { error: updateProfilesError } = await supabaseClient
+            .from('profiles')
+            .update({ has_recouvra: true, updated_at: now.toISOString() })
+            .eq('entreprise_id', payment.entreprise_id);
+        if (updateProfilesError) throw updateProfilesError;
+
+        showToast('✅ Paiement confirmé — entreprise activée.', 'success');
         closeModal('payment-detail-backdrop');
+
+        // 4. Recharger les deux listes pour voir les changements immédiatement
         await loadPayments();
-    } catch (error) { showToast(friendlyError(error), 'error'); }
+        await loadEntreprises();   // ← AJOUT INDISPENSABLE
+
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
 }
 
 function rejectPayment(paymentId) {
