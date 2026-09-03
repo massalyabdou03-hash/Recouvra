@@ -613,55 +613,164 @@ async function annulerPaiement(paymentId) {
 // GESTION DES ENTREPRISES
 // ============================================================================
 
-async function loadEntreprises() {
-    try {
-        const { data: entreprisesData, error: err1 } = await supabaseClient.from('entreprises').select('*').order('created_at', { ascending: false });
-        if (err1) throw err1;
-        const { data: subscriptionsData, error: err2 } = await supabaseClient.from('subscriptions').select('*');
-        if (err2) throw err2;
-        const { data: profilesData, error: err3 } = await supabaseClient.from('profiles').select('id, entreprise_id, role, has_recouvra');
-        if (err3) throw err3;
-        allEntreprises = (entreprisesData || []).map(e => {
-            const sub = (subscriptionsData || []).find(s => s.entreprise_id === e.id);
-            const users = (profilesData || []).filter(p => p.entreprise_id === e.id);
-            return { ...e, subscriptions: sub, profiles: users };
-        });
-        renderEntreprises();
-        const actives = allEntreprises.filter(e => e.subscriptions?.status === 'active').length;
-        document.getElementById('stat-entreprises').textContent = actives;
-    } catch (error) {
-        console.error('Erreur chargement entreprises:', error);
-        document.getElementById('entreprises-tbody').innerHTML = `<tr><td colspan="6" class="payments-empty">${friendlyError(error)}</td></tr>`;
+function renderEntreprises(search = '') {
+    const tbody = document.getElementById('entreprises-tbody');
+    if (!tbody) return;
+
+    let filtered = allEntreprises;
+    if (search) {
+        filtered = filtered.filter(e =>
+            (e.nom || '').toLowerCase().includes(search) ||
+            (e.gerant_nom || '').toLowerCase().includes(search) ||
+            (e.telephone || '').toLowerCase().includes(search)
+        );
     }
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="payments-empty">Aucune entreprise trouvée</td></tr>`;
+        return;
+    }
+
+    const statusBadge = {
+        active: '<span class="badge badge-success">✅ Active</span>',
+        pending: '<span class="badge badge-warning">🕐 En attente</span>',
+        expired: '<span class="badge badge-danger">❌ Expirée</span>',
+        cancelled: '<span class="badge badge-muted">🚫 Annulée</span>'
+    };
+
+    let html = '';
+    filtered.forEach(e => {
+        const status = e.subscriptions?.status || '—';
+        const endDate = e.subscriptions?.current_period_end ? fmtDate(e.subscriptions.current_period_end) : '—';
+        html += `
+        <tr>
+            <td><strong>${esc(e.nom || '—')}</strong></td>
+            <td>${esc(e.gerant_nom || '—')}</td>
+            <td>${esc(e.telephone || '—')}</td>
+            <td>${statusBadge[status] || status}</td>
+            <td>${endDate}</td>
+            <td>
+                <div class="admin-actions">
+                    <button class="admin-btn info" data-action="edit" data-id="${e.id}">✏️ Modifier</button>
+                    <button class="admin-btn danger" data-action="disable" data-id="${e.id}">🚫 Désactiver</button>
+                </div>
+            </td>
+        </tr>`;
+    });
+
+    tbody.innerHTML = html;
+
+    // Attacher les événements avec addEventListener (plus fiable)
+    tbody.querySelectorAll('[data-action="edit"]').forEach(btn => {
+        btn.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            const id = btn.dataset.id;
+            console.log('🖱️ Clic Modifier pour l\'entreprise ID:', id);
+            openEditEntreprise(id);
+        });
+    });
+
+    tbody.querySelectorAll('[data-action="disable"]').forEach(btn => {
+        btn.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            const id = btn.dataset.id;
+            console.log('🖱️ Clic Désactiver pour l\'entreprise ID:', id);
+            desactiverEntreprise(id);
+        });
+    });
 }
 
 function renderEntreprises(search = '') {
     const tbody = document.getElementById('entreprises-tbody');
     if (!tbody) return;
+
     let filtered = allEntreprises;
-    if (search) filtered = filtered.filter(e => (e.nom || '').toLowerCase().includes(search) || (e.gerant_nom || '').toLowerCase().includes(search) || (e.telephone || '').toLowerCase().includes(search));
-    if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="payments-empty">Aucune entreprise trouvée</td></tr>`; return; }
-    const statusBadge = { active: '<span class="badge badge-success">✅ Active</span>', pending: '<span class="badge badge-warning">🕐 En attente</span>', expired: '<span class="badge badge-danger">❌ Expirée</span>', cancelled: '<span class="badge badge-muted">🚫 Annulée</span>' };
-    tbody.innerHTML = filtered.map(e => `<tr>
-        <td><strong>${esc(e.nom || '—')}</strong></td>
-        <td>${esc(e.gerant_nom || '—')}</td>
-        <td>${esc(e.telephone || '—')}</td>
-        <td>${e.subscriptions?.status ? statusBadge[e.subscriptions.status] : '—'}</td>
-        <td>${e.subscriptions?.current_period_end ? fmtDate(e.subscriptions.current_period_end) : '—'}</td>
-        <td><div class="admin-actions"><button class="admin-btn info" onclick="openEditEntreprise('${e.id}')">✏️ Modifier</button><button class="admin-btn danger" onclick="desactiverEntreprise('${e.id}')">🚫 Désactiver</button></div></td>
-    </tr>`).join('');
+    if (search) {
+        filtered = filtered.filter(e =>
+            (e.nom || '').toLowerCase().includes(search) ||
+            (e.gerant_nom || '').toLowerCase().includes(search) ||
+            (e.telephone || '').toLowerCase().includes(search)
+        );
+    }
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="payments-empty">Aucune entreprise trouvée</td></tr>`;
+        return;
+    }
+
+    const statusBadge = {
+        active: '<span class="badge badge-success">✅ Active</span>',
+        pending: '<span class="badge badge-warning">🕐 En attente</span>',
+        expired: '<span class="badge badge-danger">❌ Expirée</span>',
+        cancelled: '<span class="badge badge-muted">🚫 Annulée</span>'
+    };
+
+    let html = '';
+    filtered.forEach(e => {
+        const status = e.subscriptions?.status || '—';
+        const endDate = e.subscriptions?.current_period_end ? fmtDate(e.subscriptions.current_period_end) : '—';
+        html += `
+        <tr>
+            <td><strong>${esc(e.nom || '—')}</strong></td>
+            <td>${esc(e.gerant_nom || '—')}</td>
+            <td>${esc(e.telephone || '—')}</td>
+            <td>${statusBadge[status] || status}</td>
+            <td>${endDate}</td>
+            <td>
+                <div class="admin-actions">
+                    <button class="admin-btn info" data-action="edit" data-id="${e.id}">✏️ Modifier</button>
+                    <button class="admin-btn danger" data-action="disable" data-id="${e.id}">🚫 Désactiver</button>
+                </div>
+            </td>
+        </tr>`;
+    });
+
+    tbody.innerHTML = html;
+
+    // Attacher les événements après l'insertion du HTML
+    tbody.querySelectorAll('[data-action="edit"]').forEach(btn => {
+        btn.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            const id = btn.dataset.id;
+            console.log('🖱️ Clic sur Modifier pour id:', id);
+            openEditEntreprise(id);
+        });
+    });
+
+    tbody.querySelectorAll('[data-action="disable"]').forEach(btn => {
+        btn.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            const id = btn.dataset.id;
+            console.log('🖱️ Clic sur Désactiver pour id:', id);
+            desactiverEntreprise(id);
+        });
+    });
 }
 
 function openEditEntreprise(id) {
+    console.log('🔍 openEditEntreprise appelé avec id:', id);
     const entreprise = allEntreprises.find(e => e.id === id);
-    if (!entreprise) return;
+    if (!entreprise) {
+        console.error('❌ Entreprise non trouvée pour id:', id);
+        showToast('Erreur : entreprise introuvable.', 'error');
+        return;
+    }
+    console.log('✅ Entreprise trouvée :', entreprise.nom);
+
     document.getElementById('edit-entreprise-id').value = entreprise.id;
     document.getElementById('edit-entreprise-nom').value = entreprise.nom || '';
     document.getElementById('edit-entreprise-gerant').value = entreprise.gerant_nom || '';
     document.getElementById('edit-entreprise-telephone').value = entreprise.telephone || '';
     document.getElementById('edit-entreprise-email').value = entreprise.email || '';
     document.getElementById('edit-entreprise-statut').value = entreprise.subscriptions?.status || 'pending';
-    document.getElementById('edit-entreprise-backdrop').classList.add('open');
+
+    const backdrop = document.getElementById('edit-entreprise-backdrop');
+    if (backdrop) {
+        backdrop.classList.add('open');
+        console.log('✅ Modal ouvert');
+    } else {
+        console.error('❌ Modal #edit-entreprise-backdrop introuvable');
+    }
 }
 
 async function saveEntreprise(e) {
@@ -685,16 +794,38 @@ async function saveEntreprise(e) {
 }
 
 async function desactiverEntreprise(id) {
-    const ok = await confirmDialog('Désactiver cette entreprise ? Elle ne pourra plus se connecter.', { title: 'Désactiver l\'entreprise', confirmLabel: 'Désactiver', danger: true });
+    console.log('🔍 desactiverEntreprise appelé avec id:', id);
+    const entreprise = allEntreprises.find(e => e.id === id);
+    if (!entreprise) {
+        console.error('❌ Entreprise non trouvée');
+        showToast('Erreur : entreprise introuvable.', 'error');
+        return;
+    }
+    const ok = await confirmDialog(
+        `Désactiver "${entreprise.nom}" ? Elle ne pourra plus se connecter.`,
+        { title: 'Désactiver l\'entreprise', confirmLabel: 'Désactiver', danger: true }
+    );
     if (!ok) return;
+
     try {
-        const { error: err1 } = await supabaseClient.from('subscriptions').update({ status: 'cancelled', updated_at: new Date().toISOString() }).eq('entreprise_id', id);
+        const { error: err1 } = await supabaseClient
+            .from('subscriptions')
+            .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+            .eq('entreprise_id', id);
         if (err1) throw err1;
-        const { error: err2 } = await supabaseClient.from('profiles').update({ has_recouvra: false, updated_at: new Date().toISOString() }).eq('entreprise_id', id);
+
+        const { error: err2 } = await supabaseClient
+            .from('profiles')
+            .update({ has_recouvra: false, updated_at: new Date().toISOString() })
+            .eq('entreprise_id', id);
         if (err2) throw err2;
-        showToast('Entreprise désactivée. Elle ne peut plus se connecter.', 'success');
+
+        showToast('✅ Entreprise désactivée.', 'success');
         await loadEntreprises();
-    } catch (error) { showToast(friendlyError(error), 'error'); }
+    } catch (error) {
+        console.error('❌ Erreur désactivation:', error);
+        showToast(friendlyError(error), 'error');
+    }
 }
 
 // ============================================================================
