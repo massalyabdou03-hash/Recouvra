@@ -1,5 +1,5 @@
 // ============================================================================
-// RELANCES - Historique des relances envoyées
+// RELANCES - Historique des relances envoyées (utilise app.js)
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -12,37 +12,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadRelances();
 });
 
-async function requireAuth() {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session) {
-        window.location.href = 'login.html';
-        return null;
-    }
-    return session;
-}
-
-async function requireRecouvra() {
-    const session = await requireAuth();
-    if (!session) return false;
-
-    const { data: profile, error } = await supabaseClient
-        .from('profiles')
-        .select('has_recouvra')
-        .eq('id', session.user.id)
-        .single();
-
-    if (error || !profile?.has_recouvra) {
-        window.location.href = 'abonnement.html';
-        return false;
-    }
-    return true;
-}
-
+// ---------- Chargement de l'historique ----------
 async function loadRelances() {
     const el = document.getElementById('relances-content');
     if (!el) return;
-
-    el.innerHTML = '<div class="empty-state">Chargement...</div>';
+    el.innerHTML = '<div class="empty-state"><span class="spinner-small"></span> Chargement...</div>';
 
     try {
         const { data, error } = await supabaseClient
@@ -50,7 +24,6 @@ async function loadRelances() {
             .select('*, clients(nom, telephone), factures(numero_facture)')
             .order('created_at', { ascending: false })
             .limit(100);
-
         if (error) throw error;
 
         if (!data || data.length === 0) {
@@ -96,9 +69,9 @@ async function loadRelances() {
                 </table>
             </div>
         `;
-
     } catch (error) {
         console.error('Erreur chargement relances:', error);
         el.innerHTML = `<div class="error-msg">${friendlyError(error)}</div>`;
+        showToast(friendlyError(error), 'error');
     }
 }

@@ -1,123 +1,121 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Paiements — Ma Boutique</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#4F46E5">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Ma Boutique">
-<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
-<link rel="stylesheet" href="assets/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiements — Recouvra</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Recouvra">
+    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+    <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 
-<button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
-<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
-
 <div class="app">
-  <nav class="sidebar">
-    <div class="brand">
-      <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
-      <span data-company-name>Ma Boutique</span>
-    </div>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="brand">
+            <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
+            <span data-company-name>Recouvra</span>
+        </div>
 
-    <div class="nav-section">
-      <div class="nav-section-title">Mon Quotidien</div>
-      <a href="index.html" class="nav-link"><span class="nav-emoji">🏠</span> Accueil</a>
-      <a href="factures.html" class="nav-link"><span class="nav-emoji">🧾</span> Vendre</a>
-      <a href="clients.html" class="nav-link"><span class="nav-emoji">👥</span> Mes Clients</a>
-    </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Quotidien</div>
+            <a href="index.html" class="nav-link"><span class="nav-emoji">🏠</span> Accueil</a>
+            <a href="factures.html" class="nav-link"><span class="nav-emoji">🧾</span> Vendre</a>
+            <a href="clients.html" class="nav-link"><span class="nav-emoji">👥</span> Mes Clients</a>
+        </div>
 
-    <div class="nav-section">
-      <div class="nav-section-title">Mon Stock</div>
-      
-      <a href="stock.html" class="nav-link"><span class="nav-emoji">📊</span> Stock & Produits</a>
-    </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Stock</div>
+            <a href="stock.html" class="nav-link"><span class="nav-emoji">📊</span> Stock & Produits</a>
+        </div>
 
-    <div class="nav-section">
-      <div class="nav-section-title">Mon Argent</div>
-      <a href="credits.html" class="nav-link"><span class="nav-emoji">💸</span> On me doit</a>
-      <a href="recouvra.html" class="nav-link premium"><span class="nav-emoji">📣</span> Relancer <span class="badge-premium">PRO</span></a>
-    </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Argent</div>
+            <a href="credits.html" class="nav-link"><span class="nav-emoji">💸</span> On me doit</a>
+            <a href="recouvra.html" class="nav-link premium"><span class="nav-emoji">📣</span> Relancer <span class="badge-premium">PRO</span></a>
+        </div>
 
-    <div class="sidebar-footer">
-      <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;"><span id="dark-mode-icon">🌙</span> <span id="dark-mode-label">Mode sombre</span></button>
-      <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
-      <button class="btn-logout" onclick="logout()">Déconnexion</button>
-    </div>
-  </nav>
+        <div class="sidebar-footer">
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;">
+                <span id="dark-mode-icon">🌙</span> <span id="dark-mode-label">Mode sombre</span>
+            </button>
+            <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
+            <button class="btn-logout" onclick="logout()">Déconnexion</button>
+        </div>
+    </nav>
 
-  <main class="main">
-    <div class="page-header-simple">
-      <a href="index.html" class="btn-back"><span class="arrow">←</span> Retour au tableau de bord</a>
-      <h1>💳 Paiements</h1>
-      <p>Enregistrez les paiements reçus et suivez l'historique.</p>
-    </div>
+    <!-- Contenu principal -->
+    <main class="main">
+        <div class="page-header-simple">
+            <a href="index.html" class="btn-back"><span class="arrow">←</span> Retour au tableau de bord</a>
+            <h1>💳 Paiements</h1>
+            <p>Enregistrez les paiements reçus et suivez l'historique.</p>
+        </div>
 
-    <!-- Formulaire d'enregistrement -->
-    <div class="card">
-      <div class="card-head">
-        <h3>Enregistrer un paiement</h3>
-      </div>
-      <form id="payment-form" class="form-grid">
-        <label>
-          Facture
-          <select id="invoice" required>
-            <option value="">Chargement...</option>
-          </select>
-        </label>
-        <label>
-          Montant (FCFA)
-          <input id="amount" type="number" min="1" step="1" required>
-        </label>
-        <label>
-          Méthode
-          <select id="method">
-            <option value="ESPECES">Espèces</option>
-            <option value="WAVE">Wave</option>
-            <option value="OM">Orange Money</option>
-            <option value="VIREMENT">Virement</option>
-            <option value="CARTE">Carte</option>
-            <option value="CHEQUE">Chèque</option>
-          </select>
-        </label>
-        <label>
-          Référence
-          <input id="reference" placeholder="Ex: TXN-123456">
-        </label>
-        <button class="btn recouvra-cta" type="submit">Enregistrer le paiement</button>
-      </form>
-      <p id="payment-message" aria-live="polite"></p>
-    </div>
+        <!-- Formulaire d'enregistrement -->
+        <div class="card">
+            <div class="card-head">
+                <h3>Enregistrer un paiement</h3>
+            </div>
+            <form id="payment-form" class="form-grid">
+                <label>
+                    Facture
+                    <select id="invoice" required>
+                        <option value="">Chargement...</option>
+                    </select>
+                </label>
+                <label>
+                    Montant (FCFA)
+                    <input id="amount" type="number" min="1" step="1" required>
+                </label>
+                <label>
+                    Méthode
+                    <select id="method">
+                        <option value="ESPECES">Espèces</option>
+                        <option value="WAVE">Wave</option>
+                        <option value="OM">Orange Money</option>
+                        <option value="VIREMENT">Virement</option>
+                        <option value="CARTE">Carte</option>
+                        <option value="CHEQUE">Chèque</option>
+                    </select>
+                </label>
+                <label>
+                    Référence
+                    <input id="reference" placeholder="Ex: TXN-123456">
+                </label>
+                <button class="btn recouvra-cta" type="submit">Enregistrer le paiement</button>
+            </form>
+            <p id="payment-message" aria-live="polite"></p>
+        </div>
 
-    <!-- Historique -->
-    <div class="card">
-      <div class="card-head">
-        <h3>Historique des paiements</h3>
-      </div>
-      <div id="payments-content">
-        <div class="empty-state">Chargement...</div>
-      </div>
-    </div>
-  </main>
+        <!-- Historique -->
+        <div class="card">
+            <div class="card-head">
+                <h3>Historique des paiements</h3>
+            </div>
+            <div id="payments-content">
+                <div class="empty-state">Chargement...</div>
+            </div>
+        </div>
+    </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
 <script>
-function toggleSidebar() { const sidebar = document.querySelector('.sidebar'); const overlay = document.querySelector('.sidebar-overlay'); if (sidebar) sidebar.classList.toggle('open'); if (overlay) overlay.classList.toggle('active'); document.body.classList.toggle('menu-open', sidebar?.classList.contains('open')); }
-document.addEventListener('click', (e) => { if (e.target.closest('.nav-link')) { const sidebar = document.querySelector('.sidebar'); const overlay = document.querySelector('.sidebar-overlay'); if (sidebar) sidebar.classList.remove('open'); if (overlay) overlay.classList.remove('active'); document.body.classList.remove('menu-open'); } });
-function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = isDark ? '☀️' : '🌙'; if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre'; }
-function initDarkMode() { if (localStorage.getItem('recouvra_dark_mode') === '1') { document.body.classList.add('dark-mode'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = '☀️'; if (label) label.textContent = 'Mode clair'; } }
+// ============================================================================
+// PAIEMENTS - LOGIQUE (utilise les fonctions de assets/app.js)
+// ============================================================================
 
 document.addEventListener('DOMContentLoaded', async () => {
-    initDarkMode();
     const session = await requireAuth();
     if (!session) return;
 
@@ -127,9 +125,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadInvoices();
     await loadPayments();
 
-    document.getElementById('payment-form').addEventListener('submit', handlePaymentSubmit);
+    const form = document.getElementById('payment-form');
+    if (form) form.addEventListener('submit', handlePaymentSubmit);
 });
 
+// ---------- Chargement des factures impayées ----------
 async function loadInvoices() {
     const select = document.getElementById('invoice');
     if (!select) return;
@@ -142,33 +142,44 @@ async function loadInvoices() {
             .gt('montant_restant', 0)
             .order('numero_facture');
         if (error) throw error;
+
         if (!data || data.length === 0) {
             select.innerHTML = '<option value="">Aucune facture impayée</option>';
             return;
         }
-        select.innerHTML = `<option value="">Sélectionner une facture...</option>` +
-            data.map(f => `<option value="${f.id}">${f.numero_facture} — ${f.clients?.nom || 'Client'} — Reste: ${fmtMoney(f.montant_restant)}</option>`).join('');
+        select.innerHTML = `
+            <option value="">Sélectionner une facture...</option>
+            ${data.map(f => `
+                <option value="${f.id}">
+                    ${f.numero_facture} — ${f.clients?.nom || 'Client'} — Reste: ${fmtMoney(f.montant_restant)}
+                </option>
+            `).join('')}
+        `;
     } catch (error) {
         console.error('Erreur chargement factures:', error);
         select.innerHTML = '<option value="">Erreur de chargement</option>';
+        showToast(friendlyError(error), 'error');
     }
 }
 
+// ---------- Soumission du formulaire de paiement ----------
 async function handlePaymentSubmit(e) {
     e.preventDefault();
-    const msgEl = document.getElementById('payment-message');
-    clearMsg(msgEl);
+
     const factureId = document.getElementById('invoice').value;
     const montant = Number(document.getElementById('amount').value);
     const methode = document.getElementById('method').value;
     const reference = document.getElementById('reference').value.trim();
+
     if (!factureId || !montant || montant <= 0) {
-        showMsg(msgEl, 'Veuillez remplir tous les champs obligatoires.', 'error');
+        showToast('Veuillez remplir tous les champs obligatoires.', 'error');
         return;
     }
+
     const btn = e.target.querySelector('button[type="submit"]');
     btn.disabled = true;
     btn.textContent = 'Enregistrement...';
+
     try {
         const { error } = await supabaseClient
             .rpc('enregistrer_paiement', {
@@ -178,22 +189,25 @@ async function handlePaymentSubmit(e) {
                 p_reference: reference || null,
             });
         if (error) throw error;
-        showMsg(msgEl, '✅ Paiement enregistré avec succès.', 'success');
+
+        showToast('✅ Paiement enregistré avec succès.', 'success');
         e.target.reset();
         await loadInvoices();
         await loadPayments();
     } catch (error) {
-        showMsg(msgEl, friendlyError(error), 'error');
+        showToast(friendlyError(error), 'error');
     } finally {
         btn.disabled = false;
         btn.textContent = 'Enregistrer le paiement';
     }
 }
 
+// ---------- Chargement de l'historique des paiements ----------
 async function loadPayments() {
     const el = document.getElementById('payments-content');
     if (!el) return;
     el.innerHTML = '<div class="empty-state">Chargement...</div>';
+
     try {
         const { data, error } = await supabaseClient
             .from('paiements')
@@ -201,10 +215,12 @@ async function loadPayments() {
             .order('created_at', { ascending: false })
             .limit(50);
         if (error) throw error;
+
         if (!data || data.length === 0) {
             el.innerHTML = '<div class="empty-state">Aucun paiement enregistré.</div>';
             return;
         }
+
         el.innerHTML = `
             <div class="table-wrapper">
                 <table>
@@ -231,12 +247,16 @@ async function loadPayments() {
                         `).join('')}
                     </tbody>
                 </table>
-            </div>`;
+            </div>
+        `;
     } catch (error) {
         console.error('Erreur chargement paiements:', error);
         el.innerHTML = `<div class="error-msg">${friendlyError(error)}</div>`;
+        showToast(friendlyError(error), 'error');
     }
 }
 </script>
+
+<!-- Navigation mobile (générée par app.js) -->
 </body>
 </html>

@@ -1,136 +1,165 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mes Clients — Recouvra</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#4F46E5">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Recouvra">
-<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
-<link rel="stylesheet" href="assets/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Clients — Recouvra</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Recouvra">
+    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+    <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 
 <div class="app">
-  <nav class="sidebar">
-    <div class="brand">
-      <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
-      <span data-company-name>Recouvra</span>
-    </div>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="brand">
+            <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
+            <span data-company-name>Recouvra</span>
+        </div>
 
-    <div class="nav-section">
-      <div class="nav-section-title">Mon Quotidien</div>
-      <a href="index.html" class="nav-link"><span class="nav-emoji">🏠</span> Accueil</a>
-      <a href="factures.html" class="nav-link"><span class="nav-emoji">🧾</span> Vendre</a>
-      <a href="clients.html" class="nav-link active"><span class="nav-emoji">👥</span> Mes Clients</a>
-    </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Quotidien</div>
+            <a href="index.html" class="nav-link"><span class="nav-emoji">🏠</span> Accueil</a>
+            <a href="factures.html" class="nav-link"><span class="nav-emoji">🧾</span> Vendre</a>
+            <a href="clients.html" class="nav-link active"><span class="nav-emoji">👥</span> Mes Clients</a>
+        </div>
 
-    <div class="nav-section">
-      <div class="nav-section-title">Mon Stock</div>
-      <a href="stock.html" class="nav-link"><span class="nav-emoji">📊</span> Stock & Produits</a>
-    </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Stock</div>
+            <a href="stock.html" class="nav-link"><span class="nav-emoji">📊</span> Stock & Produits</a>
+        </div>
 
-    <div class="nav-section">
-      <div class="nav-section-title">Mon Argent</div>
-      <a href="credits.html" class="nav-link"><span class="nav-emoji">💸</span> On me doit</a>
-      <a href="recouvra.html" class="nav-link premium"><span class="nav-emoji">📣</span> Relancer <span class="badge-premium">PRO</span></a>
-    </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Argent</div>
+            <a href="credits.html" class="nav-link"><span class="nav-emoji">💸</span> On me doit</a>
+            <a href="recouvra.html" class="nav-link premium"><span class="nav-emoji">📣</span> Relancer <span class="badge-premium">PRO</span></a>
+        </div>
 
-    <div class="sidebar-footer">
-      <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;">
-        <span id="dark-mode-icon">🌙</span> <span id="dark-mode-label">Mode sombre</span>
-      </button>
-      <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
-      <button class="btn-logout" onclick="logout()">Déconnexion</button>
-    </div>
-  </nav>
+        <div class="sidebar-footer">
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;">
+                <span id="dark-mode-icon">🌙</span> <span id="dark-mode-label">Mode sombre</span>
+            </button>
+            <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
+            <button class="btn-logout" onclick="logout()">Déconnexion</button>
+        </div>
+    </nav>
 
-  <main class="main">
-    <div class="page-header-simple">
-      <h1>👥 Mes Clients</h1>
-      <p>Tous vos clients et ce qu'ils vous doivent.</p>
-    </div>
+    <!-- Contenu principal -->
+    <main class="main">
+        <div class="page-header-simple">
+            <h1>👥 Mes Clients</h1>
+            <p>Tous vos clients et ce qu'ils vous doivent.</p>
+        </div>
 
-    <div class="client-stats">
-      <div class="client-stat-card"><span class="client-stat-value" id="stat-total">—</span><span class="client-stat-label">Clients</span></div>
-      <div class="client-stat-card warning"><span class="client-stat-value" id="stat-impayes">—</span><span class="client-stat-label">Avec dette</span></div>
-      <div class="client-stat-card"><span class="client-stat-value" id="stat-total-facture">—</span><span class="client-stat-label">Total facturé</span></div>
-    </div>
+        <!-- Statistiques -->
+        <div class="client-stats">
+            <div class="client-stat-card"><span class="client-stat-value" id="stat-total">—</span><span class="client-stat-label">Clients</span></div>
+            <div class="client-stat-card warning"><span class="client-stat-value" id="stat-impayes">—</span><span class="client-stat-label">Avec dette</span></div>
+            <div class="client-stat-card"><span class="client-stat-value" id="stat-total-facture">—</span><span class="client-stat-label">Total facturé</span></div>
+        </div>
 
-    <div class="search-bar-big"><input type="text" id="search" placeholder="🔍 Rechercher un client..." oninput="filterClients()"></div>
+        <!-- Recherche -->
+        <div class="search-bar-big">
+            <input type="text" id="search" placeholder="🔍 Rechercher un client..." oninput="debouncedFilter()">
+        </div>
 
-    <div style="margin-bottom:20px;"><button class="btn-primary-big" onclick="openModal()">➕ Ajouter un client</button></div>
+        <!-- Bouton ajout -->
+        <div style="margin-bottom:20px;">
+            <button class="btn-primary-big" onclick="openModal()">➕ Ajouter un client</button>
+        </div>
 
-    <div class="clients-list" id="clients-list"><div class="empty-state">Chargement des clients...</div></div>
-  </main>
+        <!-- Liste des clients -->
+        <div class="clients-list" id="clients-list">
+            <div class="empty-state">Chargement des clients...</div>
+        </div>
+    </main>
 </div>
 
+<!-- Modal Détail Client -->
 <div class="modal-backdrop" id="client-detail-backdrop">
-  <div class="modal">
-    <div class="modal-head"><h3 id="client-detail-title">Détail du client</h3><button class="close-x" onclick="closeClientDetail()">×</button></div>
-    <div id="client-detail-content"></div>
-    <div class="modal-actions"><button class="btn btn-secondary" onclick="closeClientDetail()">Fermer</button></div>
-  </div>
+    <div class="modal">
+        <div class="modal-head"><h3 id="client-detail-title">Détail du client</h3><button class="close-x" onclick="closeClientDetail()">×</button></div>
+        <div id="client-detail-content"></div>
+        <div class="modal-actions"><button class="btn btn-secondary" onclick="closeClientDetail()">Fermer</button></div>
+    </div>
 </div>
 
+<!-- Modal Ajouter / Modifier Client -->
 <div class="modal-backdrop" id="modal-backdrop">
-  <div class="modal">
-    <div class="modal-head"><h3 id="modal-title">Nouveau client</h3><button class="close-x" onclick="closeModal()">×</button></div>
-    <form id="client-form">
-      <input type="hidden" id="client-id">
-      <label>Nom *</label><input id="nom" required>
-      <div class="field-row"><div><label>Téléphone</label><input id="telephone" placeholder="ex: 77 123 45 67"></div><div><label>Email</label><input id="email" type="email"></div></div>
-      <label>Adresse</label><textarea id="adresse" rows="2" placeholder="Quartier, ville..."></textarea>
-      <div id="form-msg"></div>
-      <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button><button type="submit" class="btn" id="save-btn">Enregistrer</button></div>
-    </form>
-  </div>
+    <div class="modal">
+        <div class="modal-head"><h3 id="modal-title">Nouveau client</h3><button class="close-x" onclick="closeModal()">×</button></div>
+        <form id="client-form">
+            <input type="hidden" id="client-id">
+            <label>Nom *</label><input id="nom" required>
+            <div class="field-row">
+                <div><label>Téléphone</label><input id="telephone" placeholder="ex: 77 123 45 67"></div>
+                <div><label>Email</label><input id="email" type="email"></div>
+            </div>
+            <label>Adresse</label><textarea id="adresse" rows="2" placeholder="Quartier, ville..."></textarea>
+            <div id="form-msg"></div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                <button type="submit" class="btn" id="save-btn">Enregistrer</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
 <script>
-function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
-    document.getElementById('dark-mode-icon').textContent = isDark ? '☀️' : '🌙';
-    document.getElementById('dark-mode-label').textContent = isDark ? 'Mode clair' : 'Mode sombre';
-}
-function initDarkMode() {
-    if (localStorage.getItem('recouvra_dark_mode') === '1') {
-        document.body.classList.add('dark-mode');
-        document.getElementById('dark-mode-icon').textContent = '☀️';
-        document.getElementById('dark-mode-label').textContent = 'Mode clair';
-    }
-}
+// ============================================================================
+// CLIENTS - LOGIQUE (utilise les fonctions de assets/app.js)
+// ============================================================================
+
 let allClients = [];
 let clientStats = {};
+let debounceTimer = null;
+
 document.addEventListener('DOMContentLoaded', async () => {
-    initDarkMode();
     const session = await requireAuth();
     if (!session) return;
+
     await loadClients();
     await loadClientStats();
+
     document.getElementById('client-form').addEventListener('submit', saveClient);
 });
-async function loadClients() {
-    const { items, offline, savedAt } = await loadWithCache('clients', () => fetchAllRows(() => supabaseClient.from('clients').select('*').order('nom')));
-    allClients = items;
-    if (offline && savedAt) showToast(`Hors ligne : données du ${fmtDateTime(savedAt)}.`, 'info');
-    renderClients(allClients);
+
+// Debounce pour la recherche
+function debouncedFilter() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => filterClients(), 300);
 }
+
+// ---------- Chargement des clients (avec cache) ----------
+async function loadClients() {
+    const { items, offline, savedAt } = await loadWithCache('clients', () =>
+        fetchAllRows(() => supabaseClient.from('clients').select('*').order('nom'))
+    );
+    allClients = items;
+    renderClients(allClients);
+    if (offline && savedAt) showToast(`Hors ligne : données du ${fmtDateTime(savedAt)}.`, 'info');
+}
+
+// ---------- Statistiques ----------
 async function loadClientStats() {
     clientStats = {};
     try {
-        const { data, error } = await supabaseClient.from('factures').select('client_id, montant_total, montant_restant, mode_paiement, paye').eq('statut', 'VALIDEE');
+        const { data, error } = await supabaseClient
+            .from('factures')
+            .select('client_id, montant_total, montant_restant, mode_paiement, paye')
+            .eq('statut', 'VALIDEE');
         if (error) throw error;
+
         (data || []).forEach(f => {
             if (!clientStats[f.client_id]) clientStats[f.client_id] = { total: 0, du: 0, nbFactures: 0 };
             const s = clientStats[f.client_id];
@@ -138,35 +167,63 @@ async function loadClientStats() {
             s.nbFactures += 1;
             if (f.mode_paiement === 'CREDIT' && !f.paye) s.du += Number(f.montant_restant || f.montant_total);
         });
-    } catch (error) { console.error('Erreur stats clients:', error); }
-    const totalClients = allClients.length;
-    const clientsAvecDette = Object.values(clientStats).filter(s => s.du > 0).length;
-    const totalFacture = Object.values(clientStats).reduce((s, c) => s + c.total, 0);
-    document.getElementById('stat-total').textContent = totalClients;
-    document.getElementById('stat-impayes').textContent = clientsAvecDette;
-    document.getElementById('stat-total-facture').textContent = fmtMoney(totalFacture);
+
+        const totalClients = allClients.length;
+        const clientsAvecDette = Object.values(clientStats).filter(s => s.du > 0).length;
+        const totalFacture = Object.values(clientStats).reduce((s, c) => s + c.total, 0);
+        document.getElementById('stat-total').textContent = totalClients;
+        document.getElementById('stat-impayes').textContent = clientsAvecDette;
+        document.getElementById('stat-total-facture').textContent = fmtMoney(totalFacture);
+    } catch (error) {
+        console.error('Erreur stats clients:', error);
+        showToast(friendlyError(error), 'error');
+    }
 }
+
+// ---------- Affichage de la liste ----------
 function renderClients(clients) {
     const el = document.getElementById('clients-list');
-    if (clients.length === 0) { el.innerHTML = '<div class="empty-state">Aucun client. Ajoutez votre premier client !</div>'; return; }
+    if (clients.length === 0) {
+        el.innerHTML = '<div class="empty-state">Aucun client. Ajoutez votre premier client !</div>';
+        return;
+    }
+
     el.innerHTML = clients.map(c => {
         const stats = clientStats[c.id] || { total: 0, du: 0, nbFactures: 0 };
         const initiales = (c.nom || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
         return `<div class="client-card" onclick="openClientDetail(${c.id})">
             <div class="client-avatar">${esc(initiales)}</div>
-            <div class="client-info"><div class="client-name">${esc(c.nom)}</div><div class="client-phone">${c.telephone ? '📞 ' + esc(c.telephone) : '—'}</div></div>
-            <div class="client-sales-info"><span class="client-total">${fmtMoney(stats.total)}</span><span class="client-nb-factures">${stats.nbFactures} vente(s)</span></div>
-            <div class="client-debt ${stats.du > 0 ? 'has-debt' : 'ok'}">${stats.du > 0 ? `<span class="debt-amount">${fmtMoney(stats.du)}</span><span class="debt-label">à payer</span>` : `<span class="debt-clear">✅ À jour</span>`}</div>
+            <div class="client-info">
+                <div class="client-name">${esc(c.nom)}</div>
+                <div class="client-phone">${c.telephone ? '📞 ' + esc(c.telephone) : '—'}</div>
+            </div>
+            <div class="client-sales-info">
+                <span class="client-total">${fmtMoney(stats.total)}</span>
+                <span class="client-nb-factures">${stats.nbFactures} vente(s)</span>
+            </div>
+            <div class="client-debt ${stats.du > 0 ? 'has-debt' : 'ok'}">
+                ${stats.du > 0
+                    ? `<span class="debt-amount">${fmtMoney(stats.du)}</span><span class="debt-label">à payer</span>`
+                    : `<span class="debt-clear">✅ À jour</span>`}
+            </div>
             <div class="client-arrow">→</div>
         </div>`;
     }).join('');
 }
+
+// ---------- Filtre ----------
 function filterClients() {
     const q = document.getElementById('search').value.trim().toLowerCase();
     if (!q) { renderClients(allClients); return; }
-    const filtered = allClients.filter(c => (c.nom || '').toLowerCase().includes(q) || (c.telephone || '').toLowerCase().includes(q) || (c.email || '').toLowerCase().includes(q));
+    const filtered = allClients.filter(c =>
+        (c.nom || '').toLowerCase().includes(q) ||
+        (c.telephone || '').toLowerCase().includes(q) ||
+        (c.email || '').toLowerCase().includes(q)
+    );
     renderClients(filtered);
 }
+
+// ---------- Détail client ----------
 function openClientDetail(id) {
     const client = allClients.find(c => c.id === id);
     if (!client) return;
@@ -190,9 +247,22 @@ function openClientDetail(id) {
     `;
     document.getElementById('client-detail-backdrop').classList.add('open');
 }
-function closeClientDetail() { document.getElementById('client-detail-backdrop').classList.remove('open'); }
-function editClientFromDetail(id) { document.getElementById('client-detail-backdrop').classList.remove('open'); editClient(id); }
-async function deleteClientFromDetail(id) { document.getElementById('client-detail-backdrop').classList.remove('open'); await deleteClient(id); }
+
+function closeClientDetail() {
+    document.getElementById('client-detail-backdrop').classList.remove('open');
+}
+
+function editClientFromDetail(id) {
+    document.getElementById('client-detail-backdrop').classList.remove('open');
+    editClient(id);
+}
+
+async function deleteClientFromDetail(id) {
+    document.getElementById('client-detail-backdrop').classList.remove('open');
+    await deleteClient(id);
+}
+
+// ---------- Modal Ajouter / Modifier ----------
 function openModal() {
     document.getElementById('client-form').reset();
     document.getElementById('client-id').value = '';
@@ -201,7 +271,11 @@ function openModal() {
     document.getElementById('modal-backdrop').classList.add('open');
     document.getElementById('nom').focus();
 }
-function closeModal() { document.getElementById('modal-backdrop').classList.remove('open'); }
+
+function closeModal() {
+    document.getElementById('modal-backdrop').classList.remove('open');
+}
+
 function editClient(id) {
     const c = allClients.find(x => x.id === id);
     if (!c) return;
@@ -214,39 +288,56 @@ function editClient(id) {
     clearMsg(document.getElementById('form-msg'));
     document.getElementById('modal-backdrop').classList.add('open');
 }
+
+// ---------- Sauvegarde client ----------
 async function saveClient(e) {
     e.preventDefault();
-    const msgEl = document.getElementById('form-msg'); clearMsg(msgEl);
+    const msgEl = document.getElementById('form-msg');
+    clearMsg(msgEl);
     const id = document.getElementById('client-id').value;
-    const payload = { nom: document.getElementById('nom').value.trim(), telephone: document.getElementById('telephone').value.trim() || null, email: document.getElementById('email').value.trim() || null, adresse: document.getElementById('adresse').value.trim() || null };
+    const payload = {
+        nom: document.getElementById('nom').value.trim(),
+        telephone: document.getElementById('telephone').value.trim() || null,
+        email: document.getElementById('email').value.trim() || null,
+        adresse: document.getElementById('adresse').value.trim() || null,
+    };
     if (!payload.nom) { showMsg(msgEl, 'Le nom est obligatoire.'); return; }
-    const btn = document.getElementById('save-btn'); btn.disabled = true; btn.textContent = 'Enregistrement...';
+    const btn = document.getElementById('save-btn');
+    btn.disabled = true;
+    btn.textContent = 'Enregistrement...';
     let error;
-    if (id) ({ error } = await supabaseClient.from('clients').update(payload).eq('id', id));
-    else ({ error } = await supabaseClient.from('clients').insert(payload));
-    btn.disabled = false; btn.textContent = 'Enregistrer';
+    if (id) {
+        ({ error } = await supabaseClient.from('clients').update(payload).eq('id', id));
+    } else {
+        ({ error } = await supabaseClient.from('clients').insert(payload));
+    }
+    btn.disabled = false;
+    btn.textContent = 'Enregistrer';
     if (error) { showMsg(msgEl, friendlyError(error)); return; }
-    closeModal(); showToast('Client enregistré avec succès.', 'success');
-    await loadClients(); await loadClientStats();
+    closeModal();
+    showToast('Client enregistré avec succès.', 'success');
+    await loadClients();
+    await loadClientStats();
 }
+
+// ---------- Suppression client ----------
 async function deleteClient(id) {
     const client = allClients.find(c => c.id === id);
     if (!client) return;
-    const ok = await confirmDialog(`Supprimer "${client.nom}" ? Cette action est irréversible.`, { title: 'Supprimer le client', confirmLabel: 'Supprimer', danger: true });
+    const ok = await confirmDialog(`Supprimer "${client.nom}" ? Cette action est irréversible.`, {
+        title: 'Supprimer le client',
+        confirmLabel: 'Supprimer',
+        danger: true
+    });
     if (!ok) return;
     const { error } = await supabaseClient.from('clients').delete().eq('id', id);
     if (error) { showToast(friendlyError(error), 'error'); return; }
     showToast('Client supprimé.', 'success');
-    await loadClients(); await loadClientStats();
+    await loadClients();
+    await loadClientStats();
 }
 </script>
 
-<nav class="global-nav">
-    <a href="index.html" class="global-nav-link"><span class="global-nav-icon">🏠</span><span class="global-nav-text">Accueil</span></a>
-    <a href="factures.html" class="global-nav-link"><span class="global-nav-icon">🧾</span><span class="global-nav-text">Vendre</span></a>
-    <a href="clients.html" class="global-nav-link active"><span class="global-nav-icon">👥</span><span class="global-nav-text">Clients</span></a>
-    <a href="stock.html" class="global-nav-link"><span class="global-nav-icon">📊</span><span class="global-nav-text">Stock</span></a>
-    <a href="credits.html" class="global-nav-link"><span class="global-nav-icon">💸</span><span class="global-nav-text">Crédits</span></a>
-</nav>
+<!-- Navigation mobile (générée par app.js) -->
 </body>
 </html>

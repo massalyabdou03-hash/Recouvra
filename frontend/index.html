@@ -1,205 +1,197 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Accueil — Recouvra</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#4F46E5">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Recouvra">
-<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
-<link rel="stylesheet" href="assets/style.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil — Recouvra</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Recouvra">
+    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+    <link rel="stylesheet" href="assets/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
 <div class="app">
-  <nav class="sidebar">
-    <div class="brand">
-      <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
-      <span data-company-name>Recouvra</span>
-    </div>
-
-    <div class="nav-section">
-      <div class="nav-section-title">Mon Quotidien</div>
-      <a href="index.html" class="nav-link active"><span class="nav-emoji">🏠</span> Accueil</a>
-      <a href="factures.html" class="nav-link"><span class="nav-emoji">🧾</span> Vendre</a>
-      <a href="clients.html" class="nav-link"><span class="nav-emoji">👥</span> Mes Clients</a>
-    </div>
-
-    <div class="nav-section">
-      <div class="nav-section-title">Mon Stock</div>
-      <a href="stock.html" class="nav-link"><span class="nav-emoji">📊</span> Stock & Produits</a>
-    </div>
-
-    <div class="nav-section">
-      <div class="nav-section-title">Mon Argent</div>
-      <a href="credits.html" class="nav-link"><span class="nav-emoji">💸</span> On me doit</a>
-      <a href="recouvra.html" class="nav-link premium"><span class="nav-emoji">📣</span> Relancer <span class="badge-premium">PRO</span></a>
-    </div>
-
-    <div class="sidebar-footer">
-      <a href="https://wa.me/221770338030?text=Bonjour%2C%20j%27ai%20besoin%20d%27aide%20avec%20Recouvra" target="_blank" class="support-link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.019-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        <span>Support WhatsApp</span>
-      </a>
-      <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;">
-        <span id="dark-mode-icon">🌙</span> <span id="dark-mode-label">Mode sombre</span>
-      </button>
-      <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
-      <button class="btn-logout" onclick="logout()">Déconnexion</button>
-    </div>
-  </nav>
-
-  <main class="main">
-    <div class="welcome-header" style="display:flex; justify-content:space-between; align-items:center;">
-      <div>
-        <h1 id="welcome-name">Bonjour 👋</h1>
-        <p id="welcome-company">Voici ce qui se passe dans votre boutique.</p>
-      </div>
-      <button class="btn btn-secondary" onclick="reloadDashboard()" style="font-size:0.8rem;">🔄 Actualiser</button>
-    </div>
-
-    <div class="dashboard-big-cards" id="big-cards">
-      <div class="big-card primary" onclick="window.location.href='factures.html'">
-        <div class="big-card-icon">💰</div>
-        <div class="big-card-content">
-          <div class="big-card-label">J'ai gagné aujourd'hui</div>
-          <div class="big-card-value" id="stat-ca-jour"><span class="spinner-small"></span></div>
-          <div class="big-card-hint" id="stat-nb-jour"></div>
+    <!-- Sidebar (généré dynamiquement pour les liens admin/support par app.js) -->
+    <nav class="sidebar">
+        <div class="brand">
+            <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
+            <span data-company-name>Recouvra</span>
         </div>
-        <div class="big-card-arrow">→</div>
-      </div>
-      <div class="big-card warning" onclick="window.location.href='credits.html'">
-        <div class="big-card-icon">⚠️</div>
-        <div class="big-card-content">
-          <div class="big-card-label">On me doit de l'argent</div>
-          <div class="big-card-value" id="stat-creances"><span class="spinner-small"></span></div>
-          <div class="big-card-hint">Clients à relancer</div>
-        </div>
-        <div class="big-card-arrow">→</div>
-      </div>
-      <div class="big-card info" onclick="window.location.href='rupture-stock.html'">
-        <div class="big-card-icon">📦</div>
-        <div class="big-card-content">
-          <div class="big-card-label">Articles à commander</div>
-          <div class="big-card-value" id="stat-alertes"><span class="spinner-small"></span></div>
-          <div class="big-card-hint">Stock faible ou épuisé</div>
-        </div>
-        <div class="big-card-arrow">→</div>
-      </div>
-    </div>
 
-    <div class="dashboard-actions">
-      <div class="section-title">Que voulez-vous faire ?</div>
-      <div class="action-grid">
-        <button class="action-button primary" onclick="window.location.href='factures.html'">
-          <span class="action-emoji">🧾</span>
-          <span class="action-text">Faire une vente</span>
-        </button>
-        <button class="action-button" onclick="window.location.href='stock.html'">
-          <span class="action-emoji">➕</span>
-          <span class="action-text">Ajouter un article</span>
-        </button>
-        <button class="action-button" onclick="window.location.href='clients.html'">
-          <span class="action-emoji">👥</span>
-          <span class="action-text">Nouveau client</span>
-        </button>
-        <button class="action-button" onclick="window.location.href='recouvra.html'">
-          <span class="action-emoji">📣</span>
-          <span class="action-text">Relancer un client</span>
-        </button>
-      </div>
-    </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Quotidien</div>
+            <a href="index.html" class="nav-link active"><span class="nav-emoji">🏠</span> Accueil</a>
+            <a href="factures.html" class="nav-link"><span class="nav-emoji">🧾</span> Vendre</a>
+            <a href="clients.html" class="nav-link"><span class="nav-emoji">👥</span> Mes Clients</a>
+        </div>
 
-    <div class="dashboard-recap">
-      <div class="section-title">Ma semaine en un coup d'œil</div>
-      <div class="recap-grid">
-        <div class="recap-item">
-          <div class="recap-icon">📅</div>
-          <div class="recap-label">Cette semaine</div>
-          <div class="recap-value" id="stat-ca-semaine"><span class="spinner-small"></span></div>
-          <div class="recap-hint" id="stat-nb-semaine"></div>
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Stock</div>
+            <a href="stock.html" class="nav-link"><span class="nav-emoji">📊</span> Stock & Produits</a>
         </div>
-        <div class="recap-item">
-          <div class="recap-icon">🗓️</div>
-          <div class="recap-label">Ce mois</div>
-          <div class="recap-value" id="stat-ca-mois"><span class="spinner-small"></span></div>
-          <div class="recap-hint" id="stat-nb-mois"></div>
-        </div>
-        <div class="recap-item">
-          <div class="recap-icon">📦</div>
-          <div class="recap-label">Articles</div>
-          <div class="recap-value" id="stat-pieces"><span class="spinner-small"></span></div>
-          <div class="recap-hint">En catalogue</div>
-        </div>
-        <div class="recap-item">
-          <div class="recap-icon">💰</div>
-          <div class="recap-label">Valeur stock</div>
-          <div class="recap-value" id="stat-valeur"><span class="spinner-small"></span></div>
-          <div class="recap-hint">Prix d'achat</div>
-        </div>
-      </div>
-    </div>
 
-    <div class="dashboard-recap">
-      <div class="section-title">📈 Ventes des 30 derniers jours</div>
-      <p class="hint" style="margin-bottom:10px;">Montant total des factures validées chaque jour.</p>
-      <div style="height: 300px; position: relative;">
-        <canvas id="salesChart"></canvas>
-      </div>
-    </div>
-    <div class="recap-grid" style="margin-top:15px;">
-      <div class="recap-item">
-        <div class="recap-icon">🔥</div>
-        <div class="recap-label">Meilleur jour</div>
-        <div class="recap-value" id="best-day">—</div>
-      </div>
-      <div class="recap-item">
-        <div class="recap-icon">📊</div>
-        <div class="recap-label">Total 30 jours</div>
-        <div class="recap-value" id="total-30">—</div>
-      </div>
-    </div>
-  </main>
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Argent</div>
+            <a href="credits.html" class="nav-link"><span class="nav-emoji">💸</span> On me doit</a>
+            <a href="recouvra.html" class="nav-link premium"><span class="nav-emoji">📣</span> Relancer <span class="badge-premium">PRO</span></a>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;">
+                <span id="dark-mode-icon">🌙</span> <span id="dark-mode-label">Mode sombre</span>
+            </button>
+            <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
+            <button class="btn-logout" onclick="logout()">Déconnexion</button>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="main">
+        <div class="welcome-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <h1 id="welcome-name">Bonjour 👋</h1>
+                <p id="welcome-company">Voici ce qui se passe dans votre boutique.</p>
+            </div>
+            <button class="btn btn-secondary" onclick="reloadDashboard()" style="font-size:0.8rem;">🔄 Actualiser</button>
+        </div>
+
+        <!-- Grandes cartes -->
+        <div class="dashboard-big-cards" id="big-cards">
+            <div class="big-card primary" onclick="window.location.href='factures.html'">
+                <div class="big-card-icon">💰</div>
+                <div class="big-card-content">
+                    <div class="big-card-label">J'ai gagné aujourd'hui</div>
+                    <div class="big-card-value" id="stat-ca-jour"><span class="spinner-small"></span></div>
+                    <div class="big-card-hint" id="stat-nb-jour"></div>
+                </div>
+                <div class="big-card-arrow">→</div>
+            </div>
+            <div class="big-card warning" onclick="window.location.href='credits.html'">
+                <div class="big-card-icon">⚠️</div>
+                <div class="big-card-content">
+                    <div class="big-card-label">On me doit de l'argent</div>
+                    <div class="big-card-value" id="stat-creances"><span class="spinner-small"></span></div>
+                    <div class="big-card-hint">Clients à relancer</div>
+                </div>
+                <div class="big-card-arrow">→</div>
+            </div>
+            <div class="big-card info" onclick="window.location.href='rupture-stock.html'">
+                <div class="big-card-icon">📦</div>
+                <div class="big-card-content">
+                    <div class="big-card-label">Articles à commander</div>
+                    <div class="big-card-value" id="stat-alertes"><span class="spinner-small"></span></div>
+                    <div class="big-card-hint">Stock faible ou épuisé</div>
+                </div>
+                <div class="big-card-arrow">→</div>
+            </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="dashboard-actions">
+            <div class="section-title">Que voulez-vous faire ?</div>
+            <div class="action-grid">
+                <button class="action-button primary" onclick="window.location.href='factures.html'">
+                    <span class="action-emoji">🧾</span>
+                    <span class="action-text">Faire une vente</span>
+                </button>
+                <button class="action-button" onclick="window.location.href='stock.html'">
+                    <span class="action-emoji">➕</span>
+                    <span class="action-text">Ajouter un article</span>
+                </button>
+                <button class="action-button" onclick="window.location.href='clients.html'">
+                    <span class="action-emoji">👥</span>
+                    <span class="action-text">Nouveau client</span>
+                </button>
+                <button class="action-button" onclick="window.location.href='recouvra.html'">
+                    <span class="action-emoji">📣</span>
+                    <span class="action-text">Relancer un client</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Récapitulatif hebdomadaire et mensuel -->
+        <div class="dashboard-recap">
+            <div class="section-title">Ma semaine en un coup d'œil</div>
+            <div class="recap-grid">
+                <div class="recap-item">
+                    <div class="recap-icon">📅</div>
+                    <div class="recap-label">Cette semaine</div>
+                    <div class="recap-value" id="stat-ca-semaine"><span class="spinner-small"></span></div>
+                    <div class="recap-hint" id="stat-nb-semaine"></div>
+                </div>
+                <div class="recap-item">
+                    <div class="recap-icon">🗓️</div>
+                    <div class="recap-label">Ce mois</div>
+                    <div class="recap-value" id="stat-ca-mois"><span class="spinner-small"></span></div>
+                    <div class="recap-hint" id="stat-nb-mois"></div>
+                </div>
+                <div class="recap-item">
+                    <div class="recap-icon">📦</div>
+                    <div class="recap-label">Articles</div>
+                    <div class="recap-value" id="stat-pieces"><span class="spinner-small"></span></div>
+                    <div class="recap-hint">En catalogue</div>
+                </div>
+                <div class="recap-item">
+                    <div class="recap-icon">💰</div>
+                    <div class="recap-label">Valeur stock</div>
+                    <div class="recap-value" id="stat-valeur"><span class="spinner-small"></span></div>
+                    <div class="recap-hint">Prix d'achat</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Graphique des ventes -->
+        <div class="dashboard-recap">
+            <div class="section-title">📈 Ventes des 30 derniers jours</div>
+            <p class="hint" style="margin-bottom:10px;">Montant total des factures validées chaque jour.</p>
+            <div style="height: 300px; position: relative;">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+        <div class="recap-grid" style="margin-top:15px;">
+            <div class="recap-item">
+                <div class="recap-icon">🔥</div>
+                <div class="recap-label">Meilleur jour</div>
+                <div class="recap-value" id="best-day">—</div>
+            </div>
+            <div class="recap-item">
+                <div class="recap-icon">📊</div>
+                <div class="recap-label">Total 30 jours</div>
+                <div class="recap-value" id="total-30">—</div>
+            </div>
+        </div>
+    </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
 <script>
-function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0');
-    document.getElementById('dark-mode-icon').textContent = isDark ? '☀️' : '🌙';
-    document.getElementById('dark-mode-label').textContent = isDark ? 'Mode clair' : 'Mode sombre';
-}
-function initDarkMode() {
-    if (localStorage.getItem('recouvra_dark_mode') === '1') {
-        document.body.classList.add('dark-mode');
-        document.getElementById('dark-mode-icon').textContent = '☀️';
-        document.getElementById('dark-mode-label').textContent = 'Mode clair';
-    }
-}
+// ============================================================================
+// DASHBOARD - LOGIQUE (utilise les fonctions de assets/app.js)
+// ============================================================================
 
 let chartInstance = null;
 
+// Initialisation
 document.addEventListener('DOMContentLoaded', async () => {
-    initDarkMode();
     const session = await requireAuth();
     if (!session) return;
+
     await loadWelcomeMessage();
     await loadDashboardData();
     await loadSalesChart();
 });
 
+// Rechargement manuel
 async function reloadDashboard() {
-    // Réinitialiser les cartes avec un spinner
     ['stat-ca-jour', 'stat-creances', 'stat-alertes', 'stat-ca-semaine', 'stat-ca-mois', 'stat-pieces', 'stat-valeur'].forEach(id => {
         document.getElementById(id).innerHTML = '<span class="spinner-small"></span>';
     });
@@ -208,6 +200,7 @@ async function reloadDashboard() {
     showToast('Données actualisées.', 'info');
 }
 
+// Message de bienvenue
 async function loadWelcomeMessage() {
     try {
         const { data: { session } } = await supabaseClient.auth.getSession();
@@ -228,6 +221,7 @@ async function loadWelcomeMessage() {
     }
 }
 
+// Chargement des données du dashboard
 async function loadDashboardData() {
     try {
         const { items: pieces, offline, savedAt } = await loadWithCache('pieces', () =>
@@ -245,9 +239,11 @@ async function loadDashboardData() {
         document.getElementById('stat-alertes').textContent = '⚠️';
         showToast('Erreur chargement du stock.', 'error');
     }
+
     await loadActiviteCommerciale();
 }
 
+// Activité commerciale (CA jour/semaine/mois, créances)
 async function loadActiviteCommerciale() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -302,11 +298,11 @@ async function loadActiviteCommerciale() {
     }
 }
 
+// Graphique des ventes 30 jours
 async function loadSalesChart() {
     const ctx = document.getElementById('salesChart')?.getContext('2d');
     if (!ctx) return;
 
-    // Détruire l'ancien graphique s'il existe
     if (chartInstance) {
         chartInstance.destroy();
         chartInstance = null;
@@ -398,7 +394,6 @@ async function loadSalesChart() {
 }
 </script>
 
-<!-- Petit style pour le spinner -->
 <style>
 .spinner-small {
     display: inline-block;
@@ -415,12 +410,5 @@ body.dark-mode .spinner-small {
 }
 </style>
 
-<nav class="global-nav">
-    <a href="index.html" class="global-nav-link"><span class="global-nav-icon">🏠</span><span class="global-nav-text">Accueil</span></a>
-    <a href="factures.html" class="global-nav-link"><span class="global-nav-icon">🧾</span><span class="global-nav-text">Vendre</span></a>
-    <a href="clients.html" class="global-nav-link"><span class="global-nav-icon">👥</span><span class="global-nav-text">Clients</span></a>
-    <a href="stock.html" class="global-nav-link"><span class="global-nav-icon">📊</span><span class="global-nav-text">Stock</span></a>
-    <a href="credits.html" class="global-nav-link"><span class="global-nav-icon">💸</span><span class="global-nav-text">Crédits</span></a>
-</nav>
 </body>
 </html>

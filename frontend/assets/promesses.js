@@ -1,5 +1,5 @@
 // ============================================================================
-// PROMESSES - Gestion des promesses de règlement
+// PROMESSES - Gestion des promesses de règlement (utilise app.js)
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -19,38 +19,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (invoiceSelect) invoiceSelect.addEventListener('change', updateClientDisplay);
 });
 
-async function requireAuth() {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session) {
-        window.location.href = 'login.html';
-        return null;
-    }
-    return session;
-}
-
-async function requireRecouvra() {
-    const session = await requireAuth();
-    if (!session) return false;
-
-    const { data: profile, error } = await supabaseClient
-        .from('profiles')
-        .select('has_recouvra')
-        .eq('id', session.user.id)
-        .single();
-
-    if (error || !profile?.has_recouvra) {
-        window.location.href = 'abonnement.html';
-        return false;
-    }
-    return true;
-}
-
+// ---------- Chargement des factures impayées ----------
 async function loadInvoices() {
     const select = document.getElementById('invoice');
     if (!select) return;
-
     select.innerHTML = '<option value="">Chargement...</option>';
-
     try {
         const { data, error } = await supabaseClient
             .from('factures')
@@ -58,14 +31,12 @@ async function loadInvoices() {
             .eq('statut', 'VALIDEE')
             .gt('montant_restant', 0)
             .order('numero_facture');
-
         if (error) throw error;
 
         if (!data || data.length === 0) {
             select.innerHTML = '<option value="">Aucune facture impayée</option>';
             return;
         }
-
         select.innerHTML = `
             <option value="">Sélectionner une facture...</option>
             ${data.map(f => `
@@ -77,39 +48,31 @@ async function loadInvoices() {
                 </option>
             `).join('')}
         `;
-
     } catch (error) {
         console.error('Erreur chargement factures:', error);
         select.innerHTML = '<option value="">Erreur de chargement</option>';
+        showToast(friendlyError(error), 'error');
     }
 }
 
+// ---------- Mise à jour de l'affichage client ----------
 function updateClientDisplay() {
     const select = document.getElementById('invoice');
     const option = select.selectedOptions[0];
     const clientDisplay = document.getElementById('client-display');
-    const clientHidden = document.getElementById('client');
+    const clientHidden = document.getElementById('client-id');
     const amount = document.getElementById('amount');
 
-    if (clientDisplay) clientDisplay.textContent = '—';
-    if (clientHidden) clientHidden.value = '';
-    if (amount) amount.value = '';
-
-    if (option?.dataset.clientName) {
-        if (clientDisplay) clientDisplay.textContent = option.dataset.clientName;
-        if (clientHidden) clientHidden.value = option.dataset.client;
-        if (amount) {
-            amount.max = option.dataset.montant;
-            amount.value = option.dataset.montant;
-        }
-    }
+    if (clientDisplay) clientDisplay.value = option?.dataset.clientName || '';
+    if (clientHidden) clientHidden.value = option?.dataset.client || '';
+    if (amount) amount.value = option?.dataset.montant || '';
 }
 
+// ---------- Soumission du formulaire ----------
 async function handlePromiseSubmit(e) {
     e.preventDefault();
-
     const factureId = document.getElementById('invoice').value;
-    const clientId = document.getElementById('client').value;
+    const clientId = document.getElementById('client-id').value;
     const montant = Number(document.getElementById('amount').value);
     const datePromise = document.getElementById('due').value;
 
@@ -131,15 +94,12 @@ async function handlePromiseSubmit(e) {
                 montant_promis: montant,
                 date_promise: new Date(datePromise).toISOString(),
             });
-
         if (error) throw error;
 
-        showToast('Promesse de règlement enregistrée.', 'success');
+        showToast('✅ Promesse de règlement enregistrée.', 'success');
         e.target.reset();
         updateClientDisplay();
-
         await loadPromises();
-
     } catch (error) {
         showToast(friendlyError(error), 'error');
     } finally {
@@ -148,11 +108,11 @@ async function handlePromiseSubmit(e) {
     }
 }
 
+// ---------- Chargement des promesses ----------
 async function loadPromises() {
     const el = document.getElementById('promises-content');
     if (!el) return;
-
-    el.innerHTML = '<div class="empty-state">Chargement...</div>';
+    el.innerHTML = '<div class="empty-state"><span class="spinner-small"></span> Chargement...</div>';
 
     try {
         await supabaseClient.rpc('verifier_promesses');
@@ -161,7 +121,6 @@ async function loadPromises() {
             .from('promesses_paiement')
             .select('*, clients(nom), factures(numero_facture)')
             .order('created_at', { ascending: false });
-
         if (error) throw error;
 
         if (!data || data.length === 0) {
@@ -199,12 +158,8 @@ async function loadPromises() {
                                 <td>${statusBadge[p.statut] || p.statut}</td>
                                 <td class="actions-cell">
                                     ${p.statut === 'EN_ATTENTE' ? `
-                                        <button class="btn btn-sm btn-secondary" onclick="markPromiseRespected('${p.id}')">
-                                            ✓ Respectée
-                                        </button>
-                                        <button class="btn btn-sm btn-secondary" onclick="markPromiseNotRespected('${p.id}')">
-                                            ✗ Non respectée
-                                        </button>
+                                        <button class="btn btn-sm btn-secondary" onclick="markPromiseRespected('${p.id}')">✓ Respectée</button>
+                                        <button class="btn btn-sm btn-secondary" onclick="markPromiseNotRespected('${p.id}')">✗ Non respectée</button>
                                     ` : ''}
                                 </td>
                             </tr>
@@ -213,20 +168,20 @@ async function loadPromises() {
                 </table>
             </div>
         `;
-
     } catch (error) {
         console.error('Erreur chargement promesses:', error);
         el.innerHTML = `<div class="error-msg">${friendlyError(error)}</div>`;
+        showToast(friendlyError(error), 'error');
     }
 }
 
+// ---------- Marquer comme respectée ----------
 async function markPromiseRespected(id) {
     try {
         const { error } = await supabaseClient
             .from('promesses_paiement')
             .update({ statut: 'RESPECTEE', updated_at: new Date().toISOString() })
             .eq('id', id);
-
         if (error) throw error;
         showToast('Promesse marquée comme respectée.', 'success');
         await loadPromises();
@@ -235,13 +190,13 @@ async function markPromiseRespected(id) {
     }
 }
 
+// ---------- Marquer comme non respectée ----------
 async function markPromiseNotRespected(id) {
     try {
         const { error } = await supabaseClient
             .from('promesses_paiement')
             .update({ statut: 'NON_RESPECTEE', updated_at: new Date().toISOString() })
             .eq('id', id);
-
         if (error) throw error;
         showToast('Promesse marquée comme non respectée.', 'info');
         await loadPromises();
