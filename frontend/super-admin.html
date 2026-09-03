@@ -163,7 +163,6 @@
 
       <!-- ========== ONGLET UTILISATEURS ========== -->
       <div id="tab-utilisateurs" style="display:none;">
-        <!-- Bouton ajouter -->
         <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
           <h3 style="margin:0;">Utilisateurs</h3>
           <button class="btn btn-primary" onclick="openCreateUserModal()">➕ Ajouter un utilisateur</button>
@@ -393,8 +392,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     initDarkMode();
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session) { window.location.href = 'login.html'; return; }
-    const { data: profile, error } = await supabaseClient.from('profiles').select('role').eq('id', session.user.id).single();
-    if (error || !profile || profile.role !== 'super_admin') { showToast('Accès non autorisé.', 'error'); window.location.href = 'index.html'; return; }
+    const { data: profile, error } = await supabaseClient
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+    if (error || !profile || profile.role !== 'super_admin') {
+        showToast('Accès non autorisé.', 'error');
+        window.location.href = 'index.html';
+        return;
+    }
 
     await loadPayments();
     await loadEntreprises();
@@ -451,14 +458,18 @@ function closeRejectModal() { closeModal('reject-backdrop'); }
 
 async function loadPayments() {
     try {
-        const { data, error } = await supabaseClient.from('subscription_payments').select('*, entreprises(nom, gerant_nom, telephone)').order('created_at', { ascending: false });
+        const { data, error } = await supabaseClient
+            .from('subscription_payments')
+            .select('*, entreprises(nom, gerant_nom, telephone)')
+            .order('created_at', { ascending: false });
         if (error) throw error;
         allPayments = data || [];
         renderStats();
         renderPayments();
     } catch (error) {
         console.error('Erreur chargement paiements:', error);
-        document.getElementById('payments-tbody').innerHTML = `<tr><td colspan="8" class="payments-empty">${friendlyError(error)}</td></tr>`;
+        document.getElementById('payments-tbody').innerHTML =
+            `<tr><td colspan="8" class="payments-empty">${friendlyError(error)}</td></tr>`;
     }
 }
 
@@ -475,7 +486,9 @@ function renderStats() {
     if (pending.length > 0) {
         notice.hidden = false;
         notice.innerHTML = `⚠️ <strong>${pending.length}</strong> paiement(s) en attente de validation (${fmtMoney(pendingAmount)})`;
-    } else { notice.hidden = true; }
+    } else {
+        notice.hidden = true;
+    }
 }
 
 function renderPayments(search = '') {
@@ -483,9 +496,22 @@ function renderPayments(search = '') {
     if (!tbody) return;
     let filtered = allPayments;
     if (currentPaymentFilter !== 'all') filtered = filtered.filter(p => p.status === currentPaymentFilter);
-    if (search) filtered = filtered.filter(p => (p.entreprises?.nom || '').toLowerCase().includes(search) || (p.entreprises?.gerant_nom || '').toLowerCase().includes(search) || (p.entreprises?.telephone || '').toLowerCase().includes(search));
-    if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="8" class="payments-empty">Aucun paiement trouvé</td></tr>`; return; }
-    const statusBadge = { pending: '<span class="badge badge-warning">🕐 En attente</span>', confirmed: '<span class="badge badge-success">✅ Confirmé</span>', rejected: '<span class="badge badge-danger">❌ Rejeté</span>' };
+    if (search) {
+        filtered = filtered.filter(p =>
+            (p.entreprises?.nom || '').toLowerCase().includes(search) ||
+            (p.entreprises?.gerant_nom || '').toLowerCase().includes(search) ||
+            (p.entreprises?.telephone || '').toLowerCase().includes(search)
+        );
+    }
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="payments-empty">Aucun paiement trouvé</td></tr>`;
+        return;
+    }
+    const statusBadge = {
+        pending: '<span class="badge badge-warning">🕐 En attente</span>',
+        confirmed: '<span class="badge badge-success">✅ Confirmé</span>',
+        rejected: '<span class="badge badge-danger">❌ Rejeté</span>'
+    };
     tbody.innerHTML = filtered.map(p => `<tr>
         <td><strong>${esc(p.entreprises?.nom || '—')}</strong></td>
         <td>${esc(p.entreprises?.gerant_nom || '—')}</td>
@@ -495,9 +521,15 @@ function renderPayments(search = '') {
         <td>${fmtDate(p.created_at)}</td>
         <td>${statusBadge[p.status] || p.status}</td>
         <td><div class="admin-actions">
-            ${p.status === 'pending' ? `<button class="admin-btn success" onclick="confirmPayment('${p.id}')">✅ Valider</button><button class="admin-btn info" onclick="openPaymentDetail('${p.id}')">👁️ Vérifier</button><button class="admin-btn danger" onclick="rejectPayment('${p.id}')">❌ Rejeter</button>` : ''}
-            ${p.status === 'confirmed' ? `<button class="admin-btn danger" onclick="annulerPaiement('${p.id}')">↩️ Annuler</button>` : ''}
-            ${p.status === 'rejected' ? `<button class="admin-btn success" onclick="confirmPayment('${p.id}')">✅ Valider</button>` : ''}
+            ${p.status === 'pending' ?
+                `<button class="admin-btn success" onclick="confirmPayment('${p.id}')">✅ Valider</button>
+                 <button class="admin-btn info" onclick="openPaymentDetail('${p.id}')">👁️ Vérifier</button>
+                 <button class="admin-btn danger" onclick="rejectPayment('${p.id}')">❌ Rejeter</button>` :
+                (p.status === 'confirmed' ?
+                    `<button class="admin-btn danger" onclick="annulerPaiement('${p.id}')">↩️ Annuler</button>` :
+                    (p.status === 'rejected' ?
+                        `<button class="admin-btn success" onclick="confirmPayment('${p.id}')">✅ Valider</button>` :
+                        ''))}
         </div></td></tr>`).join('');
 }
 
@@ -506,16 +538,22 @@ function openPaymentDetail(paymentId) {
     if (!payment) return;
     currentPaymentDetail = payment;
     const content = document.getElementById('payment-detail-content');
-    content.innerHTML = `<div class="detail-row"><span class="k">Entreprise</span><span class="v">${esc(payment.entreprises?.nom || '—')}</span></div>
+    content.innerHTML = `
+        <div class="detail-row"><span class="k">Entreprise</span><span class="v">${esc(payment.entreprises?.nom || '—')}</span></div>
         <div class="detail-row"><span class="k">Gérant</span><span class="v">${esc(payment.entreprises?.gerant_nom || '—')}</span></div>
         <div class="detail-row"><span class="k">Téléphone</span><span class="v">${esc(payment.entreprises?.telephone || '—')}</span></div>
         <div class="detail-row"><span class="k">Type</span><span class="v">${esc(payment.payment_type)}</span></div>
         <div class="detail-row"><span class="k">Montant</span><span class="v">${fmtMoney(payment.amount)} ${esc(payment.currency)}</span></div>
         <div class="detail-row"><span class="k">Référence</span><span class="v">${esc(payment.payment_reference || '—')}</span></div>
         <div class="detail-row"><span class="k">Date</span><span class="v">${fmtDateTime(payment.created_at)}</span></div>
-        ${payment.proof_path ? `<div class="detail-row"><span class="k">Preuve</span><span class="v"><a href="${getStorageUrl(payment.proof_path)}" target="_blank" class="btn btn-secondary btn-sm">Voir la preuve</a></span></div>` : ''}`;
+        ${payment.proof_path ? `<div class="detail-row"><span class="k">Preuve</span><span class="v"><a href="${getStorageUrl(payment.proof_path)}" target="_blank" class="btn btn-secondary btn-sm">Voir la preuve</a></span></div>` : ''}
+    `;
     const actions = document.getElementById('payment-detail-actions');
-    actions.innerHTML = `<button class="btn btn-secondary" onclick="closeModal('payment-detail-backdrop')">Fermer</button><button class="btn btn-danger" onclick="rejectPayment('${payment.id}')">Rejeter</button><button class="btn" onclick="confirmPayment('${payment.id}')">Confirmer</button>`;
+    actions.innerHTML = `
+        <button class="btn btn-secondary" onclick="closeModal('payment-detail-backdrop')">Fermer</button>
+        <button class="btn btn-danger" onclick="rejectPayment('${payment.id}')">Rejeter</button>
+        <button class="btn" onclick="confirmPayment('${payment.id}')">Confirmer</button>
+    `;
     document.getElementById('payment-detail-backdrop').classList.add('open');
 }
 
@@ -536,11 +574,11 @@ async function confirmPayment(paymentId) {
         if (fetchError) throw fetchError;
         if (!payment) throw new Error('Paiement non trouvé');
 
-        console.log('✅ Activation de l\'entreprise ID :', payment.entreprise_id); // ← LOG DE DEBUG
+        console.log('✅ Activation de l\'entreprise ID :', payment.entreprise_id);
 
         const now = new Date();
         const end = new Date(now);
-        end.setMonth(end.getMonth() + 1); // +1 mois
+        end.setMonth(end.getMonth() + 1);
 
         // 2. UPSERT dans subscriptions (crée la ligne si absente, ou met à jour)
         const { error: updateSubError } = await supabaseClient
@@ -552,7 +590,7 @@ async function confirmPayment(paymentId) {
                 current_period_end: end.toISOString(),
                 updated_at: now.toISOString()
             }, {
-                onConflict: 'entreprise_id'   // ← CLÉ UNIQUE !
+                onConflict: 'entreprise_id'
             });
         if (updateSubError) throw updateSubError;
 
@@ -571,7 +609,7 @@ async function confirmPayment(paymentId) {
         await loadEntreprises();
 
     } catch (error) {
-        console.error('❌ Erreur dans confirmPayment :', error); // ← AFFICHE L'ERREUR DANS LA CONSOLE
+        console.error('❌ Erreur dans confirmPayment :', error);
         showToast(friendlyError(error), 'error');
     }
 }
@@ -587,31 +625,87 @@ async function submitRejection() {
     const reason = document.getElementById('reject-reason-select').value;
     const otherReason = document.getElementById('reject-other-text').value.trim();
     const finalReason = reason === 'Autre' ? otherReason : reason;
-    if (!finalReason) { showToast('Un motif est obligatoire pour rejeter.', 'error'); return; }
+    if (!finalReason) {
+        showToast('Un motif est obligatoire pour rejeter.', 'error');
+        return;
+    }
     try {
-        const { error } = await supabaseClient.rpc('confirm_subscription_payment', { p_payment_id: currentPaymentDetail.id, p_decision: 'rejected', p_rejection_reason: finalReason });
+        const { error } = await supabaseClient
+            .rpc('confirm_subscription_payment', {
+                p_payment_id: currentPaymentDetail.id,
+                p_decision: 'rejected',
+                p_rejection_reason: finalReason,
+            });
         if (error) throw error;
         showToast('Paiement rejeté.', 'info');
         closeRejectModal();
         closeModal('payment-detail-backdrop');
         await loadPayments();
-    } catch (error) { showToast(friendlyError(error), 'error'); }
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
 }
 
 async function annulerPaiement(paymentId) {
-    const ok = await confirmDialog('Annuler ce paiement confirmé ? L\'entreprise sera désactivée.', { title: 'Annuler le paiement', confirmLabel: 'Annuler', danger: true });
+    const ok = await confirmDialog(
+        'Annuler ce paiement confirmé ? L\'entreprise sera désactivée.',
+        { title: 'Annuler le paiement', confirmLabel: 'Annuler', danger: true }
+    );
     if (!ok) return;
     try {
-        const { error } = await supabaseClient.rpc('annuler_paiement_admin', { p_payment_id: paymentId });
+        const { error } = await supabaseClient
+            .rpc('annuler_paiement_admin', { p_payment_id: paymentId });
         if (error) throw error;
         showToast('Paiement annulé — entreprise désactivée.', 'info');
         await loadPayments();
-    } catch (error) { showToast(friendlyError(error), 'error'); }
+        await loadEntreprises();
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
 }
 
 // ============================================================================
 // GESTION DES ENTREPRISES
 // ============================================================================
+
+async function loadEntreprises() {
+    console.log('🔍 Chargement des entreprises...');
+    try {
+        const { data: entreprisesData, error: err1 } = await supabaseClient
+            .from('entreprises')
+            .select('*')
+            .order('created_at', { ascending: false });
+        if (err1) throw err1;
+        console.log('✅ entreprisesData :', entreprisesData?.length || 0);
+
+        const { data: subscriptionsData, error: err2 } = await supabaseClient
+            .from('subscriptions')
+            .select('*');
+        if (err2) console.warn('⚠️ Erreur chargement subscriptions:', err2);
+
+        const { data: profilesData, error: err3 } = await supabaseClient
+            .from('profiles')
+            .select('id, entreprise_id, role, has_recouvra');
+        if (err3) console.warn('⚠️ Erreur chargement profiles:', err3);
+
+        allEntreprises = (entreprisesData || []).map(e => {
+            const sub = (subscriptionsData || []).find(s => s.entreprise_id === e.id);
+            const users = (profilesData || []).filter(p => p.entreprise_id === e.id);
+            return { ...e, subscriptions: sub, profiles: users };
+        });
+
+        renderEntreprises();
+
+        const actives = allEntreprises.filter(e => e.subscriptions?.status === 'active').length;
+        document.getElementById('stat-entreprises').textContent = actives;
+
+        console.log('📦 allEntreprises chargées :', allEntreprises.length);
+    } catch (error) {
+        console.error('❌ Erreur loadEntreprises:', error);
+        document.getElementById('entreprises-tbody').innerHTML =
+            `<tr><td colspan="6" class="payments-empty">Erreur : ${friendlyError(error)}</td></tr>`;
+    }
+}
 
 function renderEntreprises(search = '') {
     const tbody = document.getElementById('entreprises-tbody');
@@ -660,7 +754,7 @@ function renderEntreprises(search = '') {
 
     tbody.innerHTML = html;
 
-    // Attacher les événements avec addEventListener (plus fiable)
+    // Attacher les événements avec addEventListener
     tbody.querySelectorAll('[data-action="edit"]').forEach(btn => {
         btn.addEventListener('click', (ev) => {
             ev.stopPropagation();
@@ -675,73 +769,6 @@ function renderEntreprises(search = '') {
             ev.stopPropagation();
             const id = btn.dataset.id;
             console.log('🖱️ Clic Désactiver pour l\'entreprise ID:', id);
-            desactiverEntreprise(id);
-        });
-    });
-}
-
-function renderEntreprises(search = '') {
-    const tbody = document.getElementById('entreprises-tbody');
-    if (!tbody) return;
-
-    let filtered = allEntreprises;
-    if (search) {
-        filtered = filtered.filter(e =>
-            (e.nom || '').toLowerCase().includes(search) ||
-            (e.gerant_nom || '').toLowerCase().includes(search) ||
-            (e.telephone || '').toLowerCase().includes(search)
-        );
-    }
-
-    if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="payments-empty">Aucune entreprise trouvée</td></tr>`;
-        return;
-    }
-
-    const statusBadge = {
-        active: '<span class="badge badge-success">✅ Active</span>',
-        pending: '<span class="badge badge-warning">🕐 En attente</span>',
-        expired: '<span class="badge badge-danger">❌ Expirée</span>',
-        cancelled: '<span class="badge badge-muted">🚫 Annulée</span>'
-    };
-
-    let html = '';
-    filtered.forEach(e => {
-        const status = e.subscriptions?.status || '—';
-        const endDate = e.subscriptions?.current_period_end ? fmtDate(e.subscriptions.current_period_end) : '—';
-        html += `
-        <tr>
-            <td><strong>${esc(e.nom || '—')}</strong></td>
-            <td>${esc(e.gerant_nom || '—')}</td>
-            <td>${esc(e.telephone || '—')}</td>
-            <td>${statusBadge[status] || status}</td>
-            <td>${endDate}</td>
-            <td>
-                <div class="admin-actions">
-                    <button class="admin-btn info" data-action="edit" data-id="${e.id}">✏️ Modifier</button>
-                    <button class="admin-btn danger" data-action="disable" data-id="${e.id}">🚫 Désactiver</button>
-                </div>
-            </td>
-        </tr>`;
-    });
-
-    tbody.innerHTML = html;
-
-    // Attacher les événements après l'insertion du HTML
-    tbody.querySelectorAll('[data-action="edit"]').forEach(btn => {
-        btn.addEventListener('click', (ev) => {
-            ev.stopPropagation();
-            const id = btn.dataset.id;
-            console.log('🖱️ Clic sur Modifier pour id:', id);
-            openEditEntreprise(id);
-        });
-    });
-
-    tbody.querySelectorAll('[data-action="disable"]').forEach(btn => {
-        btn.addEventListener('click', (ev) => {
-            ev.stopPropagation();
-            const id = btn.dataset.id;
-            console.log('🖱️ Clic sur Désactiver pour id:', id);
             desactiverEntreprise(id);
         });
     });
@@ -781,16 +808,36 @@ async function saveEntreprise(e) {
     const telephone = document.getElementById('edit-entreprise-telephone').value.trim();
     const statut = document.getElementById('edit-entreprise-statut').value;
     try {
-        const { error: err1 } = await supabaseClient.from('entreprises').update({ nom, gerant_nom: gerant, telephone }).eq('id', id);
+        const { error: err1 } = await supabaseClient
+            .from('entreprises')
+            .update({ nom, gerant_nom: gerant, telephone })
+            .eq('id', id);
         if (err1) throw err1;
-        const { error: err2 } = await supabaseClient.from('subscriptions').update({ status: statut, updated_at: new Date().toISOString() }).eq('entreprise_id', id);
+
+        const { error: err2 } = await supabaseClient
+            .from('subscriptions')
+            .update({ status: statut, updated_at: new Date().toISOString() })
+            .eq('entreprise_id', id);
         if (err2) throw err2;
-        if (statut === 'active') await supabaseClient.from('profiles').update({ has_recouvra: true, updated_at: new Date().toISOString() }).eq('entreprise_id', id);
-        else await supabaseClient.from('profiles').update({ has_recouvra: false, updated_at: new Date().toISOString() }).eq('entreprise_id', id);
+
+        if (statut === 'active') {
+            await supabaseClient
+                .from('profiles')
+                .update({ has_recouvra: true, updated_at: new Date().toISOString() })
+                .eq('entreprise_id', id);
+        } else {
+            await supabaseClient
+                .from('profiles')
+                .update({ has_recouvra: false, updated_at: new Date().toISOString() })
+                .eq('entreprise_id', id);
+        }
+
         showToast('Entreprise modifiée avec succès.', 'success');
         closeModal('edit-entreprise-backdrop');
         await loadEntreprises();
-    } catch (error) { showToast(friendlyError(error), 'error'); }
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
 }
 
 async function desactiverEntreprise(id) {
@@ -833,36 +880,86 @@ async function desactiverEntreprise(id) {
 // ============================================================================
 
 async function loadUsers() {
+    console.log('🔍 Chargement des utilisateurs...');
     try {
-        const { data, error } = await supabaseClient.from('profiles').select('*, entreprises(nom)').order('created_at', { ascending: false });
+        const { data, error } = await supabaseClient
+            .from('profiles')
+            .select('*, entreprises(nom)')
+            .order('created_at', { ascending: false });
         if (error) throw error;
-        allUsers = (data || []).map(u => ({ ...u, email: u.email || '—' }));
+        // L'email n'existe pas dans profiles, on utilise l'ID comme identifiant
+        allUsers = (data || []).map(u => ({ ...u, email: u.id || '—' }));
         renderUsers();
+        console.log('👤 Utilisateurs chargés :', allUsers.length);
     } catch (error) {
-        console.error('Erreur chargement utilisateurs:', error);
-        document.getElementById('utilisateurs-tbody').innerHTML = `<tr><td colspan="5" class="payments-empty">${friendlyError(error)}</td></tr>`;
+        console.error('❌ Erreur loadUsers:', error);
+        document.getElementById('utilisateurs-tbody').innerHTML =
+            `<tr><td colspan="5" class="payments-empty">${friendlyError(error)}</td></tr>`;
     }
 }
 
 function renderUsers(search = '') {
     const tbody = document.getElementById('utilisateurs-tbody');
     if (!tbody) return;
+
     let filtered = allUsers;
-    if (search) filtered = filtered.filter(u => (u.entreprises?.nom || '').toLowerCase().includes(search) || (u.role || '').toLowerCase().includes(search) || (u.email || '').toLowerCase().includes(search));
-    if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="payments-empty">Aucun utilisateur trouvé</td></tr>`; return; }
-    tbody.innerHTML = filtered.map(u => `<tr>
-        <td>${esc(u.email || '—')}</td>
-        <td>${esc(u.entreprises?.nom || '—')}</td>
-        <td>${esc(u.role || '—')}</td>
-        <td>${u.has_recouvra ? '<span class="badge badge-success">✅ PRO</span>' : '<span class="badge badge-muted">—</span>'}</td>
-        <td>
-            <div class="admin-actions">
-                <button class="admin-btn info" onclick="openEditUser('${u.id}')">✏️ Modifier</button>
-                <button class="admin-btn danger" onclick="openDeleteUserModal('${u.id}')">🗑️ Supprimer</button>
-                <button class="admin-btn secondary" onclick="openResetPasswordModal('${u.id}')">🔑 MDP</button>
-            </div>
-        </td>
-    </tr>`).join('');
+    if (search) {
+        filtered = filtered.filter(u =>
+            (u.entreprises?.nom || '').toLowerCase().includes(search) ||
+            (u.role || '').toLowerCase().includes(search) ||
+            (u.id || '').toLowerCase().includes(search)
+        );
+    }
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="payments-empty">Aucun utilisateur trouvé</td></tr>`;
+        return;
+    }
+
+    let html = '';
+    filtered.forEach(u => {
+        html += `
+        <tr>
+            <td>${esc(u.email || '—')}</td>
+            <td>${esc(u.entreprises?.nom || '—')}</td>
+            <td>${esc(u.role || '—')}</td>
+            <td>${u.has_recouvra ? '<span class="badge badge-success">✅ PRO</span>' : '<span class="badge badge-muted">—</span>'}</td>
+            <td>
+                <div class="admin-actions">
+                    <button class="admin-btn info" data-action="editUser" data-id="${u.id}">✏️ Modifier</button>
+                    <button class="admin-btn danger" data-action="deleteUser" data-id="${u.id}">🗑️ Supprimer</button>
+                    <button class="admin-btn secondary" data-action="resetPassword" data-id="${u.id}">🔑 MDP</button>
+                </div>
+            </td>
+        </tr>`;
+    });
+
+    tbody.innerHTML = html;
+
+    // Événements
+    tbody.querySelectorAll('[data-action="editUser"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            console.log('✏️ Modifier utilisateur:', id);
+            openEditUser(id);
+        });
+    });
+
+    tbody.querySelectorAll('[data-action="deleteUser"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            console.log('🗑️ Supprimer utilisateur:', id);
+            openDeleteUserModal(id);
+        });
+    });
+
+    tbody.querySelectorAll('[data-action="resetPassword"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            console.log('🔑 Réinitialiser MDP:', id);
+            openResetPasswordModal(id);
+        });
+    });
 }
 
 function openEditUser(id) {
@@ -880,12 +977,17 @@ async function saveUser(e) {
     const role = document.getElementById('edit-user-role').value;
     const hasRecouvra = document.getElementById('edit-user-recouvra').checked;
     try {
-        const { error } = await supabaseClient.from('profiles').update({ role, has_recouvra: hasRecouvra, updated_at: new Date().toISOString() }).eq('id', id);
+        const { error } = await supabaseClient
+            .from('profiles')
+            .update({ role, has_recouvra: hasRecouvra, updated_at: new Date().toISOString() })
+            .eq('id', id);
         if (error) throw error;
         showToast('Utilisateur modifié avec succès.', 'success');
         closeModal('edit-user-backdrop');
         await loadUsers();
-    } catch (error) { showToast(friendlyError(error), 'error'); }
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
 }
 
 function openResetPasswordModal(id) {
@@ -901,13 +1003,19 @@ async function resetPassword(e) {
     e.preventDefault();
     const userId = document.getElementById('reset-password-user-id').value;
     const newPassword = document.getElementById('reset-password-new').value;
-    if (!newPassword || newPassword.length < 8) { showToast('Le mot de passe doit contenir au moins 8 caractères.', 'error'); return; }
+    if (!newPassword || newPassword.length < 8) {
+        showToast('Le mot de passe doit contenir au moins 8 caractères.', 'error');
+        return;
+    }
     try {
-        const { error } = await supabaseClient.rpc('admin_reset_password', { p_user_id: userId, p_new_password: newPassword });
+        const { error } = await supabaseClient
+            .rpc('admin_reset_password', { p_user_id: userId, p_new_password: newPassword });
         if (error) throw error;
         showToast('Mot de passe réinitialisé avec succès.', 'success');
         closeModal('reset-password-backdrop');
-    } catch (error) { showToast(friendlyError(error), 'error'); }
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
 }
 
 function openCreateUserModal() {
@@ -937,14 +1045,15 @@ async function createUser(e) {
         return;
     }
     try {
-        const { data, error } = await supabaseClient.rpc('admin_create_user', {
-            p_email: email,
-            p_password: password,
-            p_nom: nom || null,
-            p_entreprise_id: entrepriseId || null,
-            p_role: role,
-            p_has_recouvra: hasRecouvra
-        });
+        const { data, error } = await supabaseClient
+            .rpc('admin_create_user', {
+                p_email: email,
+                p_password: password,
+                p_nom: nom || null,
+                p_entreprise_id: entrepriseId || null,
+                p_role: role,
+                p_has_recouvra: hasRecouvra
+            });
         if (error) throw error;
         msgEl.textContent = '✅ Utilisateur créé avec succès.';
         msgEl.style.color = 'green';
@@ -967,7 +1076,8 @@ function openDeleteUserModal(userId) {
 async function deleteUser() {
     if (!userToDelete) return;
     try {
-        const { error } = await supabaseClient.rpc('admin_delete_user', { p_user_id: userToDelete });
+        const { error } = await supabaseClient
+            .rpc('admin_delete_user', { p_user_id: userToDelete });
         if (error) throw error;
         showToast('Utilisateur supprimé.', 'success');
         closeModal('delete-user-backdrop');
