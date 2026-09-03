@@ -5,13 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion — Recouvra</title>
     <link rel="stylesheet" href="assets/style.css">
-    <!-- Autres métas et liens -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Recouvra">
+    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+    <style>
+        /* ============================================================
+           LOGIN — Page de connexion (CSS intégré pour sécurité)
+           ============================================================ */
+        .login-shell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 24px 16px;
+            background: var(--bg);
+        }
+
+        .login-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 36px 32px 32px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-soft);
+            animation: loginFadeIn 0.5s ease;
+        }
+
+        @keyframes loginFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-card .brand {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .login-card .brand h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 8px 0 2px;
+            color: var(--text);
+        }
+
+        .login-card .brand p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .login-card .form-group {
+            margin-bottom: 18px;
+        }
+
+        .login-card .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .login-card .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--surface-2);
+            color: var(--text);
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .login-card .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px var(--accent-glow);
+            background: var(--surface);
+        }
+
+        .login-card .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(155deg, var(--accent-hi), var(--accent));
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            box-shadow: 0 4px 14px -4px rgba(79, 70, 229, 0.5);
+        }
+
+        .login-card .btn-login:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -6px rgba(79, 70, 229, 0.55);
+        }
+
+        .login-card .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .login-card .login-footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .login-card .login-footer a {
+            color: var(--accent);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .login-card .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .login-card .error-msg {
+            background: var(--danger-dim);
+            color: var(--danger-hi);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--danger);
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        .login-card .error-msg.show {
+            display: block;
+        }
+
+        /* Spinner dans le bouton */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.6s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Mode sombre */
+        body.dark-mode .login-card .form-group input {
+            background: var(--surface-2);
+        }
+    </style>
 </head>
 <body>
+
     <main class="login-shell">
         <div class="login-card">
             <div class="brand">
-                <img src="assets/img/logo.png" alt="Recouvra" height="48">
+                <!-- Logo SVG comme dans les autres pages -->
+                <svg viewBox="0 0 24 24" width="48" height="48" style="display:block; margin:0 auto 8px;">
+                    <rect width="24" height="24" rx="6" fill="#4F46E5"/>
+                    <path d="M7 12h10M12 7v10" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+                </svg>
                 <h1>Recouvra</h1>
                 <p>Connectez-vous à votre espace</p>
             </div>
@@ -21,7 +188,7 @@
             <form id="login-form">
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" placeholder="votre@email.com" required>
+                    <input type="email" id="email" placeholder="votre@email.com" required autofocus>
                 </div>
                 <div class="form-group">
                     <label for="password">Mot de passe</label>
@@ -31,7 +198,7 @@
             </form>
 
             <div class="login-footer">
-                Pas encore de compte ? <a href="signup.html">S'inscrire</a>
+                Pas encore de compte ? <a href="onboarding.html">S'inscrire</a>
             </div>
         </div>
     </main>
@@ -40,56 +207,76 @@
     <script src="assets/config.js"></script>
     <script src="assets/app.js"></script>
     <script>
-    <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('login-form');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const errorMsg = document.getElementById('login-error');
-    const btn = document.querySelector('.btn-login');
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('login-form');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const errorMsg = document.getElementById('login-error');
+            const btn = document.querySelector('.btn-login');
 
-    if (form) {
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            // Réinitialiser le message d'erreur
-            errorMsg.classList.remove('show');
-            errorMsg.textContent = '';
+            // Gestion du mode sombre (si besoin, on reprend celui de app.js)
+            // La fonction toggleDarkMode est déjà dans app.js
 
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
+            if (form) {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    // Réinitialiser le message d'erreur
+                    errorMsg.classList.remove('show');
+                    errorMsg.textContent = '';
 
-            if (!email || !password) {
-                errorMsg.textContent = 'Veuillez remplir tous les champs.';
-                errorMsg.classList.add('show');
-                return;
-            }
+                    const email = emailInput.value.trim();
+                    const password = passwordInput.value;
 
-            // Désactiver le bouton et afficher le spinner
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> Connexion...';
+                    if (!email || !password) {
+                        errorMsg.textContent = 'Veuillez remplir tous les champs.';
+                        errorMsg.classList.add('show');
+                        return;
+                    }
 
-            try {
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email: email,
-                    password: password,
+                    // Désactiver le bouton et afficher le spinner
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="spinner"></span> Connexion...';
+
+                    try {
+                        const { data, error } = await supabaseClient.auth.signInWithPassword({
+                            email: email,
+                            password: password,
+                        });
+
+                        if (error) throw error;
+
+                        // Vérifier si l'utilisateur a déjà complété l'onboarding
+                        try {
+                            const { data: profile, error: profileError } = await supabaseClient
+                                .from('profiles')
+                                .select('onboarding_complete')
+                                .eq('id', data.user.id)
+                                .single();
+
+                            if (profileError) throw profileError;
+
+                            // Redirection vers l'accueil (ou onboarding si non complété)
+                            if (profile?.onboarding_complete === true) {
+                                window.location.href = 'index.html';
+                            } else {
+                                window.location.href = 'onboarding.html';
+                            }
+                        } catch (err) {
+                            console.warn('Erreur vérification onboarding:', err);
+                            // En cas d'erreur, on va quand même sur l'accueil
+                            window.location.href = 'index.html';
+                        }
+
+                    } catch (err) {
+                        console.error('Erreur connexion:', err);
+                        errorMsg.textContent = err.message || 'Identifiants incorrects.';
+                        errorMsg.classList.add('show');
+                        btn.disabled = false;
+                        btn.innerHTML = 'Se connecter';
+                    }
                 });
-
-                if (error) throw error;
-
-                // Rediriger vers l'accueil
-                window.location.href = 'index.html';
-
-            } catch (err) {
-                console.error('Erreur connexion:', err);
-                errorMsg.textContent = err.message || 'Identifiants incorrects.';
-                errorMsg.classList.add('show');
-                btn.disabled = false;
-                btn.innerHTML = 'Se connecter';
             }
         });
-    }
-});
-</script>
     </script>
 </body>
 </html>
