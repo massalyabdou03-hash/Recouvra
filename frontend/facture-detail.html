@@ -138,6 +138,13 @@ async function loadFacture() {
     currentSettings = settings;
 
     const badgeClass = { BROUILLON: "badge-muted", VALIDEE: "badge-success", ANNULEE: "badge-danger" };
+    // Correction (audit V3) : `facture.paye` n'est pas mis à jour par le
+    // circuit officiel de paiement (enregistrer_paiement, qui met à jour
+    // montant_restant). On privilégie donc montant_restant quand il est
+    // disponible, `paye` ne servant que de repli.
+    const estPayee = (facture.montant_restant !== undefined && facture.montant_restant !== null)
+        ? Number(facture.montant_restant) <= 0
+        : !!facture.paye;
 
     el.innerHTML = `
         <div class="card">
@@ -191,9 +198,9 @@ async function loadFacture() {
                     <div>
                         <label style="margin-top:0;">Statut du paiement</label>
                         <div class="value">
-                            <span class="badge ${facture.paye ? "badge-success" : "badge-warn"}">${facture.paye ? "Payé" : "Non payé"}</span>
+                            <span class="badge ${estPayee ? "badge-success" : "badge-warn"}">${estPayee ? "Payé" : "Non payé"}</span>
                             ${facture._pendingSync ? `<span class="badge badge-info" style="margin-left:6px;">Sync en attente</span>` : ""}
-                            ${!facture.paye ? `<button type="button" class="btn btn-secondary btn-sm no-print" style="margin-left:10px;" onclick="marquerPaye()">Marquer comme payé</button>` : ""}
+                            ${!estPayee ? `<button type="button" class="btn btn-secondary btn-sm no-print" style="margin-left:10px;" onclick="marquerPaye()">Marquer comme payé</button>` : ""}
                         </div>
                     </div>
                 </div>
@@ -337,16 +344,57 @@ async function marquerPaye() {
     const ok = await confirmDialog("Marquer ce bon comme payé ?", { confirmLabel: "Marquer payé", danger: false });
     if (!ok) return;
 
+    const montantRestant = Number(currentFacture?.montant_restant ?? currentFacture?.montant_total ?? 0);
+    const montantTotal = Number(currentFacture?.montant_total ?? 0);
+
     if (!appIsOnline) {
-        queueFieldUpdate("factures", Number(factureId), { paye: true, paye_at: new Date().toISOString() }, `Bon #${factureId} marqué payé`);
+        // Correction (audit V3) : même bug que credits.html — on garde
+        // désormais montant_restant/montant_paye/statut_paiement cohérents
+        // avec `paye`, pour que le module Recouvra (qui se base sur
+        // montant_restant) reflète bien ce changement.
+        queueFieldUpdate("factures", Number(factureId), {
+            paye: true,
+            paye_at: new Date().toISOString(),
+            montant_restant: 0,
+            montant_paye: montantTotal,
+            statut_paiement: 'PAYEE',
+        }, `Bon #${factureId} marqué payé`);
         showToast("Marqué payé hors ligne — synchronisé automatiquement au retour de la connexion.", "info");
         loadFacture();
         return;
     }
 
     try {
-        const { error } = await supabaseClient.from("factures").update({ paye: true, paye_at: new Date().toISOString() }).eq("id", factureId);
-        if (error) throw error;
+        // Correction (audit V3) : l'ancien code se contentait de basculer le
+        // booléen `paye`, sans jamais recalculer montant_restant/montant_paye
+        // ni créer d'enregistrement de paiement — la facture restait donc
+        // visible comme impayée dans le module Recouvra (recouvra.html filtre
+        // sur montant_restant > 0). Pour une entreprise disposant du module
+        // Recouvra, on passe par le circuit officiel enregistrer_paiement()
+        // (paiement réel tracé + recalcul serveur des champs dérivés).
+        const profile = await currentProfile();
+
+        if (profile?.has_recouvra && montantRestant > 0) {
+            const { error } = await supabaseClient.rpc('enregistrer_paiement', {
+                p_facture_id: Number(factureId),
+                p_montant: montantRestant,
+                p_methode: 'AUTRE',
+                p_note: 'Marqué payé depuis le détail de la facture',
+            });
+            if (error) throw error;
+        } else {
+            const { error } = await supabaseClient
+                .from("factures")
+                .update({
+                    paye: true,
+                    paye_at: new Date().toISOString(),
+                    montant_restant: 0,
+                    montant_paye: montantTotal,
+                    statut_paiement: 'PAYEE',
+                })
+                .eq("id", factureId);
+            if (error) throw error;
+        }
         showToast("Bon marqué comme payé.", "success");
         loadFacture();
     } catch (error) {

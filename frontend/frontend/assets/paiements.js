@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const session = await requireAuth();
     if (!session) return;
 
-    const profile = await requireRecouvra();
-    if (!profile) return;
+    const hasRecouvra = await requireRecouvra();
+    if (!hasRecouvra) return;
 
     // Charger le formulaire
     await loadInvoices();
@@ -20,9 +20,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (form) form.addEventListener('submit', handlePaymentSubmit);
 });
 
-// requireAuth() et requireRecouvra() sont définis globalement dans app.js
-// (gèrent aussi le statut d'abonnement et le rôle super_admin) : on les
-// réutilise ici plutôt que de dupliquer une version locale divergente.
+async function requireAuth() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+        window.location.href = 'login.html';
+        return null;
+    }
+    return session;
+}
+
+async function requireRecouvra() {
+    const session = await requireAuth();
+    if (!session) return false;
+
+    const { data: profile, error } = await supabaseClient
+        .from('profiles')
+        .select('has_recouvra')
+        .eq('id', session.user.id)
+        .single();
+
+    if (error || !profile?.has_recouvra) {
+        window.location.href = 'abonnement.html';
+        return false;
+    }
+    return true;
+}
 
 async function loadInvoices() {
     const select = document.getElementById('invoice');
@@ -104,7 +126,7 @@ async function handlePaymentSubmit(e) {
 }
 
 async function loadPayments() {
-    const el = document.getElementById('payments-content');
+    const el = document.getElementById('payments');
     if (!el) return;
 
     el.innerHTML = '<div class="empty-state">Chargement...</div>';

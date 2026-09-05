@@ -3,6 +3,16 @@
    Version 2.0 - Moderne, Responsive, Dark Mode, Animations
    ============================================================ */
 
+/* Correction (audit V2 — refonte visuelle) : --font-display (Space Grotesk)
+   et --font-mono (IBM Plex Mono) étaient référencées partout dans ce fichier
+   mais n'étaient chargées nulle part (seul login.html chargeait des polices
+   Google Fonts, et ce n'étaient même pas les bonnes : Fraunces/Inter au lieu
+   de Space Grotesk/IBM Plex Mono). Résultat : sur 18 des 19 pages, tous les
+   titres et le texte "mono" retombaient silencieusement sur la police système.
+   En les importateurs ici, dans le fichier partagé par toutes les pages, la
+   police prévue s'applique désormais partout sans toucher au HTML. */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
 /* ============================================================
    1. VARIABLES GLOBALES
    ============================================================ */
@@ -938,6 +948,7 @@ tbody tr:hover {
     letter-spacing: 0.02em;
 }
 
+.badge-warning,
 .badge-warn {
     background: var(--warn-dim);
     color: var(--warn-hi);
@@ -3664,4 +3675,334 @@ body.dark-mode .spinner-small {
         border: none;
         box-shadow: none;
     }
+}
+/* ============================================================
+   21. CORRECTIONS AUDIT V2 — classes utilisées dans le HTML/JS
+   mais jamais définies dans ce fichier (voir rapport d'audit).
+   Ajouts uniquement : aucune règle existante n'est modifiée ici.
+   ============================================================ */
+
+/* --- États vides / chargement génériques (~50 usages, toutes pages) --- */
+.empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+}
+
+/* --- Texte secondaire / mono (utilisés très largement) --- */
+.hint {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.mono {
+    font-family: var(--font-mono);
+    font-size: 12px;
+}
+
+/* --- Eyebrow générique (label court au-dessus d'un titre) --- */
+.eyebrow {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 6px;
+}
+
+/* --- Conteneur générique "panel" + écran plein-page "shell" ---
+   Utilisés notamment par le panneau d'accès refusé au module Recouvra
+   (voir app.js: requireRecouvra()) et par recouvra-detail.html. */
+.shell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+}
+
+.panel {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    box-shadow: var(--shadow-sm);
+    max-width: 560px;
+    width: 100%;
+}
+
+.access-panel {
+    text-align: center;
+}
+
+.access-panel h1 {
+    margin: 4px 0 10px;
+}
+
+.access-panel p {
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+.recouvra-cta {
+    display: inline-flex;
+}
+
+/* --- Sous-navigation (onglets secondaires en haut d'une page) --- */
+.subnav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.subnav a {
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--bg-2);
+}
+
+.subnav a:hover {
+    background: var(--accent-dim);
+    color: var(--accent);
+}
+
+/* --- Formulaires en grille (paiements.html, promesses.html) --- */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+/* --- Barre de progression (recouvra-detail.html) --- */
+.progress {
+    height: 8px;
+    border-radius: 999px;
+    background: var(--surface-3);
+    overflow: hidden;
+    margin: 10px 0 18px;
+}
+
+.progress i {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+    font-style: normal;
+}
+
+/* --- Lien sidebar "Relancer PRO" mis en valeur --- */
+.nav-link.premium {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* --- Stats génériques (stock.html : .stat-card existe déjà, mais pas
+   les éléments internes .stat-value / .stat-label — mêmes styles que
+   .client-stat-value / .client-stat-label utilisés ailleurs) --- */
+.stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    display: block;
+    margin-bottom: 4px;
+    color: var(--text);
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* --- Page Abonnement (module premium payant) --- */
+.subscription-page {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.subscription-heading h1 {
+    margin: 8px 0 6px;
+    font-size: 26px;
+}
+
+.subscription-heading p {
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.subscription-card {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+}
+
+.pricing-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 16px 0;
+}
+
+.pricing-option {
+    position: relative;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    cursor: pointer;
+    transition: var(--transition-base);
+    background: var(--bg-2);
+}
+
+.pricing-option:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.pricing-option.selected {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.pricing-option .amount {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--accent);
+    margin: 6px 0 10px;
+}
+
+.pricing-option ul {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.payment-steps {
+    margin: 12px 0 20px;
+    padding-left: 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.text-button {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--accent);
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.terms-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.terms-check input {
+    margin-top: 3px;
+}
+
+.terms-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1000;
+}
+
+/* [hidden] est plus spécifique que .terms-modal seule : cette règle
+   l'emporte donc bien quand l'attribut hidden est présent. */
+.terms-modal[hidden] {
+    display: none;
+}
+
+.terms-dialog {
+    position: relative;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    max-width: 520px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 28px;
+    box-shadow: var(--shadow-lg);
+}
+
+.terms-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.terms-content p {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+    .subscription-card { padding: 16px; }
+    .pricing-options { grid-template-columns: 1fr; }
+    .shell { padding: 12px; }
+    .panel { padding: 20px; }
+}
+
+/* --- Compléments (deuxième passe d'audit) --- */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+}
+
+.loading-spinner {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.pay-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 520px;
 }

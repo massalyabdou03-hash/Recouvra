@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration — Recouvra</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4F46E5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Recouvra">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<!-- ========== MENU MOBILE ========== -->
+<button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<div class="app">
+  <nav class="sidebar">
+    <div class="brand">
+      <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
+      <span data-company-name>Recouvra</span>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Quotidien</div>
+      <a href="index.html" class="nav-link"><span class="nav-emoji">🏠</span> Accueil</a>
+      <a href="factures.html" class="nav-link"><span class="nav-emoji">🧾</span> Vendre</a>
+      <a href="clients.html" class="nav-link"><span class="nav-emoji">👥</span> Mes Clients</a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Stock</div>
+      
+      <a href="stock.html" class="nav-link"><span class="nav-emoji">📊</span> Stock & Produits</a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon Argent</div>
+      <a href="credits.html" class="nav-link"><span class="nav-emoji">💸</span> On me doit</a>
+      <a href="recouvra.html" class="nav-link premium"><span class="nav-emoji">📣</span> Relancer <span class="badge-premium">PRO</span></a>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;"><span id="dark-mode-icon">🌙</span> <span id="dark-mode-label">Mode sombre</span></button>
+      <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
+      <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="admin-shell">
+
+      <!-- En-tête admin -->
+      <div class="admin-header">
+        <div class="admin-header-left">
+          <div class="admin-icon">🔐</div>
+          <div>
+            <h1>Administration</h1>
+            <p>Gestion complète des paiements, entreprises et utilisateurs</p>
+          </div>
+        </div>
+        <div class="admin-header-actions">
+          <button class="dark-mode-toggle" onclick="toggleDarkMode()"><span id="dark-mode-icon">🌙</span> <span id="dark-mode-label">Mode sombre</span></button>
+          <a href="index.html" class="btn-back"><span class="arrow">←</span> Retour</a>
+        </div>
+      </div>
+
+      <!-- Notification -->
+      <div id="payments-notice" class="payments-notice" hidden></div>
+
+      <!-- Statistiques -->
+      <div class="grid-stats">
+        <div class="stat-card warning">
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg></div>
+          <div class="stat-body"><div class="label">Paiements en attente</div><div class="value" id="stat-pending-count">—</div></div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
+          <div class="stat-body"><div class="label">Montant en attente</div><div class="value" id="stat-pending-amount">—</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <div class="stat-body"><div class="label">Paiements confirmés</div><div class="value" id="stat-confirmed-count">—</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div class="stat-body"><div class="label">Revenus confirmés</div><div class="value" id="stat-confirmed-amount">—</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div class="stat-body"><div class="label">Entreprises actives</div><div class="value" id="stat-entreprises">—</div></div>
+        </div>
+      </div>
+
+      <!-- Onglets -->
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="showTab('paiements')">💳 Paiements</button>
+        <button class="admin-tab" onclick="showTab('entreprises')">🏢 Entreprises</button>
+        <button class="admin-tab" onclick="showTab('utilisateurs')">👤 Utilisateurs</button>
+      </div>
+
+      <!-- Barre de recherche -->
+      <div class="admin-search">
+        <input type="text" id="admin-search" placeholder="🔍 Rechercher (entreprise, client, email, téléphone)..." oninput="filterData()">
+      </div>
+
+      <!-- ========== ONGLET PAIEMENTS ========== -->
+      <div id="tab-paiements">
+        <div class="payments-filters">
+          <button type="button" class="filter-chip active" data-filter="pending">🕐 En attente</button>
+          <button type="button" class="filter-chip" data-filter="confirmed">✅ Confirmés</button>
+          <button type="button" class="filter-chip" data-filter="rejected">❌ Rejetés</button>
+          <button type="button" class="filter-chip" data-filter="all">📋 Tous</button>
+        </div>
+
+        <div class="payments-table-wrap">
+          <table class="payments-table">
+            <thead>
+              <tr>
+                <th>Entreprise</th>
+                <th>Client</th>
+                <th>Téléphone</th>
+                <th>Montant</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="payments-tbody">
+              <tr><td colspan="8" class="payments-empty">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ========== ONGLET ENTREPRISES ========== -->
+      <div id="tab-entreprises" style="display:none;">
+        <div class="payments-table-wrap">
+          <table class="payments-table">
+            <thead>
+              <tr>
+                <th>Entreprise</th>
+                <th>Gérant</th>
+                <th>Téléphone</th>
+                <th>Abonnement</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="entreprises-tbody">
+              <tr><td colspan="6" class="payments-empty">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ========== ONGLET UTILISATEURS ========== -->
+      <div id="tab-utilisateurs" style="display:none;">
+        <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+          <h3 style="margin:0;">Utilisateurs</h3>
+          <button class="btn btn-primary" onclick="openCreateUserModal()">➕ Ajouter un utilisateur</button>
+        </div>
+
+        <div class="payments-table-wrap">
+          <table class="payments-table">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Entreprise</th>
+                <th>Rôle</th>
+                <th>Recouvra</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="utilisateurs-tbody">
+              <tr><td colspan="5" class="payments-empty">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ========== MODAL DÉTAIL PAIEMENT ========== -->
+<div class="modal-backdrop" id="payment-detail-backdrop">
+  <div class="modal modal-lg">
+    <div class="modal-head">
+      <h3>Paiement à vérifier</h3>
+      <button class="close-x" onclick="closeModal('payment-detail-backdrop')">×</button>
+    </div>
+    <div id="payment-detail-content"></div>
+    <div class="admin-reminder">
+      <span>⚠️</span>
+      <span>Vérifiez d'abord votre compte Wave Business afin de confirmer que le paiement a bien été reçu.</span>
+    </div>
+    <div class="modal-actions" id="payment-detail-actions"></div>
+  </div>
+</div>
+
+<!-- ========== MODAL REJETER PAIEMENT ========== -->
+<div class="modal-backdrop" id="reject-backdrop">
+  <div class="modal modal-sm">
+    <div class="modal-head">
+      <h3>Rejeter le paiement</h3>
+      <button class="close-x" onclick="closeRejectModal()">×</button>
+    </div>
+    <label for="reject-reason-select">Motif</label>
+    <select id="reject-reason-select">
+      <option value="Paiement introuvable">Paiement introuvable</option>
+      <option value="Montant incorrect">Montant incorrect</option>
+      <option value="Preuve insuffisante">Preuve insuffisante</option>
+      <option value="Paiement déjà utilisé">Paiement déjà utilisé</option>
+      <option value="Autre">Autre</option>
+    </select>
+    <div id="reject-other-wrap" hidden>
+      <label for="reject-other-text">Précisez</label>
+      <textarea id="reject-other-text" rows="2"></textarea>
+    </div>
+    <div id="reject-msg"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" onclick="closeRejectModal()">Annuler</button>
+      <button type="button" class="btn btn-danger" id="reject-final-btn">Rejeter</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MODAL MODIFIER ENTREPRISE ========== -->
+<div class="modal-backdrop" id="edit-entreprise-backdrop">
+  <div class="modal modal-lg">
+    <div class="modal-head">
+      <h3>Modifier l'entreprise</h3>
+      <button class="close-x" onclick="closeModal('edit-entreprise-backdrop')">×</button>
+    </div>
+    <form id="edit-entreprise-form">
+      <input type="hidden" id="edit-entreprise-id">
+      <label>Nom de l'entreprise</label>
+      <input id="edit-entreprise-nom" required>
+      <label>Gérant</label>
+      <input id="edit-entreprise-gerant">
+      <label>Téléphone</label>
+      <input id="edit-entreprise-telephone">
+      <label>Email</label>
+      <input id="edit-entreprise-email" type="email">
+      <label>Statut abonnement</label>
+      <select id="edit-entreprise-statut">
+        <option value="active">✅ Actif</option>
+        <option value="pending">🕐 En attente</option>
+        <option value="expired">❌ Expiré</option>
+        <option value="cancelled">🚫 Annulé</option>
+      </select>
+      <div id="edit-entreprise-msg"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('edit-entreprise-backdrop')">Annuler</button>
+        <button type="submit" class="btn">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========== MODAL RÉINITIALISER MOT DE PASSE ========== -->
+<div class="modal-backdrop" id="reset-password-backdrop">
+  <div class="modal modal-sm">
+    <div class="modal-head">
+      <h3>Réinitialiser le mot de passe</h3>
+      <button class="close-x" onclick="closeModal('reset-password-backdrop')">×</button>
+    </div>
+    <form id="reset-password-form">
+      <input type="hidden" id="reset-password-user-id">
+      <label>Email de l'utilisateur</label>
+      <input id="reset-password-email" type="email" readonly>
+      <label>Nouveau mot de passe</label>
+      <input id="reset-password-new" type="password" required minlength="8">
+      <div id="reset-password-msg"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('reset-password-backdrop')">Annuler</button>
+        <button type="submit" class="btn">Réinitialiser</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========== MODAL MODIFIER UTILISATEUR ========== -->
+<div class="modal-backdrop" id="edit-user-backdrop">
+  <div class="modal modal-sm">
+    <div class="modal-head">
+      <h3>Modifier l'utilisateur</h3>
+      <button class="close-x" onclick="closeModal('edit-user-backdrop')">×</button>
+    </div>
+    <form id="edit-user-form">
+      <input type="hidden" id="edit-user-id">
+      <label>Rôle</label>
+      <select id="edit-user-role">
+        <option value="super_admin">🔐 Super Admin</option>
+        <option value="admin">👑 Admin</option>
+        <option value="vendeur">🛒 Vendeur</option>
+        <option value="magasinier">📦 Magasinier</option>
+      </select>
+      <label><input type="checkbox" id="edit-user-recouvra"> Accès Recouvra (PRO)</label>
+      <div id="edit-user-msg"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('edit-user-backdrop')">Annuler</button>
+        <button type="submit" class="btn">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========== MODAL CRÉER UTILISATEUR ========== -->
+<div class="modal-backdrop" id="create-user-backdrop">
+  <div class="modal modal-lg">
+    <div class="modal-head">
+      <h3>Créer un utilisateur</h3>
+      <button class="close-x" onclick="closeModal('create-user-backdrop')">×</button>
+    </div>
+    <form id="create-user-form">
+      <label>Email *</label>
+      <input id="create-user-email" type="email" required>
+      <label>Mot de passe *</label>
+      <input id="create-user-password" type="password" required minlength="8">
+      <label>Nom complet</label>
+      <input id="create-user-nom" type="text">
+      <label>Entreprise</label>
+      <select id="create-user-entreprise">
+        <option value="">— Choisir —</option>
+      </select>
+      <label>Rôle</label>
+      <select id="create-user-role">
+        <option value="vendeur">Vendeur</option>
+        <option value="magasinier">Magasinier</option>
+        <option value="admin">Admin</option>
+        <option value="super_admin">Super Admin</option>
+      </select>
+      <label>
+        <input type="checkbox" id="create-user-recouvra"> Accès Recouvra (PRO)
+      </label>
+      <div id="create-user-msg"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('create-user-backdrop')">Annuler</button>
+        <button type="submit" class="btn">Créer l'utilisateur</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========== MODAL CONFIRMATION SUPPRESSION ========== -->
+<div class="modal-backdrop" id="delete-user-backdrop">
+  <div class="modal modal-sm">
+    <div class="modal-head">
+      <h3>Supprimer l'utilisateur</h3>
+      <button class="close-x" onclick="closeModal('delete-user-backdrop')">×</button>
+    </div>
+    <p>Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" onclick="closeModal('delete-user-backdrop')">Annuler</button>
+      <button type="button" class="btn btn-danger" id="confirm-delete-user-btn">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script>
+// Fonctions globales (redéclarées)
+function toggleSidebar() { const sidebar = document.querySelector('.sidebar'); const overlay = document.querySelector('.sidebar-overlay'); if (sidebar) sidebar.classList.toggle('open'); if (overlay) overlay.classList.toggle('active'); document.body.classList.toggle('menu-open', sidebar?.classList.contains('open')); }
+document.addEventListener('click', (e) => { if (e.target.closest('.nav-link')) { const sidebar = document.querySelector('.sidebar'); const overlay = document.querySelector('.sidebar-overlay'); if (sidebar) sidebar.classList.remove('open'); if (overlay) overlay.classList.remove('active'); document.body.classList.remove('menu-open'); } });
+function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('recouvra_dark_mode', isDark ? '1' : '0'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = isDark ? '☀️' : '🌙'; if (label) label.textContent = isDark ? 'Mode clair' : 'Mode sombre'; }
+function initDarkMode() { if (localStorage.getItem('recouvra_dark_mode') === '1') { document.body.classList.add('dark-mode'); const icon = document.getElementById('dark-mode-icon'); const label = document.getElementById('dark-mode-label'); if (icon) icon.textContent = '☀️'; if (label) label.textContent = 'Mode clair'; } }
+
+// ============================================================================
+// SUPER ADMIN - GESTION COMPLÈTE
+// ============================================================================
+
+let currentPaymentFilter = 'pending';
+let allPayments = [];
+let allEntreprises = [];
+let allUsers = [];
+let currentPaymentDetail = null;
+let currentAdminTab = 'paiements';
+let userToDelete = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+    initDarkMode();
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = 'login.html'; return; }
+    const { data: profile, error } = await supabaseClient
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+    if (error || !profile || profile.role !== 'super_admin') {
+        showToast('Accès non autorisé.', 'error');
+        window.location.href = 'index.html';
+        return;
+    }
+
+    await loadPayments();
+    await loadEntreprises();
+    await loadUsers();
+
+    // Filtres paiements
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            currentPaymentFilter = chip.dataset.filter;
+            renderPayments();
+        });
+    });
+
+    // Rejet
+    document.getElementById('reject-reason-select').addEventListener('change', (e) => {
+        document.getElementById('reject-other-wrap').hidden = e.target.value !== 'Autre';
+    });
+    document.getElementById('reject-final-btn').addEventListener('click', submitRejection);
+
+    // Formulaires
+    document.getElementById('edit-entreprise-form').addEventListener('submit', saveEntreprise);
+    document.getElementById('reset-password-form').addEventListener('submit', resetPassword);
+    document.getElementById('edit-user-form').addEventListener('submit', saveUser);
+    document.getElementById('create-user-form').addEventListener('submit', createUser);
+    document.getElementById('confirm-delete-user-btn').addEventListener('click', deleteUser);
+});
+
+function showTab(tabName) {
+    currentAdminTab = tabName;
+    document.querySelectorAll('.admin-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.textContent.toLowerCase().includes(tabName === 'paiements' ? 'paiement' : tabName === 'entreprises' ? 'entreprise' : 'utilisateur'));
+    });
+    document.getElementById('tab-paiements').style.display = tabName === 'paiements' ? 'block' : 'none';
+    document.getElementById('tab-entreprises').style.display = tabName === 'entreprises' ? 'block' : 'none';
+    document.getElementById('tab-utilisateurs').style.display = tabName === 'utilisateurs' ? 'block' : 'none';
+    filterData();
+}
+
+function filterData() {
+    const q = document.getElementById('admin-search').value.trim().toLowerCase();
+    if (currentAdminTab === 'paiements') renderPayments(q);
+    else if (currentAdminTab === 'entreprises') renderEntreprises(q);
+    else renderUsers(q);
+}
+
+function closeModal(modalId) { document.getElementById(modalId).classList.remove('open'); }
+function closeRejectModal() { closeModal('reject-backdrop'); }
+
+// ============================================================================
+// GESTION DES PAIEMENTS
+// ============================================================================
+
+async function loadPayments() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('subscription_payments')
+            .select('*, entreprises(nom, gerant_nom, telephone)')
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        allPayments = data || [];
+        renderStats();
+        renderPayments();
+    } catch (error) {
+        console.error('Erreur chargement paiements:', error);
+        document.getElementById('payments-tbody').innerHTML =
+            `<tr><td colspan="8" class="payments-empty">${friendlyError(error)}</td></tr>`;
+    }
+}
+
+function renderStats() {
+    const pending = allPayments.filter(p => p.status === 'pending');
+    const confirmed = allPayments.filter(p => p.status === 'confirmed');
+    const pendingAmount = pending.reduce((s, p) => s + Number(p.amount), 0);
+    const confirmedAmount = confirmed.reduce((s, p) => s + Number(p.amount), 0);
+    document.getElementById('stat-pending-count').textContent = pending.length;
+    document.getElementById('stat-pending-amount').textContent = fmtMoney(pendingAmount);
+    document.getElementById('stat-confirmed-count').textContent = confirmed.length;
+    document.getElementById('stat-confirmed-amount').textContent = fmtMoney(confirmedAmount);
+    const notice = document.getElementById('payments-notice');
+    if (pending.length > 0) {
+        notice.hidden = false;
+        notice.innerHTML = `⚠️ <strong>${pending.length}</strong> paiement(s) en attente de validation (${fmtMoney(pendingAmount)})`;
+    } else {
+        notice.hidden = true;
+    }
+}
+
+function renderPayments(search = '') {
+    const tbody = document.getElementById('payments-tbody');
+    if (!tbody) return;
+    let filtered = allPayments;
+    if (currentPaymentFilter !== 'all') filtered = filtered.filter(p => p.status === currentPaymentFilter);
+    if (search) {
+        filtered = filtered.filter(p =>
+            (p.entreprises?.nom || '').toLowerCase().includes(search) ||
+            (p.entreprises?.gerant_nom || '').toLowerCase().includes(search) ||
+            (p.entreprises?.telephone || '').toLowerCase().includes(search)
+        );
+    }
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="payments-empty">Aucun paiement trouvé</td></tr>`;
+        return;
+    }
+    const statusBadge = {
+        pending: '<span class="badge badge-warning">🕐 En attente</span>',
+        confirmed: '<span class="badge badge-success">✅ Confirmé</span>',
+        rejected: '<span class="badge badge-danger">❌ Rejeté</span>'
+    };
+    tbody.innerHTML = filtered.map(p => `<tr>
+        <td><strong>${esc(p.entreprises?.nom || '—')}</strong></td>
+        <td>${esc(p.entreprises?.gerant_nom || '—')}</td>
+        <td>${esc(p.entreprises?.telephone || '—')}</td>
+        <td><strong>${fmtMoney(p.amount)}</strong></td>
+        <td>${esc(p.payment_type || '—')}</td>
+        <td>${fmtDate(p.created_at)}</td>
+        <td>${statusBadge[p.status] || p.status}</td>
+        <td><div class="admin-actions">
+            ${p.status === 'pending' ?
+                `<button class="admin-btn success" onclick="confirmPayment('${p.id}')">✅ Valider</button>
+                 <button class="admin-btn info" onclick="openPaymentDetail('${p.id}')">👁️ Vérifier</button>
+                 <button class="admin-btn danger" onclick="rejectPayment('${p.id}')">❌ Rejeter</button>` :
+                (p.status === 'confirmed' ?
+                    `<button class="admin-btn danger" onclick="annulerPaiement('${p.id}')">↩️ Annuler</button>` :
+                    (p.status === 'rejected' ?
+                        `<button class="admin-btn success" onclick="confirmPayment('${p.id}')">✅ Valider</button>` :
+                        ''))}
+        </div></td></tr>`).join('');
+}
+
+function openPaymentDetail(paymentId) {
+    const payment = allPayments.find(p => p.id === paymentId);
+    if (!payment) return;
+    currentPaymentDetail = payment;
+    const content = document.getElementById('payment-detail-content');
+    content.innerHTML = `
+        <div class="detail-row"><span class="k">Entreprise</span><span class="v">${esc(payment.entreprises?.nom || '—')}</span></div>
+        <div class="detail-row"><span class="k">Gérant</span><span class="v">${esc(payment.entreprises?.gerant_nom || '—')}</span></div>
+        <div class="detail-row"><span class="k">Téléphone</span><span class="v">${esc(payment.entreprises?.telephone || '—')}</span></div>
+        <div class="detail-row"><span class="k">Type</span><span class="v">${esc(payment.payment_type)}</span></div>
+        <div class="detail-row"><span class="k">Montant</span><span class="v">${fmtMoney(payment.amount)} ${esc(payment.currency)}</span></div>
+        <div class="detail-row"><span class="k">Référence</span><span class="v">${esc(payment.payment_reference || '—')}</span></div>
+        <div class="detail-row"><span class="k">Date</span><span class="v">${fmtDateTime(payment.created_at)}</span></div>
+        ${payment.proof_path ? `<div class="detail-row"><span class="k">Preuve</span><span class="v"><a href="${getStorageUrl(payment.proof_path)}" target="_blank" class="btn btn-secondary btn-sm">Voir la preuve</a></span></div>` : ''}
+    `;
+    const actions = document.getElementById('payment-detail-actions');
+    actions.innerHTML = `
+        <button class="btn btn-secondary" onclick="closeModal('payment-detail-backdrop')">Fermer</button>
+        <button class="btn btn-danger" onclick="rejectPayment('${payment.id}')">Rejeter</button>
+        <button class="btn" onclick="confirmPayment('${payment.id}')">Confirmer</button>
+    `;
+    document.getElementById('payment-detail-backdrop').classList.add('open');
+}
+
+async function confirmPayment(paymentId) {
+    const ok = await confirmDialog(
+        'Confirmer ce paiement ? L\'entreprise sera activée immédiatement.',
+        { title: 'Confirmer le paiement', confirmLabel: 'Confirmer', danger: false }
+    );
+    if (!ok) return;
+
+    try {
+        // 1. Récupérer l'entreprise_id depuis le paiement
+        const { data: payment, error: fetchError } = await supabaseClient
+            .from('subscription_payments')
+            .select('entreprise_id')
+            .eq('id', paymentId)
+            .single();
+        if (fetchError) throw fetchError;
+        if (!payment) throw new Error('Paiement non trouvé');
+
+        console.log('✅ Activation de l\'entreprise ID :', payment.entreprise_id);
+
+        const now = new Date();
+        const end = new Date(now);
+        end.setMonth(end.getMonth() + 1);
+
+        // 2. Vérifier si une ligne existe déjà dans subscriptions
+        const { data: existing, error: selectError } = await supabaseClient
+            .from('subscriptions')
+            .select('id')
+            .eq('entreprise_id', payment.entreprise_id)
+            .maybeSingle();
+
+        if (selectError) throw selectError;
+
+        let updateError;
+        if (existing) {
+            // Mise à jour
+            console.log('📝 Mise à jour de subscriptions pour entreprise_id:', payment.entreprise_id);
+            const { error } = await supabaseClient
+                .from('subscriptions')
+                .update({
+                    status: 'active',
+                    current_period_start: now.toISOString(),
+                    current_period_end: end.toISOString(),
+                    updated_at: now.toISOString()
+                })
+                .eq('entreprise_id', payment.entreprise_id);
+            updateError = error;
+        } else {
+            // Insertion
+            console.log('📝 Insertion dans subscriptions pour entreprise_id:', payment.entreprise_id);
+            const { error } = await supabaseClient
+                .from('subscriptions')
+                .insert({
+                    entreprise_id: payment.entreprise_id,
+                    status: 'active',
+                    current_period_start: now.toISOString(),
+                    current_period_end: end.toISOString(),
+                    updated_at: now.toISOString()
+                });
+            updateError = error;
+        }
+        if (updateError) throw updateError;
+
+        // 3. Donner l'accès Recouvra à TOUS les utilisateurs de l'entreprise
+        const { error: updateProfilesError } = await supabaseClient
+            .from('profiles')
+            .update({ has_recouvra: true, updated_at: now.toISOString() })
+            .eq('entreprise_id', payment.entreprise_id);
+        if (updateProfilesError) throw updateProfilesError;
+
+        showToast('✅ Paiement confirmé — entreprise activée.', 'success');
+        closeModal('payment-detail-backdrop');
+
+        // 4. Recharger les deux listes
+        await loadPayments();
+        await loadEntreprises();
+
+    } catch (error) {
+        console.error('❌ Erreur dans confirmPayment :', error);
+        showToast(friendlyError(error), 'error');
+    }
+}
+
+function rejectPayment(paymentId) {
+    document.getElementById('reject-backdrop').classList.add('open');
+    document.getElementById('reject-reason-select').value = 'Paiement introuvable';
+    document.getElementById('reject-other-text').value = '';
+    document.getElementById('reject-other-wrap').hidden = true;
+}
+
+async function submitRejection() {
+    const reason = document.getElementById('reject-reason-select').value;
+    const otherReason = document.getElementById('reject-other-text').value.trim();
+    const finalReason = reason === 'Autre' ? otherReason : reason;
+    if (!finalReason) {
+        showToast('Un motif est obligatoire pour rejeter.', 'error');
+        return;
+    }
+    try {
+        const { error } = await supabaseClient
+            .rpc('confirm_subscription_payment', {
+                p_payment_id: currentPaymentDetail.id,
+                p_decision: 'rejected',
+                p_rejection_reason: finalReason,
+            });
+        if (error) throw error;
+        showToast('Paiement rejeté.', 'info');
+        closeRejectModal();
+        closeModal('payment-detail-backdrop');
+        await loadPayments();
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
+}
+
+async function annulerPaiement(paymentId) {
+    const ok = await confirmDialog(
+        'Annuler ce paiement confirmé ? L\'entreprise sera désactivée.',
+        { title: 'Annuler le paiement', confirmLabel: 'Annuler', danger: true }
+    );
+    if (!ok) return;
+    try {
+        const { error } = await supabaseClient
+            .rpc('annuler_paiement_admin', { p_payment_id: paymentId });
+        if (error) throw error;
+        showToast('Paiement annulé — entreprise désactivée.', 'info');
+        await loadPayments();
+        await loadEntreprises();
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
+}
+
+// ============================================================================
+// GESTION DES ENTREPRISES
+// ============================================================================
+
+async function loadEntreprises() {
+    console.log('🔍 Chargement des entreprises...');
+    try {
+        const { data: entreprisesData, error: err1 } = await supabaseClient
+            .from('entreprises')
+            .select('*')
+            .order('created_at', { ascending: false });
+        if (err1) throw err1;
+        console.log('✅ entreprisesData :', entreprisesData?.length || 0);
+
+        const { data: subscriptionsData, error: err2 } = await supabaseClient
+            .from('subscriptions')
+            .select('*');
+        if (err2) console.warn('⚠️ Erreur chargement subscriptions:', err2);
+
+        const { data: profilesData, error: err3 } = await supabaseClient
+            .from('profiles')
+            .select('id, entreprise_id, role, has_recouvra');
+        if (err3) console.warn('⚠️ Erreur chargement profiles:', err3);
+
+        allEntreprises = (entreprisesData || []).map(e => {
+            const sub = (subscriptionsData || []).find(s => s.entreprise_id === e.id);
+            const users = (profilesData || []).filter(p => p.entreprise_id === e.id);
+            return { ...e, subscriptions: sub, profiles: users };
+        });
+
+        renderEntreprises();
+
+        const actives = allEntreprises.filter(e => e.subscriptions?.status === 'active').length;
+        document.getElementById('stat-entreprises').textContent = actives;
+
+        console.log('📦 allEntreprises chargées :', allEntreprises.length);
+    } catch (error) {
+        console.error('❌ Erreur loadEntreprises:', error);
+        document.getElementById('entreprises-tbody').innerHTML =
+            `<tr><td colspan="6" class="payments-empty">Erreur : ${friendlyError(error)}</td></tr>`;
+    }
+}
+
+function renderEntreprises(search = '') {
+    const tbody = document.getElementById('entreprises-tbody');
+    if (!tbody) return;
+
+    let filtered = allEntreprises;
+    if (search) {
+        filtered = filtered.filter(e =>
+            (e.nom || '').toLowerCase().includes(search) ||
+            (e.gerant_nom || '').toLowerCase().includes(search) ||
+            (e.telephone || '').toLowerCase().includes(search)
+        );
+    }
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="payments-empty">Aucune entreprise trouvée</td></tr>`;
+        return;
+    }
+
+    const statusBadge = {
+        active: '<span class="badge badge-success">✅ Active</span>',
+        pending: '<span class="badge badge-warning">🕐 En attente</span>',
+        expired: '<span class="badge badge-danger">❌ Expirée</span>',
+        cancelled: '<span class="badge badge-muted">🚫 Annulée</span>'
+    };
+
+    let html = '';
+    filtered.forEach(e => {
+        const status = e.subscriptions?.status || '—';
+        const endDate = e.subscriptions?.current_period_end ? fmtDate(e.subscriptions.current_period_end) : '—';
+        html += `
+        <tr>
+            <td><strong>${esc(e.nom || '—')}</strong></td>
+            <td>${esc(e.gerant_nom || '—')}</td>
+            <td>${esc(e.telephone || '—')}</td>
+            <td>${statusBadge[status] || status}</td>
+            <td>${endDate}</td>
+            <td>
+                <div class="admin-actions">
+                    <button class="admin-btn info" data-action="edit" data-id="${e.id}">✏️ Modifier</button>
+                    <button class="admin-btn danger" data-action="disable" data-id="${e.id}">🚫 Désactiver</button>
+                </div>
+            </td>
+        </tr>`;
+    });
+
+    tbody.innerHTML = html;
+
+    // Attacher les événements avec addEventListener
+    tbody.querySelectorAll('[data-action="edit"]').forEach(btn => {
+        btn.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            const id = btn.dataset.id;
+            console.log('🖱️ Clic Modifier pour l\'entreprise ID:', id);
+            openEditEntreprise(id);
+        });
+    });
+
+    tbody.querySelectorAll('[data-action="disable"]').forEach(btn => {
+        btn.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            const id = btn.dataset.id;
+            console.log('🖱️ Clic Désactiver pour l\'entreprise ID:', id);
+            desactiverEntreprise(id);
+        });
+    });
+}
+
+function openEditEntreprise(id) {
+    console.log('🔍 openEditEntreprise appelé avec id:', id);
+    const entreprise = allEntreprises.find(e => e.id === id);
+    if (!entreprise) {
+        console.error('❌ Entreprise non trouvée pour id:', id);
+        showToast('Erreur : entreprise introuvable.', 'error');
+        return;
+    }
+    console.log('✅ Entreprise trouvée :', entreprise.nom);
+
+    document.getElementById('edit-entreprise-id').value = entreprise.id;
+    document.getElementById('edit-entreprise-nom').value = entreprise.nom || '';
+    document.getElementById('edit-entreprise-gerant').value = entreprise.gerant_nom || '';
+    document.getElementById('edit-entreprise-telephone').value = entreprise.telephone || '';
+    document.getElementById('edit-entreprise-email').value = entreprise.email || '';
+    document.getElementById('edit-entreprise-statut').value = entreprise.subscriptions?.status || 'pending';
+
+    const backdrop = document.getElementById('edit-entreprise-backdrop');
+    if (backdrop) {
+        backdrop.classList.add('open');
+        console.log('✅ Modal ouvert');
+    } else {
+        console.error('❌ Modal #edit-entreprise-backdrop introuvable');
+    }
+}
+
+async function saveEntreprise(e) {
+    e.preventDefault();
+    const id = document.getElementById('edit-entreprise-id').value;
+    const nom = document.getElementById('edit-entreprise-nom').value.trim();
+    const gerant = document.getElementById('edit-entreprise-gerant').value.trim();
+    const telephone = document.getElementById('edit-entreprise-telephone').value.trim();
+    const statut = document.getElementById('edit-entreprise-statut').value;
+    try {
+        const { error: err1 } = await supabaseClient
+            .from('entreprises')
+            .update({ nom, gerant_nom: gerant, telephone })
+            .eq('id', id);
+        if (err1) throw err1;
+
+        const { error: err2 } = await supabaseClient
+            .from('subscriptions')
+            .update({ status: statut, updated_at: new Date().toISOString() })
+            .eq('entreprise_id', id);
+        if (err2) throw err2;
+
+        if (statut === 'active') {
+            await supabaseClient
+                .from('profiles')
+                .update({ has_recouvra: true, updated_at: new Date().toISOString() })
+                .eq('entreprise_id', id);
+        } else {
+            await supabaseClient
+                .from('profiles')
+                .update({ has_recouvra: false, updated_at: new Date().toISOString() })
+                .eq('entreprise_id', id);
+        }
+
+        showToast('Entreprise modifiée avec succès.', 'success');
+        closeModal('edit-entreprise-backdrop');
+        await loadEntreprises();
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
+}
+
+async function desactiverEntreprise(id) {
+    console.log('🔍 desactiverEntreprise appelé avec id:', id);
+    const entreprise = allEntreprises.find(e => e.id === id);
+    if (!entreprise) {
+        console.error('❌ Entreprise non trouvée');
+        showToast('Erreur : entreprise introuvable.', 'error');
+        return;
+    }
+    const ok = await confirmDialog(
+        `Désactiver "${entreprise.nom}" ? Elle ne pourra plus se connecter.`,
+        { title: 'Désactiver l\'entreprise', confirmLabel: 'Désactiver', danger: true }
+    );
+    if (!ok) return;
+
+    try {
+        const { error: err1 } = await supabaseClient
+            .from('subscriptions')
+            .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+            .eq('entreprise_id', id);
+        if (err1) throw err1;
+
+        const { error: err2 } = await supabaseClient
+            .from('profiles')
+            .update({ has_recouvra: false, updated_at: new Date().toISOString() })
+            .eq('entreprise_id', id);
+        if (err2) throw err2;
+
+        showToast('✅ Entreprise désactivée.', 'success');
+        await loadEntreprises();
+    } catch (error) {
+        console.error('❌ Erreur désactivation:', error);
+        showToast(friendlyError(error), 'error');
+    }
+}
+
+// ============================================================================
+// GESTION DES UTILISATEURS
+// ============================================================================
+
+async function loadUsers() {
+    console.log('🔍 Chargement des utilisateurs...');
+    try {
+        const { data, error } = await supabaseClient
+            .from('profiles')
+            .select('*, entreprises(nom)')
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        // L'email n'existe pas dans profiles, on utilise l'ID comme identifiant
+        allUsers = (data || []).map(u => ({ ...u, email: u.id || '—' }));
+        renderUsers();
+        console.log('👤 Utilisateurs chargés :', allUsers.length);
+    } catch (error) {
+        console.error('❌ Erreur loadUsers:', error);
+        document.getElementById('utilisateurs-tbody').innerHTML =
+            `<tr><td colspan="5" class="payments-empty">${friendlyError(error)}</td></tr>`;
+    }
+}
+
+function renderUsers(search = '') {
+    const tbody = document.getElementById('utilisateurs-tbody');
+    if (!tbody) return;
+
+    let filtered = allUsers;
+    if (search) {
+        filtered = filtered.filter(u =>
+            (u.entreprises?.nom || '').toLowerCase().includes(search) ||
+            (u.role || '').toLowerCase().includes(search) ||
+            (u.id || '').toLowerCase().includes(search)
+        );
+    }
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="payments-empty">Aucun utilisateur trouvé</td></tr>`;
+        return;
+    }
+
+    let html = '';
+    filtered.forEach(u => {
+        html += `
+        <tr>
+            <td>${esc(u.email || '—')}</td>
+            <td>${esc(u.entreprises?.nom || '—')}</td>
+            <td>${esc(u.role || '—')}</td>
+            <td>${u.has_recouvra ? '<span class="badge badge-success">✅ PRO</span>' : '<span class="badge badge-muted">—</span>'}</td>
+            <td>
+                <div class="admin-actions">
+                    <button class="admin-btn info" data-action="editUser" data-id="${u.id}">✏️ Modifier</button>
+                    <button class="admin-btn danger" data-action="deleteUser" data-id="${u.id}">🗑️ Supprimer</button>
+                    <button class="admin-btn secondary" data-action="resetPassword" data-id="${u.id}">🔑 MDP</button>
+                </div>
+            </td>
+        </tr>`;
+    });
+
+    tbody.innerHTML = html;
+
+    // Événements
+    tbody.querySelectorAll('[data-action="editUser"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            console.log('✏️ Modifier utilisateur:', id);
+            openEditUser(id);
+        });
+    });
+
+    tbody.querySelectorAll('[data-action="deleteUser"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            console.log('🗑️ Supprimer utilisateur:', id);
+            openDeleteUserModal(id);
+        });
+    });
+
+    tbody.querySelectorAll('[data-action="resetPassword"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            console.log('🔑 Réinitialiser MDP:', id);
+            openResetPasswordModal(id);
+        });
+    });
+}
+
+function openEditUser(id) {
+    const user = allUsers.find(u => u.id === id);
+    if (!user) return;
+    document.getElementById('edit-user-id').value = user.id;
+    document.getElementById('edit-user-role').value = user.role || 'vendeur';
+    document.getElementById('edit-user-recouvra').checked = user.has_recouvra || false;
+    document.getElementById('edit-user-backdrop').classList.add('open');
+}
+
+async function saveUser(e) {
+    e.preventDefault();
+    const id = document.getElementById('edit-user-id').value;
+    const role = document.getElementById('edit-user-role').value;
+    const hasRecouvra = document.getElementById('edit-user-recouvra').checked;
+    try {
+        const { error } = await supabaseClient
+            .from('profiles')
+            .update({ role, has_recouvra: hasRecouvra, updated_at: new Date().toISOString() })
+            .eq('id', id);
+        if (error) throw error;
+        showToast('Utilisateur modifié avec succès.', 'success');
+        closeModal('edit-user-backdrop');
+        await loadUsers();
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
+}
+
+function openResetPasswordModal(id) {
+    const user = allUsers.find(u => u.id === id);
+    if (!user) return;
+    document.getElementById('reset-password-user-id').value = user.id;
+    document.getElementById('reset-password-email').value = user.email || '';
+    document.getElementById('reset-password-new').value = '';
+    document.getElementById('reset-password-backdrop').classList.add('open');
+}
+
+async function resetPassword(e) {
+    e.preventDefault();
+    const userId = document.getElementById('reset-password-user-id').value;
+    const newPassword = document.getElementById('reset-password-new').value;
+    if (!newPassword || newPassword.length < 8) {
+        showToast('Le mot de passe doit contenir au moins 8 caractères.', 'error');
+        return;
+    }
+    try {
+        const { error } = await supabaseClient
+            .rpc('admin_reset_password', { p_user_id: userId, p_new_password: newPassword });
+        if (error) throw error;
+        showToast('Mot de passe réinitialisé avec succès.', 'success');
+        closeModal('reset-password-backdrop');
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
+}
+
+function openCreateUserModal() {
+    document.getElementById('create-user-form').reset();
+    document.getElementById('create-user-msg').textContent = '';
+    const select = document.getElementById('create-user-entreprise');
+    select.innerHTML = '<option value="">— Choisir —</option>';
+    allEntreprises.forEach(e => {
+        select.innerHTML += `<option value="${e.id}">${esc(e.nom || 'Sans nom')}</option>`;
+    });
+    document.getElementById('create-user-backdrop').classList.add('open');
+}
+
+async function createUser(e) {
+    e.preventDefault();
+    const msgEl = document.getElementById('create-user-msg');
+    msgEl.textContent = 'Création...';
+    const email = document.getElementById('create-user-email').value.trim();
+    const password = document.getElementById('create-user-password').value;
+    const nom = document.getElementById('create-user-nom').value.trim();
+    const entrepriseId = document.getElementById('create-user-entreprise').value;
+    const role = document.getElementById('create-user-role').value;
+    const hasRecouvra = document.getElementById('create-user-recouvra').checked;
+    if (!email || !password) {
+        msgEl.textContent = 'Email et mot de passe sont obligatoires.';
+        msgEl.style.color = 'red';
+        return;
+    }
+    try {
+        const { data, error } = await supabaseClient
+            .rpc('admin_create_user', {
+                p_email: email,
+                p_password: password,
+                p_nom: nom || null,
+                p_entreprise_id: entrepriseId || null,
+                p_role: role,
+                p_has_recouvra: hasRecouvra
+            });
+        if (error) throw error;
+        msgEl.textContent = '✅ Utilisateur créé avec succès.';
+        msgEl.style.color = 'green';
+        setTimeout(() => {
+            closeModal('create-user-backdrop');
+            loadUsers();
+        }, 1500);
+    } catch (error) {
+        console.error('Erreur création utilisateur:', error);
+        msgEl.textContent = friendlyError(error);
+        msgEl.style.color = 'red';
+    }
+}
+
+function openDeleteUserModal(userId) {
+    userToDelete = userId;
+    document.getElementById('delete-user-backdrop').classList.add('open');
+}
+
+async function deleteUser() {
+    if (!userToDelete) return;
+    try {
+        const { error } = await supabaseClient
+            .rpc('admin_delete_user', { p_user_id: userToDelete });
+        if (error) throw error;
+        showToast('Utilisateur supprimé.', 'success');
+        closeModal('delete-user-backdrop');
+        await loadUsers();
+    } catch (error) {
+        showToast(friendlyError(error), 'error');
+    }
+}
+</script>
+</body>
+</html>

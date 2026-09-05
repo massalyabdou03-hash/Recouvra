@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bienvenue — Recouvra</title>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4F46E5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Recouvra">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+</head>
+<body>
+
+<main class="onboarding-shell">
+  <div class="onboarding-card">
+    <div class="onboarding-progress">
+      <i data-step="1"></i><i data-step="2"></i><i data-step="3"></i>
+    </div>
+
+    <!-- Étape 1 : Bienvenue -->
+    <section class="onboarding-step" data-step="1">
+      <span class="onboarding-eyebrow">Étape 1 sur 3</span>
+      <h1>Bienvenue sur Recouvra 👋</h1>
+      <p class="lead">Votre espace de gestion est prêt. Quelques questions rapides pour adapter l'application à votre commerce.</p>
+      <div class="onboarding-nav" style="justify-content:flex-end;">
+        <button type="button" class="btn" onclick="goToStep(2)">Continuer</button>
+      </div>
+    </section>
+
+    <!-- Étape 2 : Type de commerce -->
+    <section class="onboarding-step" data-step="2" hidden>
+      <span class="onboarding-eyebrow">Étape 2 sur 3</span>
+      <h1>Quel est votre commerce ?</h1>
+      <p class="lead">Ça nous aide à personnaliser votre expérience.</p>
+      <div class="onboarding-choice-grid" id="commerce-choices">
+        <button type="button" class="onboarding-choice" data-value="boutique">Boutique</button>
+        <button type="button" class="onboarding-choice" data-value="quincaillerie">Quincaillerie</button>
+        <button type="button" class="onboarding-choice" data-value="garage">Garage</button>
+        <button type="button" class="onboarding-choice" data-value="pieces_auto">Pièces automobiles</button>
+        <button type="button" class="onboarding-choice" data-value="alimentation">Alimentation</button>
+        <button type="button" class="onboarding-choice" data-value="autre">Autre</button>
+      </div>
+      <div class="onboarding-nav">
+        <button type="button" class="btn-back" onclick="goToStep(1)"><span class="arrow">←</span> Retour</button>
+        <button type="button" class="btn" id="step2-next" onclick="goToStep(3)" disabled>Continuer</button>
+      </div>
+    </section>
+
+    <!-- Étape 3 : Besoins + Plan + Essai gratuit -->
+    <section class="onboarding-step" data-step="3" hidden>
+      <span class="onboarding-eyebrow">Étape 3 sur 3</span>
+      <h1>Configurez votre espace</h1>
+      <p class="lead">Sélectionnez ce qui vous concerne et choisissez votre plan. Vous avez 14 jours d'essai gratuit.</p>
+
+      <h3>Vos besoins (optionnel)</h3>
+      <div class="onboarding-choice-grid" id="besoins-choices">
+        <button type="button" class="onboarding-choice" data-value="stock">📦 Stock</button>
+        <button type="button" class="onboarding-choice" data-value="facturation">🧾 Facturation</button>
+        <button type="button" class="onboarding-choice" data-value="paiements">💳 Paiements</button>
+        <button type="button" class="onboarding-choice" data-value="credits">🤝 Crédits</button>
+        <button type="button" class="onboarding-choice" data-value="recouvrement">📣 Recouvrement</button>
+        <button type="button" class="onboarding-choice" data-value="clients">👥 Clients</button>
+      </div>
+
+      <h3>Choisissez votre plan mensuel</h3>
+      <div class="pricing-options" id="plan-choices">
+        <div class="pricing-option" data-plan="simple" onclick="selectPlan('simple', this)">
+          <strong>🛒 Simple</strong>
+          <div class="amount">10 000 FCFA/mois</div>
+          <ul><li>1 000 articles</li><li>1 utilisateur</li><li>Gestion stock & ventes</li></ul>
+        </div>
+        <div class="pricing-option" data-plan="recouvrement" onclick="selectPlan('recouvrement', this)">
+          <strong>📣 Recouvrement</strong>
+          <div class="amount">15 000 FCFA/mois</div>
+          <ul><li>Articles illimités</li><li>3 utilisateurs</li><li>Relances WhatsApp</li></ul>
+          <span class="badge badge-success">Recommandé</span>
+        </div>
+      </div>
+
+      <div id="value-blocks" style="margin-top:20px;"></div>
+
+      <div class="reassurance-box">
+        <span class="icon">🎁</span>
+        <span><strong>Essai gratuit de 14 jours</strong> — Testez toutes les fonctionnalités sans payer. Aucune carte bancaire requise.</span>
+      </div>
+
+      <div id="onboarding-msg"></div>
+      <div class="onboarding-nav">
+        <button type="button" class="btn-back" onclick="goToStep(2)"><span class="arrow">←</span> Retour</button>
+        <button type="button" class="btn" id="finish-btn" onclick="startTrial()">Commencer mon essai gratuit</button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/onboarding.js" defer></script>
+</body>
+</html>

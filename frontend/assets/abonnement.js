@@ -89,7 +89,7 @@ async function submitPayment() {
     const termsChecked = document.getElementById('terms').checked;
     if (!termsChecked) {
         msgEl.textContent = 'Veuillez accepter les conditions générales.';
-        msgEl.style.color = 'red';
+        msgEl.style.color = 'var(--danger)';
         return;
     }
 
@@ -127,11 +127,11 @@ async function submitPayment() {
         if (error) throw error;
 
         msgEl.textContent = '✅ Demande envoyée ! Notre équipe vérifiera votre paiement et activera votre abonnement.';
-        msgEl.style.color = 'green';
+        msgEl.style.color = 'var(--success)';
     } catch (error) {
         console.error('Erreur soumission paiement:', error);
         msgEl.textContent = friendlyError(error);
-        msgEl.style.color = 'red';
+        msgEl.style.color = 'var(--danger)';
     } finally {
         btn.disabled = false;
         btn.textContent = 'J\'ai effectué le paiement';

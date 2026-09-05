@@ -476,8 +476,22 @@ function openPaymentDetail(paymentId) {
         <div class="detail-row"><span class="k">Montant</span><span class="v">${fmtMoney(payment.amount)} ${esc(payment.currency)}</span></div>
         <div class="detail-row"><span class="k">Référence</span><span class="v">${esc(payment.payment_reference || '—')}</span></div>
         <div class="detail-row"><span class="k">Date</span><span class="v">${fmtDateTime(payment.created_at)}</span></div>
-        ${payment.proof_path ? `<div class="detail-row"><span class="k">Preuve</span><span class="v"><a href="${getStorageUrl(payment.proof_path)}" target="_blank" class="btn btn-secondary btn-sm">Voir la preuve</a></span></div>` : ''}
+        ${payment.proof_path ? `<div class="detail-row" id="proof-row"><span class="k">Preuve</span><span class="v">Chargement du lien...</span></div>` : ''}
     `;
+    // Correction (audit V3) : getStorageUrl() est asynchrone (elle génère une
+    // URL signée pour un bucket privé) et ne peut donc pas être appelée
+    // directement à l'intérieur d'un template literal synchrone comme
+    // c'était le cas avant — cela levait une ReferenceError/Promise non
+    // résolue et cassait l'affichage dès qu'un paiement avait une preuve.
+    if (payment.proof_path) {
+        getStorageUrl('payment-proofs', payment.proof_path).then(url => {
+            const row = document.getElementById('proof-row');
+            if (!row) return; // la modale a pu être fermée entre-temps
+            row.querySelector('.v').innerHTML = url
+                ? `<a href="${url}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">Voir la preuve</a>`
+                : 'Lien indisponible';
+        });
+    }
     const actions = document.getElementById('payment-detail-actions');
     actions.innerHTML = `
         <button class="btn btn-secondary" onclick="closeModal('payment-detail-backdrop')">Fermer</button>
@@ -494,64 +508,39 @@ async function confirmPayment(paymentId) {
     );
     if (!ok) return;
 
+    // Correction (audit V3) : ce code faisait 4 opérations manuelles
+    // séparées (subscriptions, profiles, subscription_payments) au lieu
+    // d'utiliser le RPC confirm_subscription_payment() déjà écrit côté
+    // serveur — lequel verrouille la ligne et vérifie que le paiement est
+    // toujours "pending" avant d'agir, ce qui protège contre un double-clic
+    // ou une validation concurrente depuis un autre onglet admin.
+    //
+    // ATTENTION : ce RPC ne met PAS à jour profiles.has_recouvra (il ne gère
+    // que subscription_payments + subscriptions). On complète donc avec la
+    // même mise à jour qu'avant en second temps. Idéalement, has_recouvra
+    // devrait être mis à jour À L'INTÉRIEUR du RPC pour rester atomique —
+    // voir la note dans PROPOSED_fix_admin_user_management.sql.
+    const actions = document.getElementById('payment-detail-actions');
+    if (actions) actions.querySelectorAll('button').forEach(b => b.disabled = true);
+
     try {
-        const { data: payment, error: fetchError } = await supabaseClient
+        const { data: payment } = await supabaseClient
             .from('subscription_payments')
             .select('entreprise_id')
             .eq('id', paymentId)
             .single();
-        if (fetchError) throw fetchError;
-        if (!payment) throw new Error('Paiement non trouvé');
 
-        const now = new Date();
-        const end = new Date(now);
-        end.setMonth(end.getMonth() + 1);
+        const { error } = await supabaseClient
+            .rpc('confirm_subscription_payment', { p_payment_id: paymentId, p_decision: 'confirmed' });
+        if (error) throw error;
 
-        const { data: existing } = await supabaseClient
-            .from('subscriptions')
-            .select('id')
-            .eq('entreprise_id', payment.entreprise_id)
-            .maybeSingle();
-
-        let updateError;
-        if (existing) {
-            const { error } = await supabaseClient
-                .from('subscriptions')
-                .update({
-                    status: 'active',
-                    plan: 'recouvra_pro',
-                    current_period_start: now.toISOString(),
-                    current_period_end: end.toISOString(),
-                    updated_at: now.toISOString()
-                })
+        if (payment?.entreprise_id) {
+            const { error: profileError } = await supabaseClient
+                .from('profiles')
+                .update({ has_recouvra: true, updated_at: new Date().toISOString() })
                 .eq('entreprise_id', payment.entreprise_id);
-            updateError = error;
-        } else {
-            const { error } = await supabaseClient
-                .from('subscriptions')
-                .insert({
-                    entreprise_id: payment.entreprise_id,
-                    plan: 'recouvra_pro',
-                    status: 'active',
-                    current_period_start: now.toISOString(),
-                    current_period_end: end.toISOString(),
-                    updated_at: now.toISOString()
-                });
-            updateError = error;
+            if (profileError) throw profileError;
         }
-        if (updateError) throw updateError;
-
-        const { error: updateProfilesError } = await supabaseClient
-            .from('profiles')
-            .update({ has_recouvra: true, updated_at: now.toISOString() })
-            .eq('entreprise_id', payment.entreprise_id);
-        if (updateProfilesError) throw updateProfilesError;
-
-        const { error: updatePaymentError } = await supabaseClient
-            .from('subscription_payments')
-            .update({ status: 'confirmed', updated_at: now.toISOString() })
-            .eq('id', paymentId);
-        if (updatePaymentError) throw updatePaymentError;
 
         showToast('✅ Paiement confirmé — entreprise activée.', 'success');
         closeModal('payment-detail-backdrop');
@@ -560,6 +549,8 @@ async function confirmPayment(paymentId) {
     } catch (error) {
         console.error('Erreur confirmPayment :', error);
         showToast(friendlyError(error), 'error');
+    } finally {
+        if (actions) actions.querySelectorAll('button').forEach(b => b.disabled = false);
     }
 }
 
@@ -580,16 +571,20 @@ async function submitRejection() {
         return;
     }
     if (!currentPaymentDetail) return;
+
+    // Correction (audit V3) : remplace l'UPDATE direct par le RPC dédié, qui
+    // verrouille la ligne et vérifie que le paiement est toujours "pending"
+    // (protection contre le double-clic / une action concurrente).
+    const submitBtn = document.getElementById('reject-final-btn');
+    if (submitBtn) submitBtn.disabled = true;
+
     try {
-        const now = new Date();
         const { error } = await supabaseClient
-            .from('subscription_payments')
-            .update({
-                status: 'rejected',
-                rejection_reason: finalReason,
-                updated_at: now.toISOString()
-            })
-            .eq('id', currentPaymentDetail.id);
+            .rpc('confirm_subscription_payment', {
+                p_payment_id: currentPaymentDetail.id,
+                p_decision: 'rejected',
+                p_rejection_reason: finalReason,
+            });
         if (error) throw error;
         showToast('Paiement rejeté.', 'info');
         closeRejectModal();
@@ -597,6 +592,8 @@ async function submitRejection() {
         await loadPayments();
     } catch (error) {
         showToast(friendlyError(error), 'error');
+    } finally {
+        if (submitBtn) submitBtn.disabled = false;
     }
 }
 
@@ -606,6 +603,12 @@ async function annulerPaiement(paymentId) {
         { title: 'Annuler le paiement', confirmLabel: 'Annuler', danger: true }
     );
     if (!ok) return;
+    // Correction (audit V3) : ajout d'un verrou anti double-clic (aucun RPC
+    // dédié n'existe pour cette action de reversal, contrairement à la
+    // confirmation/au rejet — ces 3 requêtes restent donc séquentielles et
+    // non atomiques ; à envisager comme amélioration future côté serveur).
+    const btn = document.querySelector(`[onclick="annulerPaiement('${paymentId}')"]`);
+    if (btn) btn.disabled = true;
     try {
         const payment = allPayments.find(p => p.id === paymentId);
         if (!payment) throw new Error('Paiement non trouvé');
@@ -627,6 +630,8 @@ async function annulerPaiement(paymentId) {
         await loadEntreprises();
     } catch (error) {
         showToast(friendlyError(error), 'error');
+    } finally {
+        if (btn) btn.disabled = false;
     }
 }
 
@@ -746,6 +751,8 @@ async function saveEntreprise(e) {
     const gerant = document.getElementById('edit-entreprise-gerant').value.trim();
     const telephone = document.getElementById('edit-entreprise-telephone').value.trim();
     const statut = document.getElementById('edit-entreprise-statut').value;
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
     try {
         const { error: err1 } = await supabaseClient
             .from('entreprises')
@@ -753,29 +760,43 @@ async function saveEntreprise(e) {
             .eq('id', id);
         if (err1) throw err1;
 
-        const { error: err2 } = await supabaseClient
+        // Correction (audit V3) : l'UPDATE ci-dessous ne faisait rien
+        // silencieusement si l'entreprise n'avait pas encore de ligne dans
+        // `subscriptions` (ex: onboarding jamais terminé — voir le bug P0
+        // onboarding déjà documenté). On vérifie maintenant son existence
+        // et on la crée si besoin, comme le fait déjà confirmPayment().
+        const { data: existingSub } = await supabaseClient
             .from('subscriptions')
-            .update({ status: statut, updated_at: new Date().toISOString() })
-            .eq('entreprise_id', id);
-        if (err2) throw err2;
+            .select('id')
+            .eq('entreprise_id', id)
+            .maybeSingle();
 
-        if (statut === 'active') {
-            await supabaseClient
-                .from('profiles')
-                .update({ has_recouvra: true, updated_at: new Date().toISOString() })
+        const now = new Date().toISOString();
+        if (existingSub) {
+            const { error: err2 } = await supabaseClient
+                .from('subscriptions')
+                .update({ status: statut, updated_at: now })
                 .eq('entreprise_id', id);
+            if (err2) throw err2;
         } else {
-            await supabaseClient
-                .from('profiles')
-                .update({ has_recouvra: false, updated_at: new Date().toISOString() })
-                .eq('entreprise_id', id);
+            const { error: err2 } = await supabaseClient
+                .from('subscriptions')
+                .insert({ entreprise_id: id, plan: 'recouvra_pro', status: statut, updated_at: now });
+            if (err2) throw err2;
         }
+
+        await supabaseClient
+            .from('profiles')
+            .update({ has_recouvra: statut === 'active', updated_at: now })
+            .eq('entreprise_id', id);
 
         showToast('Entreprise modifiée avec succès.', 'success');
         closeModal('edit-entreprise-backdrop');
         await loadEntreprises();
     } catch (error) {
         showToast(friendlyError(error), 'error');
+    } finally {
+        if (submitBtn) submitBtn.disabled = false;
     }
 }
 
@@ -788,6 +809,8 @@ async function desactiverEntreprise(id) {
     );
     if (!ok) return;
 
+    const btn = document.querySelector(`[data-action="disable"][data-id="${id}"]`);
+    if (btn) btn.disabled = true;
     try {
         const { error: err1 } = await supabaseClient
             .from('subscriptions')
@@ -805,6 +828,7 @@ async function desactiverEntreprise(id) {
         await loadEntreprises();
     } catch (error) {
         showToast(friendlyError(error), 'error');
+        if (btn) btn.disabled = false;
     }
 }
 
@@ -820,6 +844,12 @@ async function loadUsers() {
             .select('*, entreprises(nom)')
             .order('created_at', { ascending: false });
         if (error) throw error;
+        // NOTE (audit V3) : `profiles` ne contient pas d'email — la table
+        // auth.users n'est pas exposée via PostgREST côté client. On affiche
+        // donc l'UUID à défaut d'un vrai email. Une fonction RPC dédiée
+        // (admin_list_users, proposée en commentaire dans
+        // PROPOSED_fix_admin_user_management.sql) permettrait d'afficher le
+        // vrai email si cette limite doit être levée.
         allUsers = (data || []).map(u => ({ ...u, email: u.id || '—' }));
         renderUsers();
     } catch (error) {
@@ -957,7 +987,7 @@ async function createUser(e) {
     const hasRecouvra = document.getElementById('create-user-recouvra').checked;
     if (!email || !password) {
         msgEl.textContent = 'Email et mot de passe sont obligatoires.';
-        msgEl.style.color = 'red';
+        msgEl.style.color = 'var(--danger)';
         return;
     }
     try {
@@ -972,7 +1002,7 @@ async function createUser(e) {
             });
         if (error) throw error;
         msgEl.textContent = '✅ Utilisateur créé avec succès.';
-        msgEl.style.color = 'green';
+        msgEl.style.color = 'var(--success)';
         setTimeout(() => {
             closeModal('create-user-backdrop');
             loadUsers();
@@ -980,7 +1010,7 @@ async function createUser(e) {
     } catch (error) {
         console.error('Erreur création utilisateur:', error);
         msgEl.textContent = friendlyError(error);
-        msgEl.style.color = 'red';
+        msgEl.style.color = 'var(--danger)';
     }
 }
 

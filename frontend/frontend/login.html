@@ -96,15 +96,6 @@
             letter-spacing: -0.015em;
             margin: 0 0 14px;
             max-width: 22ch;
-            /* Correction (audit V3 — refonte visuelle) : la règle globale
-               `h1, h2, h3 { color: var(--text) }` de style.css s'applique
-               directement sur l'élément et l'emporte sur l'héritage de
-               `.rc-brand { color: #F5F3FF }`, car une couleur héritée cède
-               toujours la priorité à une couleur déclarée directement sur
-               l'élément, quelle que soit la spécificité du sélecteur.
-               --text valant #0F172A (quasi noir) en thème clair, le titre
-               du panneau sombre devenait presque illisible. */
-            color: #F5F3FF;
         }
 
         .rc-brand p.rc-lede {

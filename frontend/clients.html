@@ -156,7 +156,7 @@ async function loadClientStats() {
     try {
         const { data, error } = await supabaseClient
             .from('factures')
-            .select('client_id, montant_total, montant_restant, mode_paiement, paye')
+            .select('client_id, montant_total, montant_restant')
             .eq('statut', 'VALIDEE');
         if (error) throw error;
 
@@ -165,7 +165,18 @@ async function loadClientStats() {
             const s = clientStats[f.client_id];
             s.total += Number(f.montant_total);
             s.nbFactures += 1;
-            if (f.mode_paiement === 'CREDIT' && !f.paye) s.du += Number(f.montant_restant || f.montant_total);
+            // Correction (audit V3) : le calcul se basait auparavant sur
+            // `mode_paiement === 'CREDIT' && !paye`. Or le booléen `paye`
+            // n'est mis à jour QUE par l'ancien bouton "Marquer payé" de la
+            // page Crédits — pas par le circuit officiel de paiement
+            // (enregistrer_paiement, utilisé par paiements.html), qui lui
+            // met à jour `montant_restant`. Un client réglé via ce circuit
+            // continuait donc à apparaître comme endetté ici. `montant_restant`
+            // est le champ faisant autorité (recalculé par le serveur à
+            // chaque paiement) : on s'aligne dessus, quel que soit le mode
+            // de paiement d'origine.
+            const restant = Number(f.montant_restant || 0);
+            if (restant > 0) s.du += restant;
         });
 
         const totalClients = allClients.length;
