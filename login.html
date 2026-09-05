@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion — Recouvra</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#14103A">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Recouvra">
+    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+    <link rel="stylesheet" href="assets/style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,440;9..144,560;9..144,650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ========== CONNEXION — TOKENS ========== */
+        :root {
+            --rc-ink: #1B1547;
+            --rc-indigo-900: #14103A;
+            --rc-indigo-800: #201A57;
+            --rc-indigo-700: #2E2277;
+            --rc-indigo-500: #5B4FE8;
+            --rc-indigo-300: #A79EFF;
+            --rc-lavender: #C7BFFF;
+            --rc-gold: #F0A93B;
+            --rc-gold-300: #FBC776;
+            --rc-mint-300: #6EE7B0;
+            --rc-paper: #FAFAFC;
+            --rc-paper-dim: #F1F0FA;
+            --rc-line-dark: rgba(255,255,255,0.12);
+            --rc-line-light: rgba(27,21,71,0.13);
+            --font-display: "Fraunces", serif;
+            --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        .rc-shell {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 20px;
+            background: var(--rc-paper-dim);
+            font-family: var(--font-body);
+        }
+
+        .rc-card {
+            width: 100%;
+            max-width: 980px;
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            background: var(--rc-paper);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 24px 60px rgba(20,16,58,0.16);
+        }
+
+        /* ---------- PANNEAU MARQUE ---------- */
+        .rc-brand {
+            position: relative;
+            padding: 46px 44px 40px;
+            background: linear-gradient(165deg, var(--rc-indigo-900) 0%, var(--rc-indigo-800) 55%, var(--rc-indigo-700) 100%);
+            color: #F5F3FF;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .rc-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .rc-logo svg { width: 30px; height: 30px; flex-shrink: 0; }
+
+        .rc-logo span {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 560;
+            letter-spacing: -0.01em;
+        }
+
+        .rc-brand h1 {
+            font-family: var(--font-display);
+            font-weight: 650;
+            font-size: 2rem;
+            line-height: 1.18;
+            letter-spacing: -0.015em;
+            margin: 0 0 14px;
+            max-width: 22ch;
+            /* Correction (audit V3 — refonte visuelle) : la règle globale
+               `h1, h2, h3 { color: var(--text) }` de style.css s'applique
+               directement sur l'élément et l'emporte sur l'héritage de
+               `.rc-brand { color: #F5F3FF }`, car une couleur héritée cède
+               toujours la priorité à une couleur déclarée directement sur
+               l'élément, quelle que soit la spécificité du sélecteur.
+               --text valant #0F172A (quasi noir) en thème clair, le titre
+               du panneau sombre devenait presque illisible. */
+            color: #F5F3FF;
+        }
+
+        .rc-brand p.rc-lede {
+            font-size: 0.96rem;
+            line-height: 1.6;
+            color: rgba(245,243,255,0.72);
+            margin: 0 0 30px;
+            max-width: 36ch;
+        }
+
+        /* ---------- COURBE ---------- */
+        .rc-curve-wrap {
+            margin: 0 -4px 22px;
+        }
+
+        .rc-curve-wrap svg { width: 100%; height: auto; display: block; }
+
+        .rc-curve-line {
+            fill: none;
+            stroke: url(#rc-line-grad);
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-dasharray: 460;
+            stroke-dashoffset: 460;
+            animation: rcDraw 1.5s cubic-bezier(0.65,0,0.35,1) 0.25s forwards;
+        }
+
+        .rc-curve-area { fill: url(#rc-area-grad); opacity: 0; animation: rcFadeIn 0.8s ease 1.3s forwards; }
+
+        .rc-dot {
+            opacity: 0;
+            transform-origin: center;
+            transform: scale(0);
+            animation: rcDotPop 0.45s cubic-bezier(0.34,1.56,0.64,1) forwards;
+        }
+        .rc-dot:nth-of-type(1) { animation-delay: 0.35s; }
+        .rc-dot:nth-of-type(2) { animation-delay: 0.85s; }
+        .rc-dot:nth-of-type(3) { animation-delay: 1.15s; }
+        .rc-dot:nth-of-type(4) { animation-delay: 1.45s; }
+
+        .rc-dot-live {
+            animation: rcDotPop 0.45s cubic-bezier(0.34,1.56,0.64,1) 1.45s forwards, rcPulse 2.6s ease-in-out 2s infinite;
+        }
+
+        @keyframes rcDraw { to { stroke-dashoffset: 0; } }
+        @keyframes rcFadeIn { to { opacity: 1; } }
+        @keyframes rcDotPop { to { opacity: 1; transform: scale(1); } }
+        @keyframes rcPulse {
+            0%, 100% { filter: drop-shadow(0 0 0 rgba(240,169,59,0.55)); }
+            50% { filter: drop-shadow(0 0 6px rgba(240,169,59,0.55)); }
+        }
+
+        /* ---------- APERÇU EN DIRECT (mini-dashboard) ---------- */
+        .rc-ledger {
+            border-top: 1px solid var(--rc-line-dark);
+            margin-top: auto;
+        }
+
+        .rc-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 2px;
+            border-bottom: 1px solid var(--rc-line-dark);
+            opacity: 0;
+            transform: translateY(6px);
+            animation: rcRowIn 0.5s ease forwards;
+        }
+        .rc-row:nth-child(1) { animation-delay: 1.6s; }
+        .rc-row:nth-child(2) { animation-delay: 1.72s; }
+        .rc-row:nth-child(3) { animation-delay: 1.84s; }
+        .rc-row:last-child { border-bottom: none; }
+
+        @keyframes rcRowIn { to { opacity: 1; transform: translateY(0); } }
+
+        .rc-row-icon { font-size: 1.1rem; width: 26px; text-align: center; flex-shrink: 0; }
+
+        .rc-row-text { flex: 1; min-width: 0; }
+
+        .rc-row-label {
+            font-size: 0.78rem;
+            color: rgba(245,243,255,0.6);
+            margin: 0 0 2px;
+        }
+
+        .rc-row-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .rc-row-trend {
+            font-size: 0.78rem;
+            font-weight: 500;
+            white-space: nowrap;
+            text-align: right;
+        }
+
+        /* ---------- PANNEAU FORMULAIRE ---------- */
+        .rc-form-panel {
+            padding: 46px 44px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .rc-form-panel h2 {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 1.6rem;
+            color: var(--rc-ink);
+            margin: 0 0 6px;
+        }
+
+        .rc-form-panel .rc-form-sub {
+            font-size: 0.92rem;
+            color: rgba(27,21,71,0.58);
+            margin: 0 0 26px;
+        }
+
+        .rc-field { margin-bottom: 16px; }
+
+        .rc-field label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: rgba(27,21,71,0.65);
+            margin-bottom: 5px;
+        }
+
+        .rc-field input {
+            width: 100%;
+            padding: 12px 14px;
+            font-family: var(--font-body);
+            font-size: 0.98rem;
+            color: var(--rc-ink);
+            background: var(--rc-paper-dim);
+            border: 1.5px solid transparent;
+            border-radius: 10px;
+            transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+        }
+
+        .rc-field input::placeholder { color: rgba(27,21,71,0.32); }
+
+        .rc-field input:focus-visible {
+            outline: none;
+            border-color: var(--rc-indigo-500);
+            box-shadow: 0 0 0 4px rgba(91,79,232,0.16);
+            background: #fff;
+        }
+
+        .btn-login {
+            width: 100%;
+            margin-top: 6px;
+            padding: 13px;
+            font-family: var(--font-body);
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, var(--rc-indigo-500), #7C3AED);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(91,79,232,0.32);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+        }
+
+        .btn-login:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 26px rgba(91,79,232,0.4);
+        }
+
+        .btn-login:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(91,79,232,0.28);
+        }
+
+        .btn-login:disabled { opacity: 0.62; cursor: not-allowed; transform: none; }
+
+        .spinner {
+            display: inline-block;
+            width: 15px; height: 15px;
+            border: 2.5px solid rgba(255,255,255,0.35);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: rcSpin 0.6s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes rcSpin { to { transform: rotate(360deg); } }
+
+        .error-msg {
+            display: none;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+            color: #B42318;
+            background: rgba(180,35,24,0.08);
+            border-left: 3px solid #B42318;
+            border-radius: 8px;
+        }
+        .error-msg.show { display: block; animation: rcShake 0.32s ease; }
+        @keyframes rcShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .rc-footer {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 0.86rem;
+            color: rgba(27,21,71,0.6);
+        }
+        .rc-footer a {
+            color: var(--rc-indigo-500);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .rc-footer a:hover { text-decoration: underline; }
+        .rc-footer a:focus-visible { outline: 2px solid var(--rc-indigo-500); outline-offset: 2px; border-radius: 3px; }
+
+        .rc-trust {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 0.76rem;
+            color: rgba(27,21,71,0.4);
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 860px) {
+            .rc-card { grid-template-columns: 1fr; max-width: 480px; }
+            .rc-brand { padding: 36px 32px 28px; }
+            .rc-form-panel { padding: 36px 32px 40px; }
+            .rc-brand h1 { font-size: 1.65rem; }
+        }
+
+        @media (max-width: 460px) {
+            .rc-shell { padding: 0; }
+            .rc-card { border-radius: 0; min-height: 100vh; }
+            .rc-brand { padding: 30px 24px 24px; }
+            .rc-form-panel { padding: 30px 24px 34px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .rc-curve-line, .rc-curve-area, .rc-dot, .rc-row {
+                animation: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+                stroke-dashoffset: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="rc-shell">
+        <div class="rc-card">
+
+            <!-- PANNEAU MARQUE -->
+            <section class="rc-brand">
+                <div class="rc-logo">
+                    <svg viewBox="0 0 24 24">
+                        <rect width="24" height="24" rx="6" fill="#5B4FE8"/>
+                        <path d="M7 12h10M12 7v10" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+                    </svg>
+                    <span>Recouvra</span>
+                </div>
+
+                <h1>La gestion de votre commerce, sans le carnet.</h1>
+                <p class="rc-lede">Ventes, stock, crédits et relances clients réunis dans une seule application, pensée pour les commerçants.</p>
+
+                <div class="rc-curve-wrap">
+                    <svg viewBox="0 0 400 170" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="rc-line-grad" x1="0" y1="0" x2="400" y2="0" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#A79EFF"/>
+                                <stop offset="100%" stop-color="#F0A93B"/>
+                            </linearGradient>
+                            <linearGradient id="rc-area-grad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#A79EFF" stop-opacity="0.28"/>
+                                <stop offset="100%" stop-color="#A79EFF" stop-opacity="0"/>
+                            </linearGradient>
+                        </defs>
+                        <path class="rc-curve-area" d="M0,150 C50,150 70,95 130,95 C190,95 200,55 260,55 C320,55 330,15 390,15 L390,170 L0,170 Z"/>
+                        <path class="rc-curve-line" d="M0,150 C50,150 70,95 130,95 C190,95 200,55 260,55 C320,55 330,15 390,15"/>
+                        <circle class="rc-dot" cx="0" cy="150" r="4.5" fill="#0F0B33" stroke="#A79EFF" stroke-width="2"/>
+                        <circle class="rc-dot" cx="130" cy="95" r="4.5" fill="#0F0B33" stroke="#C7BFFF" stroke-width="2"/>
+                        <circle class="rc-dot" cx="260" cy="55" r="4.5" fill="#0F0B33" stroke="#FBC776" stroke-width="2"/>
+                        <circle class="rc-dot rc-dot-live" cx="390" cy="15" r="5.5" fill="#F0A93B" stroke="#14103A" stroke-width="2"/>
+                    </svg>
+                </div>
+
+                <div class="rc-ledger">
+                    <div class="rc-row">
+                        <span class="rc-row-icon">🧾</span>
+                        <div class="rc-row-text">
+                            <p class="rc-row-label">Ventes aujourd'hui</p>
+                            <p class="rc-row-value">128&nbsp;400&nbsp;FCFA</p>
+                        </div>
+                        <span class="rc-row-trend" style="color:var(--rc-mint-300)">+12% vs hier</span>
+                    </div>
+                    <div class="rc-row">
+                        <span class="rc-row-icon">📦</span>
+                        <div class="rc-row-text">
+                            <p class="rc-row-label">Articles en stock</p>
+                            <p class="rc-row-value">312</p>
+                        </div>
+                        <span class="rc-row-trend" style="color:var(--rc-gold-300)">4 en alerte</span>
+                    </div>
+                    <div class="rc-row">
+                        <span class="rc-row-icon">💳</span>
+                        <div class="rc-row-text">
+                            <p class="rc-row-label">Crédits en cours</p>
+                            <p class="rc-row-value">342&nbsp;900&nbsp;FCFA</p>
+                        </div>
+                        <span class="rc-row-trend" style="color:var(--rc-lavender)">18 relances actives</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PANNEAU FORMULAIRE -->
+            <section class="rc-form-panel">
+                <h2>Heureux de vous revoir</h2>
+                <p class="rc-form-sub">Connectez-vous pour accéder à votre espace.</p>
+
+                <div id="login-error" class="error-msg"></div>
+
+                <form id="login-form">
+                    <div class="rc-field">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="votre@email.com" required>
+                    </div>
+                    <div class="rc-field">
+                        <label for="password">Mot de passe</label>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-login">Se connecter</button>
+                </form>
+
+                <div class="rc-footer">
+                    Pas encore de compte ? <a href="onboarding.html">S'inscrire</a>
+                </div>
+                <p class="rc-trust">Connexion sécurisée et chiffrée.</p>
+            </section>
+
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
+    <script src="assets/config.js"></script>
+    <script src="assets/app.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          const form = document.getElementById('login-form');
+          const emailInput = document.getElementById('email');
+          const passwordInput = document.getElementById('password');
+          const errorMsg = document.getElementById('login-error');
+          const btn = document.querySelector('.btn-login');
+
+          if (form) {
+              form.addEventListener('submit', async function(e) {
+                  e.preventDefault();
+                  errorMsg.classList.remove('show');
+                  errorMsg.textContent = '';
+
+                  const email = emailInput.value.trim();
+                  const password = passwordInput.value;
+
+                  if (!email || !password) {
+                      errorMsg.textContent = 'Veuillez remplir tous les champs.';
+                      errorMsg.classList.add('show');
+                      return;
+                  }
+
+                  btn.disabled = true;
+                  btn.innerHTML = '<span class="spinner"></span> Connexion...';
+
+                  try {
+                      const { data, error } = await supabaseClient.auth.signInWithPassword({
+                          email: email,
+                          password: password,
+                      });
+
+                      if (error) throw error;
+
+                      window.location.href = 'index.html';
+
+                  } catch (err) {
+                      console.error('Erreur connexion:', err);
+
+                      // Personnalisation du message selon l'erreur
+                      let userMessage = 'Identifiants incorrects. Vérifiez votre email et votre mot de passe.';
+                      const msg = err.message || '';
+
+                      if (msg.includes('Email not confirmed')) {
+                          userMessage = 'Votre email n\'a pas encore été confirmé. Vérifiez votre boîte de réception.';
+                      } else if (msg.includes('Invalid login credentials')) {
+                          userMessage = 'Email ou mot de passe incorrect. Réessayez.';
+                      } else if (msg.includes('User not found')) {
+                          userMessage = 'Aucun compte trouvé avec cet email.';
+                      }
+
+                      errorMsg.textContent = userMessage;
+                      errorMsg.classList.add('show');
+                      btn.disabled = false;
+                      btn.innerHTML = 'Se connecter';
+                  }
+              });
+          }
+      });
+    </script>
+</body>
+</html>

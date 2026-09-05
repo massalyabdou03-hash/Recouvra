@@ -1,0 +1,1161 @@
+// ============================================================================
+// RECOUVRA - FICHIER CENTRAL JavaScript (app.js)
+// Ce fichier contient toutes les fonctions globales, la gestion de la
+// connectivité, le cache hors ligne et la synchronisation. Il est chargé
+// sur chaque page pour éviter la duplication de code.
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// 1. SERVICE WORKER - Enregistrement pour le mode hors ligne
+// ----------------------------------------------------------------------------
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("sw.js")
+      .catch((err) => console.error("Échec de l'enregistrement du Service Worker", err));
+  });
+}
+
+// ----------------------------------------------------------------------------
+// 2. UTILITAIRES GÉNÉRAUX
+// ----------------------------------------------------------------------------
+
+// Timeout pour les appels Supabase (évite les blocages hors ligne)
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((resolve) => setTimeout(() => resolve({ data: { session: null }, timedOut: true }), ms)),
+  ]);
+}
+
+// Vérifie si une session Supabase est stockée localement (filet de secours)
+function hasStoredSupabaseSession() {
+  try {
+    return Object.keys(localStorage).some((k) => k.startsWith("sb-") && k.endsWith("-auth-token"));
+  } catch {
+    return false;
+  }
+}
+
+// Formate un nombre en FCFA
+function fmtMoney(n) {
+  const v = Number(n || 0);
+  return v.toLocaleString("fr-FR", { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + " F";
+}
+
+// Échappe les caractères HTML pour éviter les injections XSS
+function esc(str) {
+  if (str === null || str === undefined) return "";
+  return String(str).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  }[c]));
+}
+
+// Formate une date (JJ/MM/AAAA)
+function fmtDate(iso) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
+// Formate une date et heure
+function fmtDateTime(iso) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleString("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+// Affichage de messages dans un conteneur (remplace alert)
+function showMsg(containerEl, text, type = "error") {
+  containerEl.innerHTML = `<div class="${type === "error" ? "error-msg" : "success-msg"}">${esc(text)}</div>`;
+}
+
+function clearMsg(containerEl) {
+  containerEl.innerHTML = "";
+}
+
+// ----------------------------------------------------------------------------
+// 3. MODE SOMBRE (global)
+// ----------------------------------------------------------------------------
+function initDarkMode() {
+  if (localStorage.getItem("recouvra_dark_mode") === "1") {
+    document.body.classList.add("dark-mode");
+    const icon = document.getElementById("dark-mode-icon");
+    const label = document.getElementById("dark-mode-label");
+    if (icon) icon.textContent = "☀️";
+    if (label) label.textContent = "Mode clair";
+  }
+}
+
+function toggleDarkMode() {
+  document.body.classList.toggle("dark-mode");
+  const isDark = document.body.classList.contains("dark-mode");
+  localStorage.setItem("recouvra_dark_mode", isDark ? "1" : "0");
+  const icon = document.getElementById("dark-mode-icon");
+  const label = document.getElementById("dark-mode-label");
+  if (icon) icon.textContent = isDark ? "☀️" : "🌙";
+  if (label) label.textContent = isDark ? "Mode clair" : "Mode sombre";
+}
+
+// ----------------------------------------------------------------------------
+// 4. MENU MOBILE (sidebar)
+// ----------------------------------------------------------------------------
+function toggleSidebar() {
+  const sidebar = document.querySelector(".sidebar");
+  const overlay = document.querySelector(".sidebar-overlay");
+  const isOpen = sidebar?.classList.contains("open");
+
+  if (isOpen) {
+    sidebar?.classList.remove("open");
+    overlay?.classList.remove("active");
+    document.body.classList.remove("menu-open");
+  } else {
+    sidebar?.classList.add("open");
+    overlay?.classList.add("active");
+    document.body.classList.add("menu-open");
+    setTimeout(() => {
+      sidebar.scrollTop = 0;
+    }, 100);
+  }
+}
+
+// Ferme le menu quand on clique sur un lien ou un bouton du footer
+document.addEventListener("click", (e) => {
+  if (e.target.closest(".nav-link, .support-link, .dark-mode-toggle, .btn-logout")) {
+    const sidebar = document.querySelector(".sidebar");
+    const overlay = document.querySelector(".sidebar-overlay");
+    sidebar?.classList.remove("open");
+    overlay?.classList.remove("active");
+    document.body.classList.remove("menu-open");
+  }
+});
+
+// ----------------------------------------------------------------------------
+// 5. AUTHENTIFICATION ET AUTORISATIONS
+// ----------------------------------------------------------------------------
+async function requireAuth() {
+  let session = null;
+  try {
+    const { data } = await withTimeout(supabaseClient.auth.getSession(), 4000);
+    session = data.session;
+  } catch {
+    // erreur réseau
+  }
+
+  if (!session) {
+    window.location.href = "login.html";
+    return null;
+  }
+
+  const { data: profile } = await supabaseClient
+    .from("profiles")
+    .select("*, entreprises(subscriptions(status, trial_ends_at))")
+    .eq("id", session.user.id)
+    .single();
+
+  if (profile?.role === "super_admin") {
+    return session;
+  }
+
+  const currentPage = window.location.pathname.split("/").pop();
+  if (currentPage === "abonnement.html") {
+    return session;
+  }
+
+  if (!profile || !profile.entreprises) {
+    return session;
+  }
+
+  const subStatus = profile.entreprises.subscriptions?.status;
+  const trialEnd = profile.entreprises.subscriptions?.trial_ends_at;
+
+  if (subStatus === "active" || (subStatus === "trial" && trialEnd && new Date(trialEnd) > new Date())) {
+    // OK
+  } else {
+    window.location.href = "abonnement.html";
+    return null;
+  }
+
+  const email = session.user?.email;
+  const el = document.getElementById("current-user-email");
+  if (el) el.textContent = email ? "Code : " + email.split("@")[0] : "Hors ligne";
+
+  initConnectivity();
+  return session;
+}
+
+async function logout() {
+  await supabaseClient.auth.signOut();
+  window.location.href = "login.html";
+}
+
+// Retourne le profil courant (avec entreprise)
+async function currentProfile() {
+  const { data: userData } = await supabaseClient.auth.getUser();
+  if (!userData.user) return null;
+  const { data } = await supabaseClient
+    .from("profiles")
+    .select("*, entreprises(nom)")
+    .eq("id", userData.user.id)
+    .maybeSingle();
+  return data;
+}
+
+// Vérifie si l'utilisateur a accès au module Recouvra (payant)
+async function requireRecouvra() {
+  const profile = await currentProfile();
+  if (!profile) {
+    window.location.href = "login.html";
+    return null;
+  }
+  if (!profile?.has_recouvra && profile?.role !== "super_admin") {
+    document.body.innerHTML = `<main class="shell"><section class="panel access-panel"><span class="eyebrow">Module Premium</span><h1>Recouvra</h1><p>Le suivi des paiements et des relances n'est pas encore activé pour ce compte.</p><button class="btn recouvra-cta" onclick="requestRecouvra()">Demander l'activation</button></section></main>`;
+    return null;
+  }
+  return profile;
+}
+
+async function requestRecouvra() {
+  const profile = await currentProfile();
+  if (!profile) return;
+  window.location.href = "abonnement.html";
+}
+
+// ----------------------------------------------------------------------------
+// 6. TOASTS (notifications)
+// ----------------------------------------------------------------------------
+function ensureToastContainer() {
+  let c = document.getElementById("toast-container");
+  if (!c) {
+    c = document.createElement("div");
+    c.id = "toast-container";
+    c.className = "toast-container";
+    document.body.appendChild(c);
+  }
+  return c;
+}
+
+function showToast(text, type = "error", duration = 4500) {
+  const icons = { error: "⛔", success: "✅", info: "ℹ️" };
+  const c = ensureToastContainer();
+  const el = document.createElement("div");
+  el.className = `toast toast-${type}`;
+  const iconSpan = document.createElement("span");
+  iconSpan.className = "toast-icon";
+  iconSpan.textContent = icons[type] || icons.info;
+  const textSpan = document.createElement("span");
+  textSpan.className = "toast-text";
+  textSpan.textContent = text;
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "toast-close";
+  closeBtn.setAttribute("aria-label", "Fermer");
+  closeBtn.textContent = "×";
+  el.append(iconSpan, textSpan, closeBtn);
+
+  const close = () => {
+    el.classList.remove("toast-in");
+    el.classList.add("toast-out");
+    setTimeout(() => el.remove(), 200);
+  };
+  closeBtn.addEventListener("click", close);
+  c.appendChild(el);
+  requestAnimationFrame(() => el.classList.add("toast-in"));
+  if (duration) setTimeout(close, duration);
+  return el;
+}
+
+// ----------------------------------------------------------------------------
+// 7. CONFIRMATION STYLÉE (remplace confirm())
+// ----------------------------------------------------------------------------
+function confirmDialog(message, opts = {}) {
+  const { title = "Confirmer", confirmLabel = "Confirmer", cancelLabel = "Annuler", danger = true } = opts;
+  return new Promise((resolve) => {
+    const backdrop = document.createElement("div");
+    backdrop.className = "modal-backdrop open";
+    backdrop.innerHTML = `
+      <div class="modal modal-sm modal-confirm">
+        <div class="confirm-icon ${danger ? "danger" : ""}">${danger ? "⚠️" : "❓"}</div>
+        <h3>${esc(title)}</h3>
+        <p class="confirm-text">${esc(message)}</p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" data-action="cancel">${esc(cancelLabel)}</button>
+          <button type="button" class="btn ${danger ? "btn-danger-solid" : ""}" data-action="confirm">${esc(confirmLabel)}</button>
+        </div>
+      </div>`;
+    document.body.appendChild(backdrop);
+    const cleanup = (result) => {
+      backdrop.remove();
+      resolve(result);
+    };
+    backdrop.addEventListener("click", (e) => {
+      if (e.target === backdrop) cleanup(false);
+    });
+    backdrop.querySelector('[data-action="cancel"]').addEventListener("click", () => cleanup(false));
+    backdrop.querySelector('[data-action="confirm"]').addEventListener("click", () => cleanup(true));
+  });
+}
+
+// ----------------------------------------------------------------------------
+// 8. GESTION DES ERREURS FRIENDLY
+// ----------------------------------------------------------------------------
+const DUPLICATE_FIELD_LABELS = {
+  reference_interne: "La référence interne (SKU)",
+  code_barre: "Le code-barres",
+  reference_oem: "La référence OEM",
+  numero_facture: "Le numéro de facture",
+};
+
+function friendlyError(err) {
+  const msg = err?.message || String(err);
+  if (msg.includes("duplicate key")) {
+    const m = (err?.details || "").match(/Key \(([^)]+)\)=\(([^)]+)\)/);
+    if (m) {
+      const label = DUPLICATE_FIELD_LABELS[m[1]] || `Le champ "${m[1]}"`;
+      return `${label} "${m[2]}" est déjà utilisé par une autre pièce.`;
+    }
+    return "Cette référence existe déjà.";
+  }
+  if (msg.includes("violates foreign key")) return "Cet élément est utilisé ailleurs et ne peut pas être supprimé.";
+  if (msg.includes("Stock insuffisant")) return msg.split("CONTEXT")[0].trim();
+  if (msg.includes("Invalid login credentials")) return "Code d'accès incorrect.";
+  if (msg.includes("facture n'est plus en brouillon") || msg.includes("déjà")) return msg.split("CONTEXT")[0].trim();
+  return msg;
+}
+
+// ----------------------------------------------------------------------------
+// 9. CACHE LOCAL ET MODE HORS CONNEXION
+// ----------------------------------------------------------------------------
+function readLocal(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeLocal(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (err) {
+    console.error("Erreur d'écriture locale", err);
+  }
+}
+
+function cacheCollection(key, items) {
+  writeLocal(`recouvra_cache_${key}`, { savedAt: new Date().toISOString(), items });
+}
+
+function getCachedCollection(key) {
+  return readLocal(`recouvra_cache_${key}`, { savedAt: null, items: [] });
+}
+
+async function loadWithCache(cacheKey, queryFn) {
+  try {
+    const { data, error } = await queryFn();
+    if (!error && data) {
+      cacheCollection(cacheKey, data);
+      return { items: data, offline: false, savedAt: new Date().toISOString() };
+    }
+  } catch {
+    // requête impossible (hors ligne) : on tombe sur le cache
+  }
+  const cached = getCachedCollection(cacheKey);
+  return { items: cached.items, offline: true, savedAt: cached.savedAt };
+}
+
+// ---------- File d'attente générique pour petites modifications ----------
+function getFieldUpdates() {
+  return readLocal("recouvra_pending_updates", []);
+}
+function saveFieldUpdates(updates) {
+  writeLocal("recouvra_pending_updates", updates);
+}
+function queueFieldUpdate(table, id, patch, label) {
+  const updates = getFieldUpdates();
+  updates.push({
+    id: `upd-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    table,
+    recordId: id,
+    patch,
+    label,
+    createdAt: new Date().toISOString(),
+    status: "pending",
+    errorMsg: null,
+  });
+  saveFieldUpdates(updates);
+  document.dispatchEvent(new CustomEvent("sylla:pending-updates-updated"));
+}
+function removeFieldUpdate(id) {
+  saveFieldUpdates(getFieldUpdates().filter((u) => u.id !== id));
+  document.dispatchEvent(new CustomEvent("sylla:pending-updates-updated"));
+}
+function applyPendingFieldUpdates(table, items) {
+  const updates = getFieldUpdates().filter((u) => u.table === table);
+  if (updates.length === 0) return items;
+  const byId = new Map(items.map((it) => [String(it.id), it]));
+  updates.forEach((u) => {
+    const it = byId.get(String(u.recordId));
+    if (it) Object.assign(it, u.patch, { _pendingSync: true });
+  });
+  return items;
+}
+
+// ---------- File d'attente des mouvements de stock ----------
+function getPendingMovements() {
+  return readLocal("recouvra_pending_movements", []);
+}
+function savePendingMovements(movements) {
+  writeLocal("recouvra_pending_movements", movements);
+}
+function queuePendingMovement(movement) {
+  const movements = getPendingMovements();
+  const entry = {
+    id: `mvt-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    createdAt: new Date().toISOString(),
+    status: "pending",
+    errorMsg: null,
+    ...movement,
+  };
+  movements.push(entry);
+  savePendingMovements(movements);
+  document.dispatchEvent(new CustomEvent("recouvra:pending-movements-updated"));
+  return entry;
+}
+function updatePendingMovement(id, patch) {
+  const movements = getPendingMovements();
+  const idx = movements.findIndex((m) => m.id === id);
+  if (idx === -1) return;
+  movements[idx] = { ...movements[idx], ...patch };
+  savePendingMovements(movements);
+}
+function removePendingMovement(id) {
+  savePendingMovements(getPendingMovements().filter((m) => m.id !== id));
+  document.dispatchEvent(new CustomEvent("recouvra:pending-movements-updated"));
+}
+
+function computeEffectiveStock(pieceId, baseQuantity) {
+  let qty = baseQuantity;
+  getPendingMovements()
+    .filter((m) => m.status !== "error" && m.piece_id === pieceId)
+    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+    .forEach((m) => {
+      if (m.type_mouvement === "ENTREE") qty += m.quantite;
+      else if (m.type_mouvement === "SORTIE") qty -= m.quantite;
+      else if (m.type_mouvement === "AJUSTEMENT") qty = m.quantite;
+    });
+  return qty - getReservedQuantity(pieceId);
+}
+
+// ---------- File d'attente des ventes ----------
+function getPendingSales() {
+  return readLocal("recouvra_pending_sales", []);
+}
+function savePendingSales(sales) {
+  writeLocal("recouvra_pending_sales", sales);
+}
+function queuePendingSale(sale) {
+  const sales = getPendingSales();
+  const entry = {
+    id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    createdAt: new Date().toISOString(),
+    status: "pending",
+    errorMsg: null,
+    ...sale,
+  };
+  sales.push(entry);
+  savePendingSales(sales);
+  document.dispatchEvent(new CustomEvent("recouvra:pending-sales-updated"));
+  return entry;
+}
+function updatePendingSale(id, patch) {
+  const sales = getPendingSales();
+  const idx = sales.findIndex((s) => s.id === id);
+  if (idx === -1) return;
+  sales[idx] = { ...sales[idx], ...patch };
+  savePendingSales(sales);
+}
+function removePendingSale(id) {
+  savePendingSales(getPendingSales().filter((s) => s.id !== id));
+  document.dispatchEvent(new CustomEvent("recouvra:pending-sales-updated"));
+}
+
+function getReservedQuantity(pieceId) {
+  return getPendingSales()
+    .filter((s) => s.status !== "error")
+    .reduce((sum, s) => sum + s.lignes.filter((l) => l.piece_id === pieceId).reduce((a, l) => a + l.quantite, 0), 0);
+}
+
+// ----------------------------------------------------------------------------
+// 10. CONNECTIVITÉ ET SYNCHRONISATION
+// ----------------------------------------------------------------------------
+const OFFLINE_PROBE_TIMEOUT_MS = 5000;
+const OFFLINE_RECHECK_INTERVAL_MS = 30000;
+
+let appIsOnline = navigator.onLine;
+let connectivityInitialized = false;
+let offlineRecheckTimer = null;
+let syncInProgress = false;
+let movementsSyncInProgress = false;
+let fieldUpdatesSyncInProgress = false;
+
+async function probeOnline() {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), OFFLINE_PROBE_TIMEOUT_MS);
+    const { error } = await supabaseClient.from("pieces").select("id").limit(1).abortSignal(controller.signal);
+    clearTimeout(timeout);
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
+function ensureOfflineBanner() {
+  let el = document.getElementById("offline-banner");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "offline-banner";
+    el.className = "offline-banner";
+    document.body.prepend(el);
+  }
+  return el;
+}
+
+function setOnlineState(isOnline) {
+  const wasOnline = appIsOnline;
+  appIsOnline = isOnline;
+  const banner = ensureOfflineBanner();
+
+  if (!isOnline) {
+    banner.textContent =
+      "Hors connexion — l'application reste utilisable : les ventes, mouvements de stock et autres actions sont enregistrés localement et seront synchronisés automatiquement au retour d'internet.";
+    banner.className = "offline-banner offline-banner-off show";
+    if (!offlineRecheckTimer) {
+      offlineRecheckTimer = setInterval(async () => {
+        if (await probeOnline()) handleBackOnline();
+      }, OFFLINE_RECHECK_INTERVAL_MS);
+    }
+  } else {
+    if (offlineRecheckTimer) {
+      clearInterval(offlineRecheckTimer);
+      offlineRecheckTimer = null;
+    }
+    if (!wasOnline) {
+      banner.textContent = "Connexion rétablie — synchronisation en cours...";
+      banner.className = "offline-banner offline-banner-on show";
+      setTimeout(() => banner.classList.remove("show"), 4000);
+    } else {
+      banner.classList.remove("show");
+    }
+  }
+  document.dispatchEvent(new CustomEvent("recouvra:connectivity-changed", { detail: { online: isOnline } }));
+}
+
+async function syncAllPending() {
+  await syncPendingMovements();
+  await syncPendingSales();
+  await syncFieldUpdates();
+}
+
+async function handleBackOnline() {
+  if (offlineRecheckTimer) {
+    clearInterval(offlineRecheckTimer);
+    offlineRecheckTimer = null;
+  }
+  setOnlineState(true);
+  await syncAllPending();
+}
+
+function initConnectivity() {
+  if (connectivityInitialized) return;
+  connectivityInitialized = true;
+
+  window.addEventListener("offline", () => setOnlineState(false));
+  window.addEventListener("online", async () => {
+    if (await probeOnline()) handleBackOnline();
+  });
+
+  setOnlineState(navigator.onLine);
+  if (navigator.onLine) {
+    probeOnline().then((ok) => (ok ? syncAllPending() : setOnlineState(false)));
+  }
+}
+
+// ---------- Moteur de synchronisation des ventes en attente ----------
+async function syncPendingSales() {
+  if (syncInProgress) return;
+  syncInProgress = true;
+  try {
+    const sales = getPendingSales()
+      .filter((s) => s.status === "pending" || s.status === "error")
+      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+    for (const sale of sales) {
+      updatePendingSale(sale.id, { status: "syncing", errorMsg: null });
+      try {
+        let clientId = sale.client.id;
+        if (sale.client.mode === "new") {
+          const { data: newClient, error: errClient } = await supabaseClient
+            .from("clients")
+            .insert({ nom: sale.client.nom, telephone: sale.client.telephone || null, email: sale.client.email || null })
+            .select()
+            .single();
+          if (errClient) throw errClient;
+          clientId = newClient.id;
+          updatePendingSale(sale.id, { client: { mode: "existing", id: clientId, nom: sale.client.nom } });
+        }
+
+        // Correction (audit V2) : si un essai précédent a déjà créé la
+        // facture mais échoué avant la validation (lignes ou RPC), on
+        // réutilise cette facture existante au lieu d'en recréer une
+        // nouvelle à chaque réessai (source de doublons sur connexion
+        // instable).
+        let factureId = sale.factureId;
+        if (!factureId) {
+          const { data: facture, error: errFacture } = await supabaseClient
+            .from("factures")
+            .insert({ client_id: clientId, montant_total: sale.total })
+            .select()
+            .single();
+          if (errFacture) throw errFacture;
+          factureId = facture.id;
+          updatePendingSale(sale.id, { factureId });
+        }
+
+        // Idem pour les lignes : on vérifie qu'elles n'existent pas déjà
+        // pour cette facture avant de les réinsérer.
+        const { count: existingLignesCount, error: errCheckLignes } = await supabaseClient
+          .from("factures_lignes")
+          .select("id", { count: "exact", head: true })
+          .eq("facture_id", factureId);
+        if (errCheckLignes) throw errCheckLignes;
+
+        if (!existingLignesCount) {
+          const lignesPayload = sale.lignes.map((l) => ({ ...l, facture_id: factureId }));
+          const { error: errLignes } = await supabaseClient.from("factures_lignes").insert(lignesPayload);
+          if (errLignes) throw errLignes;
+        }
+
+        const { error: errValidation } = await supabaseClient.rpc("valider_facture", {
+          p_facture_id: factureId,
+          p_mode_paiement: sale.mode_paiement,
+          p_echeance_type: sale.echeance_type || null,
+        });
+        if (errValidation) throw errValidation;
+
+        removePendingSale(sale.id);
+        showToast(`Vente de ${sale.client.nom} synchronisée.`, "success");
+      } catch (err) {
+        updatePendingSale(sale.id, { status: "error", errorMsg: friendlyError(err) });
+      }
+    }
+  } finally {
+    syncInProgress = false;
+    document.dispatchEvent(new CustomEvent("recouvra:pending-sales-updated"));
+  }
+}
+
+// ---------- Moteur de synchronisation des mouvements ----------
+async function syncPendingMovements() {
+  if (movementsSyncInProgress) return;
+  movementsSyncInProgress = true;
+  try {
+    const movements = getPendingMovements()
+      .filter((m) => m.status === "pending" || m.status === "error")
+      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+    for (const mvt of movements) {
+      updatePendingMovement(mvt.id, { status: "syncing", errorMsg: null });
+      try {
+        const { error } = await supabaseClient.rpc("enregistrer_mouvement_stock", {
+          p_piece_id: mvt.piece_id,
+          p_type: mvt.type_mouvement,
+          p_quantite: mvt.quantite,
+          p_motif: mvt.motif || null,
+        });
+        if (error) throw error;
+        removePendingMovement(mvt.id);
+        showToast(`Mouvement de stock (${mvt.piece_designation || "pièce"}) synchronisé.`, "success");
+      } catch (err) {
+        updatePendingMovement(mvt.id, { status: "error", errorMsg: friendlyError(err) });
+      }
+    }
+  } finally {
+    movementsSyncInProgress = false;
+    document.dispatchEvent(new CustomEvent("recouvra:pending-movements-updated"));
+  }
+}
+
+// ---------- Moteur de synchronisation des petites mises à jour ----------
+async function syncFieldUpdates() {
+  if (fieldUpdatesSyncInProgress) return;
+  fieldUpdatesSyncInProgress = true;
+  try {
+    const updates = getFieldUpdates()
+      .filter((u) => u.status === "pending" || u.status === "error")
+      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+    for (const upd of updates) {
+      try {
+        const { error } = await supabaseClient.from(upd.table).update(upd.patch).eq("id", upd.recordId);
+        if (error) throw error;
+        removeFieldUpdate(upd.id);
+        if (upd.label) showToast(`${upd.label} synchronisé.`, "success");
+      } catch (err) {
+        const all = getFieldUpdates();
+        const idx = all.findIndex((u) => u.id === upd.id);
+        if (idx !== -1) {
+          all[idx].status = "error";
+          all[idx].errorMsg = friendlyError(err);
+          saveFieldUpdates(all);
+        }
+      }
+    }
+  } finally {
+    fieldUpdatesSyncInProgress = false;
+    document.dispatchEvent(new CustomEvent("recouvra:pending-updates-updated"));
+  }
+}
+
+// ----------------------------------------------------------------------------
+// 11. RECHERCHE D'ARTICLE (composant réutilisable)
+// ----------------------------------------------------------------------------
+let pieceSearchGlobalListenerAdded = false;
+function ensurePieceSearchGlobalListener() {
+  if (pieceSearchGlobalListenerAdded) return;
+  pieceSearchGlobalListenerAdded = true;
+  document.addEventListener("mousedown", (e) => {
+    document.querySelectorAll(".piece-search-results.open").forEach((results) => {
+      const container = results.closest(".piece-search");
+      if (container && !container.contains(e.target)) {
+        results.classList.remove("open");
+        results.innerHTML = "";
+      }
+    });
+  });
+}
+
+function initPieceSearch(container, pieces, { onSelect, getStockLabel } = {}) {
+  ensurePieceSearchGlobalListener();
+  const input = container.querySelector(".piece-search-input");
+  const results = container.querySelector(".piece-search-results");
+  let filtered = [];
+  let activeIndex = -1;
+  let selected = null;
+
+  const canonicalText = (p) => `${p.designation} (${p.reference_oem})`;
+  const stockValue = (p) => (getStockLabel ? getStockLabel(p) : p.quantite_stock);
+
+  function matches(p, q) {
+    const hay = `${p.designation} ${p.reference_oem} ${p.reference_interne} ${p.marque || ""}`.toLowerCase();
+    return hay.includes(q);
+  }
+
+  function renderResults() {
+    if (filtered.length === 0) {
+      results.innerHTML = `<div class="piece-search-empty">Aucune pièce trouvée.</div>`;
+    } else {
+      const shown = filtered.slice(0, 50);
+      results.innerHTML = shown
+        .map((p, i) => {
+          const stock = stockValue(p);
+          const stockClass =
+            stock <= 0 ? "badge-danger" : stock <= (p.seuil_alerte ?? 0) ? "badge-warn" : "badge-success";
+          return `
+        <div class="piece-search-item ${i === activeIndex ? "active" : ""}" data-idx="${i}">
+          <div class="psi-desig">${esc(p.designation)}</div>
+          <div class="psi-meta">${esc(p.reference_oem)}${p.marque ? " · " + esc(p.marque) : ""} · <span class="badge ${stockClass}">stock : ${stock}</span></div>
+        </div>`;
+        })
+        .join("") +
+        (filtered.length > shown.length
+          ? `<div class="piece-search-empty">… affine ta recherche (${filtered.length} résultats)</div>`
+          : "");
+    }
+    results.classList.add("open");
+  }
+
+  function open(query) {
+    const q = (query || "").trim().toLowerCase();
+    filtered = q ? pieces.filter((p) => matches(p, q)) : pieces.slice();
+    activeIndex = -1;
+    renderResults();
+  }
+
+  function close() {
+    results.classList.remove("open");
+    results.innerHTML = "";
+  }
+
+  function select(p) {
+    selected = p;
+    input.value = canonicalText(p);
+    close();
+    if (onSelect) onSelect(p);
+  }
+
+  function scrollActiveIntoView() {
+    results.querySelector(".piece-search-item.active")?.scrollIntoView({ block: "nearest" });
+  }
+
+  input.addEventListener("focus", () => open(selected ? "" : input.value));
+  input.addEventListener("input", () => {
+    if (selected && input.value !== canonicalText(selected)) {
+      selected = null;
+      if (onSelect) onSelect(null);
+    }
+    open(input.value);
+  });
+  input.addEventListener("keydown", (e) => {
+    if (!results.classList.contains("open")) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      activeIndex = Math.min(activeIndex + 1, filtered.length - 1);
+      renderResults();
+      scrollActiveIntoView();
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      activeIndex = Math.max(activeIndex - 1, 0);
+      renderResults();
+      scrollActiveIntoView();
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (activeIndex >= 0 && filtered[activeIndex]) select(filtered[activeIndex]);
+    } else if (e.key === "Escape") {
+      close();
+    }
+  });
+  results.addEventListener("mousedown", (e) => {
+    const item = e.target.closest(".piece-search-item");
+    if (!item) return;
+    e.preventDefault();
+    const idx = Number(item.dataset.idx);
+    if (filtered[idx]) select(filtered[idx]);
+  });
+  input.addEventListener("blur", () => {
+    setTimeout(() => {
+      if (!selected) input.value = "";
+      close();
+    }, 120);
+  });
+
+  return {
+    setPieces(newPieces) {
+      pieces = newPieces;
+    },
+    getSelected() {
+      return selected;
+    },
+    setSelected(p) {
+      selected = p;
+      input.value = p ? canonicalText(p) : "";
+    },
+    clear() {
+      selected = null;
+      input.value = "";
+      close();
+    },
+  };
+}
+
+// ----------------------------------------------------------------------------
+// 12. GESTION DES PLANS ET LIMITES
+// ----------------------------------------------------------------------------
+async function getCurrentPlan() {
+  const cachedPlan = readLocal("recouvra_plan", null);
+  if (cachedPlan && cachedPlan.code) return cachedPlan;
+
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) return null;
+
+  const { data: profile } = await supabaseClient
+    .from("profiles")
+    .select("entreprises(subscriptions(status, plans(code, prix_mensuel, max_articles, max_users, has_recouvra)))")
+    .eq("id", session.user.id)
+    .maybeSingle();
+
+  const sub = profile?.entreprises?.subscriptions;
+  if (!sub || sub.status !== "active") return null;
+
+  if (sub.plans) writeLocal("recouvra_plan", sub.plans);
+  return sub.plans || null;
+}
+
+async function canAddArticle() {
+  const plan = await getCurrentPlan();
+  if (!plan) return { ok: false, message: "Abonnement inactif." };
+  if (plan.max_articles === null || plan.max_articles === undefined) return { ok: true };
+
+  const { data, error } = await supabaseClient
+    .from("pieces")
+    .select("id", { count: "exact", head: true })
+    .eq("actif", true);
+  if (error) return { ok: false, message: error.message };
+  const count = data?.length || 0;
+  if (count >= plan.max_articles) {
+    return {
+      ok: false,
+      message: `Vous avez atteint la limite de ${plan.max_articles} articles du plan ${plan.nom}. Passez au plan supérieur pour en ajouter.`,
+    };
+  }
+  return { ok: true };
+}
+
+async function canAddUser() {
+  const plan = await getCurrentPlan();
+  if (!plan) return { ok: false, message: "Abonnement inactif." };
+  if (plan.max_users === null || plan.max_users === undefined) return { ok: true };
+
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) return { ok: false, message: "Non connecté." };
+
+  const { data: profile } = await supabaseClient
+    .from("profiles")
+    .select("entreprise_id")
+    .eq("id", session.user.id)
+    .single();
+
+  const { count } = await supabaseClient
+    .from("profiles")
+    .select("id", { count: "exact", head: true })
+    .eq("entreprise_id", profile.entreprise_id);
+
+  if (count >= plan.max_users) {
+    return {
+      ok: false,
+      message: `Le plan ${plan.nom} autorise ${plan.max_users} utilisateur(s). Passez au plan supérieur pour ajouter des employés.`,
+    };
+  }
+  return { ok: true };
+}
+
+// ----------------------------------------------------------------------------
+// 13. SUPPORT ET ADMIN (liens dynamiques)
+// ----------------------------------------------------------------------------
+function addSupportLinkToSidebar() {
+  const sidebar = document.querySelector(".sidebar");
+  if (!sidebar) return;
+  if (sidebar.querySelector(".support-link")) return;
+
+  const footer = sidebar.querySelector(".sidebar-footer");
+  if (!footer) return;
+
+  const supportLink = document.createElement("a");
+  supportLink.href = "https://wa.me/221770338030?text=Bonjour%2C%20j%27ai%20besoin%20d%27aide%20avec%20Recouvra";
+  supportLink.target = "_blank";
+  supportLink.className = "support-link";
+  supportLink.innerHTML = `
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.019-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+        <span>Support WhatsApp</span>
+    `;
+  footer.insertBefore(supportLink, footer.firstChild);
+}
+
+async function addAdminLinkIfSuperAdmin() {
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) return;
+    const { data: profile } = await supabaseClient
+      .from("profiles")
+      .select("role")
+      .eq("id", session.user.id)
+      .single();
+    if (profile?.role !== "super_admin") return;
+
+    const sidebar = document.querySelector(".sidebar");
+    if (!sidebar || sidebar.querySelector(".admin-nav-link")) return;
+
+    const adminLink = document.createElement("a");
+    adminLink.href = "super-admin.html";
+    adminLink.className = "nav-link admin-nav-link";
+    adminLink.innerHTML = '<span class="nav-emoji">🔐</span> <span>Administration</span>';
+
+    const sections = sidebar.querySelectorAll(".nav-section");
+    if (sections.length >= 3) {
+      sections[2].appendChild(adminLink);
+    } else {
+      const footer = sidebar.querySelector(".sidebar-footer");
+      footer?.before(adminLink);
+    }
+  } catch (error) {
+    console.error("Erreur vérification admin:", error);
+  }
+}
+
+// ----------------------------------------------------------------------------
+// 14. NAVIGATION MOBILE (barre en bas)
+// ----------------------------------------------------------------------------
+function createGlobalNav() {
+  if (document.querySelector(".global-nav")) return;
+  const nav = document.createElement("nav");
+  nav.className = "global-nav";
+  const currentPage = window.location.pathname.split("/").pop() || "index.html";
+  // Correction (audit V3 — refonte visuelle) : le lien "Articles" pointait
+  // vers catalogue.html, une page qui n'existe pas dans le projet (héritage
+  // d'une ancienne version où catalogue et stock étaient deux pages
+  // séparées, avant leur fusion dans stock.html). Cliquer dessus donnait un
+  // lien mort sur mobile. Retiré : "Stock" (stock.html) couvre déjà la
+  // gestion des articles via son onglet "Produits".
+  const links = [
+    { key: "index", label: "Accueil", href: "index.html", icon: "🏠" },
+    { key: "factures", label: "Vendre", href: "factures.html", icon: "🧾" },
+    { key: "clients", label: "Clients", href: "clients.html", icon: "👥" },
+    { key: "stock", label: "Stock", href: "stock.html", icon: "📊" },
+    { key: "credits", label: "Crédits", href: "credits.html", icon: "💸" },
+    { key: "recouvra", label: "Recouvra", href: "recouvra.html", icon: "📣" },
+  ];
+  nav.innerHTML = `<div class="global-nav-links">${links
+    .map(
+      (link) => `
+        <a class="global-nav-link ${link.href === currentPage ? "active" : ""}" href="${link.href}">
+            <span class="global-nav-icon">${link.icon}</span>
+            <span class="global-nav-text">${link.label}</span>
+        </a>`
+    )
+    .join("")}</div>`;
+  document.body.appendChild(nav);
+}
+
+async function addAdminToGlobalNav() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) return;
+  const { data: profile } = await supabaseClient.from("profiles").select("role").eq("id", session.user.id).single();
+  if (profile?.role !== "super_admin") return;
+
+  const nav = document.querySelector(".global-nav-links");
+  if (!nav || nav.querySelector(".global-nav-link[href='super-admin.html']")) return;
+
+  const adminLink = document.createElement("a");
+  adminLink.href = "super-admin.html";
+  adminLink.className = "global-nav-link";
+  adminLink.innerHTML = '<span class="global-nav-icon">🔐</span><span class="global-nav-text">Admin</span>';
+  nav.appendChild(adminLink);
+}
+
+// ----------------------------------------------------------------------------
+// 14bis. UTILITAIRES SUPABASE PARTAGÉS (ajoutés lors de l'audit V2 : ces deux
+// fonctions étaient appelées par rupture-stock.js et super-admin.js mais
+// n'existaient nulle part dans le projet, ce qui cassait silencieusement
+// ces deux fonctionnalités).
+// ----------------------------------------------------------------------------
+
+// Récupère toutes les lignes d'une requête en paginant par lots de 1000
+// (limite par défaut de PostgREST/Supabase). `queryBuilderFn` doit être une
+// fonction qui RENVOIE un nouveau query builder à chaque appel (sans .range()),
+// car .range() doit être appliqué sur un builder frais à chaque page.
+async function fetchAllRows(queryBuilderFn, pageSize = 1000) {
+  let allRows = [];
+  let from = 0;
+  while (true) {
+    const { data, error } = await queryBuilderFn().range(from, from + pageSize - 1);
+    if (error) return { data: null, error };
+    allRows = allRows.concat(data || []);
+    if (!data || data.length < pageSize) break;
+    from += pageSize;
+  }
+  return { data: allRows, error: null };
+}
+
+// Génère une URL signée temporaire pour un fichier privé dans un bucket
+// Supabase Storage (ex: preuves de paiement, dont le bucket n'est pas public).
+async function getStorageUrl(bucket, path, expiresIn = 3600) {
+  if (!path) return null;
+  if (/^https?:\/\//.test(path)) return path;
+  const { data, error } = await supabaseClient.storage.from(bucket).createSignedUrl(path, expiresIn);
+  if (error) {
+    console.error("Erreur génération URL storage:", error);
+    return null;
+  }
+  return data?.signedUrl || null;
+}
+
+// ----------------------------------------------------------------------------
+// 15. PARAMÈTRES ENTREPRISE (branding)
+// ----------------------------------------------------------------------------
+let companySettingsPromise;
+async function getCompanySettings() {
+  if (!companySettingsPromise) {
+    companySettingsPromise = currentProfile().then(async (profile) => {
+      if (!profile?.entreprise_id) return null;
+      const { data } = await supabaseClient
+        .from("entreprise_settings")
+        .select("*")
+        .eq("entreprise_id", profile.entreprise_id)
+        .maybeSingle();
+      if (!data) return null;
+      if (data.logo_path && !data.logo_path.startsWith("http")) {
+        const { data: signed } = await supabaseClient.storage
+          .from("company-logos")
+          .createSignedUrl(data.logo_path, 3600);
+        data.logo_url = signed?.signedUrl || null;
+      } else data.logo_url = data.logo_path;
+      return data;
+    });
+  }
+  return companySettingsPromise;
+}
+
+async function applyCompanySettings() {
+  const settings = await getCompanySettings();
+  if (!settings) return;
+  if (settings.primary_color) document.documentElement.style.setProperty("--accent", settings.primary_color);
+  if (settings.secondary_color) document.documentElement.style.setProperty("--secondary", settings.secondary_color);
+  document.querySelectorAll("[data-company-name]").forEach((el) => {
+    el.textContent = settings.nom_commercial || "Entreprise";
+  });
+  document.querySelectorAll(".global-nav-mark").forEach((mark) => {
+    mark.textContent = (settings.nom_commercial || "Entreprise").trim().charAt(0).toUpperCase();
+  });
+  if (settings.logo_url) document.querySelectorAll("[data-company-logo]").forEach((img) => (img.src = settings.logo_url));
+  if (settings.nom_commercial && document.title.includes(" — ")) {
+    document.title = document.title.split(" — ")[0] + " — " + settings.nom_commercial;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// 16. FONCTIONS DIVERSES
+// ----------------------------------------------------------------------------
+function money(value) {
+  return `${Number(value || 0).toLocaleString("fr-FR")} F`;
+}
+function date(value) {
+  return value ? new Date(value).toLocaleDateString("fr-FR") : "-";
+}
+
+// ----------------------------------------------------------------------------
+// 17. INITIALISATION GLOBALE
+// ----------------------------------------------------------------------------
+document.addEventListener("DOMContentLoaded", () => {
+  initDarkMode();
+  addSupportLinkToSidebar();
+  addAdminLinkIfSuperAdmin();
+  createGlobalNav();
+  addAdminToGlobalNav();
+  applyCompanySettings();
+});
+
+// Handle connectivity events globally
+window.addEventListener("online", () => {
+  document.dispatchEvent(new CustomEvent("recouvra:connectivity-changed", { detail: { online: true } }));
+});
+window.addEventListener("offline", () => {
+  document.dispatchEvent(new CustomEvent("recouvra:connectivity-changed", { detail: { online: false } }));
+});
+
+// Initialiser la connectivité si la session est déjà chargée
+if (document.readyState === "complete") {
+  initConnectivity();
+} else {
+  document.addEventListener("DOMContentLoaded", initConnectivity);
+}
