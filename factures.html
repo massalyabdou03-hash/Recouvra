@@ -326,7 +326,17 @@ async function saveQuickClient(e) {
 }
 
 // ---------- Validation de la vente ----------
+let saleInProgress = false;
+
 async function completeSale(modePaiement) {
+    // Correction (audit V3) : chaque bouton de paiement (Espèces, Wave,
+    // Orange Money, Crédit) ne désactivait QUE lui-même pendant la vente.
+    // Rien n'empêchait de cliquer un AUTRE bouton pendant que le premier
+    // clic était encore en cours de traitement, ce qui pouvait vendre le
+    // même panier deux fois (deux factures, double déduction du stock).
+    // Le verrou global est posé seulement après les validations, et TOUJOURS
+    // levé dans le bloc finally, quel que soit le chemin de sortie.
+    if (saleInProgress) return;
     if (cart.length === 0) { showToast('Ajoutez des articles au panier.', 'error'); return; }
     if (!isPassingClient && !selectedClientId) { showToast('Sélectionnez un client ou utilisez "Client de passage".', 'error'); return; }
     for (const item of cart) {
@@ -336,9 +346,20 @@ async function completeSale(modePaiement) {
             return;
         }
     }
+
+    saleInProgress = true;
+    const allPayButtons = document.querySelectorAll('.pay-button');
+    allPayButtons.forEach(b => b.disabled = true);
+
     const total = cart.reduce((s, item) => s + (item.prix * item.quantity), 0);
     const btn = document.querySelector(`.pay-button.${modePaiement.toLowerCase()}`);
-    if (btn) { btn.disabled = true; btn.textContent = '...'; }
+    // Correction (audit V3) : les boutons contiennent une icône + un libellé
+    // (innerHTML), mais le code écrasait ça avec `textContent = '...'` et
+    // tentait de restaurer un `dataset.originalText` qui n'était jamais
+    // défini nulle part — le bouton restait donc bloqué sur "..." après
+    // chaque vente. On sauvegarde et restaure désormais le vrai innerHTML.
+    const btnOriginalHtml = btn ? btn.innerHTML : null;
+    if (btn) { btn.innerHTML = '...'; }
     try {
         let clientId = selectedClientId;
         if (isPassingClient) {
@@ -347,6 +368,7 @@ async function completeSale(modePaiement) {
             else {
                 const { data: created } = await supabaseClient.from('clients').insert({ nom: 'Client de passage' }).select('id').single();
                 clientId = created.id;
+
             }
         }
         const { data: facture, error: errFacture } = await supabaseClient
@@ -386,8 +408,9 @@ async function completeSale(modePaiement) {
         console.error('Erreur vente:', error);
         showToast(friendlyError(error), 'error');
     } finally {
-        const btn = document.querySelector(`.pay-button.${modePaiement.toLowerCase()}`);
-        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || btn.textContent; }
+        saleInProgress = false;
+        allPayButtons.forEach(b => b.disabled = false);
+        if (btn && btnOriginalHtml !== null) { btn.innerHTML = btnOriginalHtml; }
     }
 }
 

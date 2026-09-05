@@ -3,16 +3,19 @@
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Vérifier si l'utilisateur a déjà complété l'onboarding
+    // Vérifier si l'utilisateur a déjà complété l'onboarding.
+    // Correction (audit V2) : `profiles.onboarding_complete` n'existe pas
+    // dans le schéma — le vrai champ est `entreprises.onboarding_completed_at`.
+    // Voir supabase/PROPOSED_fix_onboarding_rls.sql.
     try {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
-            const { data: profile, error } = await supabaseClient
+            const { data: profile } = await supabaseClient
                 .from('profiles')
-                .select('onboarding_complete')
+                .select('entreprise_id, entreprises(onboarding_completed_at)')
                 .eq('id', session.user.id)
                 .single();
-            if (profile?.onboarding_complete === true) {
+            if (profile?.entreprises?.onboarding_completed_at) {
                 window.location.href = 'index.html';
                 return;
             }
@@ -149,63 +152,21 @@ function initOnboarding() {
                 return;
             }
 
-            const { error: profileError } = await supabaseClient
-                .from('profiles')
-                .update({
-                    type_commerce: selectedCommerce,
-                    besoins: selectedBesoins,
-                    plan_choisi: selectedPlan,
-                    onboarding_complete: true,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', session.user.id);
-            if (profileError) throw profileError;
-
-            const { data: profile } = await supabaseClient
-                .from('profiles')
-                .select('entreprise_id')
-                .eq('id', session.user.id)
-                .single();
-            if (profile?.entreprise_id) {
-                const now = new Date();
-                const end = new Date(now);
-                end.setMonth(end.getMonth() + 1);
-
-                const { data: existingSub } = await supabaseClient
-                    .from('subscriptions')
-                    .select('id')
-                    .eq('entreprise_id', profile.entreprise_id)
-                    .maybeSingle();
-
-                if (existingSub) {
-                    await supabaseClient
-                        .from('subscriptions')
-                        .update({
-                            status: 'active',
-                            plan: selectedPlan === 'recouvrement' ? 'recouvra_pro' : 'simple',
-                            current_period_start: now.toISOString(),
-                            current_period_end: end.toISOString(),
-                            updated_at: now.toISOString()
-                        })
-                        .eq('entreprise_id', profile.entreprise_id);
-                } else {
-                    await supabaseClient
-                        .from('subscriptions')
-                        .insert({
-                            entreprise_id: profile.entreprise_id,
-                            plan: selectedPlan === 'recouvrement' ? 'recouvra_pro' : 'simple',
-                            status: 'active',
-                            current_period_start: now.toISOString(),
-                            current_period_end: end.toISOString(),
-                            updated_at: now.toISOString()
-                        });
-                }
-
-                await supabaseClient
-                    .from('profiles')
-                    .update({ has_recouvra: true, updated_at: now.toISOString() })
-                    .eq('entreprise_id', profile.entreprise_id);
-            }
+            // Correction (audit V2) : l'ancien code faisait un UPDATE direct
+            // sur `profiles` avec des colonnes inexistantes (plan_choisi,
+            // onboarding_complete) ou situées sur la mauvaise table
+            // (type_commerce/besoins appartiennent à `entreprises`), et de
+            // toute façon bloqué par la policy RLS (seul super_admin peut
+            // modifier `profiles`). Tout est désormais fait côté serveur par
+            // une fonction dédiée qui ne touche que les champs autorisés
+            // pour l'entreprise de l'utilisateur courant.
+            // -> Nécessite l'application de supabase/PROPOSED_fix_onboarding_rls.sql
+            const { error } = await supabaseClient.rpc('complete_onboarding', {
+                p_type_commerce: selectedCommerce,
+                p_besoins: selectedBesoins,
+                p_plan_choisi: selectedPlan,
+            });
+            if (error) throw error;
 
             btn.textContent = '✅ C\'est parti !';
             btn.style.background = 'var(--success)';

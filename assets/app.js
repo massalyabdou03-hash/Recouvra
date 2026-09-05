@@ -217,7 +217,7 @@ async function requireRecouvra() {
     return null;
   }
   if (!profile?.has_recouvra && profile?.role !== "super_admin") {
-    document.body.innerHTML = `<main class="shell"><section class="panel access-panel"><span class="eyebrow">Module Premium</span><h1>Recouvra</h1><p>Le suivi des paiements et des relances n'est pas encore activé pour ce compte.</p><button class="button recouvra-cta" onclick="requestRecouvra()">Demander l'activation</button></section></main>`;
+    document.body.innerHTML = `<main class="shell"><section class="panel access-panel"><span class="eyebrow">Module Premium</span><h1>Recouvra</h1><p>Le suivi des paiements et des relances n'est pas encore activé pour ce compte.</p><button class="btn recouvra-cta" onclick="requestRecouvra()">Demander l'activation</button></section></main>`;
     return null;
   }
   return profile;
@@ -614,19 +614,39 @@ async function syncPendingSales() {
           updatePendingSale(sale.id, { client: { mode: "existing", id: clientId, nom: sale.client.nom } });
         }
 
-        const { data: facture, error: errFacture } = await supabaseClient
-          .from("factures")
-          .insert({ client_id: clientId, montant_total: sale.total })
-          .select()
-          .single();
-        if (errFacture) throw errFacture;
+        // Correction (audit V2) : si un essai précédent a déjà créé la
+        // facture mais échoué avant la validation (lignes ou RPC), on
+        // réutilise cette facture existante au lieu d'en recréer une
+        // nouvelle à chaque réessai (source de doublons sur connexion
+        // instable).
+        let factureId = sale.factureId;
+        if (!factureId) {
+          const { data: facture, error: errFacture } = await supabaseClient
+            .from("factures")
+            .insert({ client_id: clientId, montant_total: sale.total })
+            .select()
+            .single();
+          if (errFacture) throw errFacture;
+          factureId = facture.id;
+          updatePendingSale(sale.id, { factureId });
+        }
 
-        const lignesPayload = sale.lignes.map((l) => ({ ...l, facture_id: facture.id }));
-        const { error: errLignes } = await supabaseClient.from("factures_lignes").insert(lignesPayload);
-        if (errLignes) throw errLignes;
+        // Idem pour les lignes : on vérifie qu'elles n'existent pas déjà
+        // pour cette facture avant de les réinsérer.
+        const { count: existingLignesCount, error: errCheckLignes } = await supabaseClient
+          .from("factures_lignes")
+          .select("id", { count: "exact", head: true })
+          .eq("facture_id", factureId);
+        if (errCheckLignes) throw errCheckLignes;
+
+        if (!existingLignesCount) {
+          const lignesPayload = sale.lignes.map((l) => ({ ...l, facture_id: factureId }));
+          const { error: errLignes } = await supabaseClient.from("factures_lignes").insert(lignesPayload);
+          if (errLignes) throw errLignes;
+        }
 
         const { error: errValidation } = await supabaseClient.rpc("valider_facture", {
-          p_facture_id: facture.id,
+          p_facture_id: factureId,
           p_mode_paiement: sale.mode_paiement,
           p_echeance_type: sale.echeance_type || null,
         });
@@ -981,11 +1001,16 @@ function createGlobalNav() {
   const nav = document.createElement("nav");
   nav.className = "global-nav";
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
+  // Correction (audit V3 — refonte visuelle) : le lien "Articles" pointait
+  // vers catalogue.html, une page qui n'existe pas dans le projet (héritage
+  // d'une ancienne version où catalogue et stock étaient deux pages
+  // séparées, avant leur fusion dans stock.html). Cliquer dessus donnait un
+  // lien mort sur mobile. Retiré : "Stock" (stock.html) couvre déjà la
+  // gestion des articles via son onglet "Produits".
   const links = [
     { key: "index", label: "Accueil", href: "index.html", icon: "🏠" },
     { key: "factures", label: "Vendre", href: "factures.html", icon: "🧾" },
     { key: "clients", label: "Clients", href: "clients.html", icon: "👥" },
-    { key: "catalogue", label: "Articles", href: "catalogue.html", icon: "📦" },
     { key: "stock", label: "Stock", href: "stock.html", icon: "📊" },
     { key: "credits", label: "Crédits", href: "credits.html", icon: "💸" },
     { key: "recouvra", label: "Recouvra", href: "recouvra.html", icon: "📣" },
@@ -1016,6 +1041,43 @@ async function addAdminToGlobalNav() {
   adminLink.className = "global-nav-link";
   adminLink.innerHTML = '<span class="global-nav-icon">🔐</span><span class="global-nav-text">Admin</span>';
   nav.appendChild(adminLink);
+}
+
+// ----------------------------------------------------------------------------
+// 14bis. UTILITAIRES SUPABASE PARTAGÉS (ajoutés lors de l'audit V2 : ces deux
+// fonctions étaient appelées par rupture-stock.js et super-admin.js mais
+// n'existaient nulle part dans le projet, ce qui cassait silencieusement
+// ces deux fonctionnalités).
+// ----------------------------------------------------------------------------
+
+// Récupère toutes les lignes d'une requête en paginant par lots de 1000
+// (limite par défaut de PostgREST/Supabase). `queryBuilderFn` doit être une
+// fonction qui RENVOIE un nouveau query builder à chaque appel (sans .range()),
+// car .range() doit être appliqué sur un builder frais à chaque page.
+async function fetchAllRows(queryBuilderFn, pageSize = 1000) {
+  let allRows = [];
+  let from = 0;
+  while (true) {
+    const { data, error } = await queryBuilderFn().range(from, from + pageSize - 1);
+    if (error) return { data: null, error };
+    allRows = allRows.concat(data || []);
+    if (!data || data.length < pageSize) break;
+    from += pageSize;
+  }
+  return { data: allRows, error: null };
+}
+
+// Génère une URL signée temporaire pour un fichier privé dans un bucket
+// Supabase Storage (ex: preuves de paiement, dont le bucket n'est pas public).
+async function getStorageUrl(bucket, path, expiresIn = 3600) {
+  if (!path) return null;
+  if (/^https?:\/\//.test(path)) return path;
+  const { data, error } = await supabaseClient.storage.from(bucket).createSignedUrl(path, expiresIn);
+  if (error) {
+    console.error("Erreur génération URL storage:", error);
+    return null;
+  }
+  return data?.signedUrl || null;
 }
 
 // ----------------------------------------------------------------------------
