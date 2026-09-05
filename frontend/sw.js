@@ -23,7 +23,6 @@ const SHELL_ASSETS = [
   "login.html",
   "onboarding.html",
   "index.html",
-  "catalogue.html",
   "stock.html",
   "rupture-stock.html",
   "factures.html",
