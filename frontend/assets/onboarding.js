@@ -1,0 +1,279 @@
+// ============================================================
+// ONBOARDING — Script complet avec animations
+// ============================================================
+
+document.addEventListener('DOMContentLoaded', async () => {
+    // Vérifier si l'utilisateur a déjà complété l'onboarding
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            const { data: profile, error } = await supabaseClient
+                .from('profiles')
+                .select('onboarding_complete')
+                .eq('id', session.user.id)
+                .single();
+            if (profile?.onboarding_complete === true) {
+                // Déjà fait → rediriger vers l'accueil
+                window.location.href = 'index.html';
+                return;
+            }
+        }
+    } catch (e) {
+        console.warn('Erreur vérification onboarding:', e);
+    }
+
+    // Si on arrive ici, l'onboarding n'a pas été complété
+    initOnboarding();
+});
+
+function initOnboarding() {
+    // Éléments DOM
+    const steps = document.querySelectorAll('.onboarding-step');
+    const progressDots = document.querySelectorAll('.onboarding-progress i');
+    const finishBtn = document.getElementById('finish-btn');
+    const msgEl = document.getElementById('onboarding-msg');
+
+    let currentStep = 1;
+    let selectedCommerce = null;
+    let selectedBesoins = [];
+    let selectedPlan = null;
+
+    // ---------- Fonction pour changer d'étape avec animation ----------
+    window.goToStep = function(step) {
+        if (step < 1 || step > steps.length) return;
+        if (step === 3 && !selectedCommerce) {
+            showMessage('Veuillez sélectionner votre type de commerce.', 'warning');
+            return;
+        }
+        const currentEl = document.querySelector(`.onboarding-step[data-step="${currentStep}"]`);
+        if (currentEl) {
+            currentEl.style.transition = 'opacity 0.25s ease, transform 0.3s ease';
+            currentEl.style.opacity = '0';
+            currentEl.style.transform = 'translateX(-20px)';
+        }
+
+        progressDots.forEach((dot, idx) => {
+            dot.className = '';
+            if (idx + 1 === step) dot.classList.add('active');
+            else if (idx + 1 < step) dot.classList.add('done');
+        });
+
+        setTimeout(() => {
+            steps.forEach(s => s.hidden = true);
+            const newEl = document.querySelector(`.onboarding-step[data-step="${step}"]`);
+            if (newEl) {
+                newEl.hidden = false;
+                newEl.style.opacity = '0';
+                newEl.style.transform = 'translateX(20px)';
+                requestAnimationFrame(() => {
+                    newEl.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    newEl.style.opacity = '1';
+                    newEl.style.transform = 'translateX(0)';
+                });
+            }
+            currentStep = step;
+        }, 300);
+    };
+
+    // ---------- Gestion des choix (type de commerce) ----------
+    document.querySelectorAll('#commerce-choices .onboarding-choice').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('#commerce-choices .onboarding-choice').forEach(b => b.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedCommerce = this.dataset.value;
+            document.getElementById('step2-next').disabled = false;
+            this.style.transition = 'background 0.2s';
+            this.style.background = 'var(--accent-dim)';
+            setTimeout(() => this.style.background = '', 300);
+        });
+    });
+
+    // ---------- Gestion des choix multiples (besoins) ----------
+    document.querySelectorAll('#besoins-choices .onboarding-choice').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.classList.toggle('selected');
+            const val = this.dataset.value;
+            if (this.classList.contains('selected')) {
+                if (!selectedBesoins.includes(val)) selectedBesoins.push(val);
+                this.style.transition = 'transform 0.15s';
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => this.style.transform = '', 150);
+            } else {
+                selectedBesoins = selectedBesoins.filter(v => v !== val);
+            }
+            updateValueBlocks();
+        });
+    });
+
+    // ---------- Sélection du plan ----------
+    window.selectPlan = function(plan, element) {
+        document.querySelectorAll('.pricing-option').forEach(el => el.classList.remove('selected'));
+        element.classList.add('selected');
+        selectedPlan = plan;
+        element.style.transition = 'transform 0.2s';
+        element.style.transform = 'scale(1.02)';
+        setTimeout(() => element.style.transform = '', 200);
+    };
+
+    // ---------- Affichage des besoins sélectionnés (étape 3) ----------
+    function updateValueBlocks() {
+        const container = document.getElementById('value-blocks');
+        if (!container) {
+            console.error('❌ #value-blocks introuvable');
+            return;
+        }
+        if (selectedBesoins.length === 0) {
+            container.innerHTML = '';
+            return;
+        }
+        const labels = {
+            stock: '📦 Gestion de stock',
+            facturation: '🧾 Facturation',
+            paiements: '💳 Paiements',
+            credits: '🤝 Crédits clients',
+            recouvrement: '📣 Recouvrement',
+            clients: '👥 Gestion clients'
+        };
+        container.innerHTML = `
+            <div style="display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 12px;">
+                ${selectedBesoins.map(b => `<span class="badge besoin-badge">${labels[b] || b}</span>`).join('')}
+            </div>
+        `;
+        // Animation d'apparition
+        container.style.transition = 'opacity 0.2s';
+        container.style.opacity = '0';
+        requestAnimationFrame(() => {
+            container.style.opacity = '1';
+        });
+    }
+
+    // ---------- Gestion du message ----------
+    function showMessage(text, type = 'info') {
+        if (!msgEl) return;
+        msgEl.textContent = text;
+        msgEl.style.color = type === 'error' ? 'var(--danger)' : 'var(--info)';
+        msgEl.style.transition = 'opacity 0.2s';
+        msgEl.style.opacity = '0';
+        requestAnimationFrame(() => msgEl.style.opacity = '1');
+    }
+
+    function clearMessage() {
+        if (msgEl) msgEl.textContent = '';
+    }
+
+    // ---------- Démarrer l'essai gratuit ----------
+    window.startTrial = async function() {
+        clearMessage();
+        if (!selectedCommerce) {
+            showMessage('Veuillez sélectionner votre type de commerce.', 'error');
+            return;
+        }
+        if (!selectedPlan) {
+            showMessage('Veuillez choisir un plan mensuel.', 'error');
+            return;
+        }
+
+        const btn = document.getElementById('finish-btn');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = '⏳ Activation...';
+
+        try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Mise à jour du profil
+            const { error: profileError } = await supabaseClient
+                .from('profiles')
+                .update({
+                    type_commerce: selectedCommerce,
+                    besoins: selectedBesoins,
+                    plan_choisi: selectedPlan,
+                    onboarding_complete: true,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', session.user.id);
+            if (profileError) throw profileError;
+
+            // Récupérer l'entreprise_id
+            const { data: profile, error: fetchError } = await supabaseClient
+                .from('profiles')
+                .select('entreprise_id')
+                .eq('id', session.user.id)
+                .single();
+            if (fetchError) throw fetchError;
+
+            if (profile?.entreprise_id) {
+                const now = new Date();
+                const end = new Date(now);
+                end.setMonth(end.getMonth() + 1);
+
+                const { data: existingSub } = await supabaseClient
+                    .from('subscriptions')
+                    .select('id')
+                    .eq('entreprise_id', profile.entreprise_id)
+                    .maybeSingle();
+
+                if (existingSub) {
+                    await supabaseClient
+                        .from('subscriptions')
+                        .update({
+                            status: 'active',
+                            plan: selectedPlan === 'recouvrement' ? 'recouvra_pro' : 'simple',
+                            current_period_start: now.toISOString(),
+                            current_period_end: end.toISOString(),
+                            updated_at: now.toISOString()
+                        })
+                        .eq('entreprise_id', profile.entreprise_id);
+                } else {
+                    await supabaseClient
+                        .from('subscriptions')
+                        .insert({
+                            entreprise_id: profile.entreprise_id,
+                            plan: selectedPlan === 'recouvrement' ? 'recouvra_pro' : 'simple',
+                            status: 'active',
+                            current_period_start: now.toISOString(),
+                            current_period_end: end.toISOString(),
+                            updated_at: now.toISOString()
+                        });
+                }
+
+                await supabaseClient
+                    .from('profiles')
+                    .update({ has_recouvra: true, updated_at: now.toISOString() })
+                    .eq('entreprise_id', profile.entreprise_id);
+            }
+
+            btn.textContent = '✅ C\'est parti !';
+            btn.style.background = 'var(--success)';
+            btn.style.color = '#fff';
+
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+
+        } catch (error) {
+            console.error('Erreur startTrial :', error);
+            showMessage('Erreur : ' + (error.message || 'Veuillez réessayer.'), 'error');
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
+    };
+
+    // ---------- Initialisation : première étape ----------
+    steps.forEach((s, idx) => {
+        if (idx === 0) {
+            s.hidden = false;
+            s.style.opacity = '1';
+            s.style.transform = 'translateX(0)';
+        } else {
+            s.hidden = true;
+        }
+    });
+    progressDots.forEach((dot, idx) => {
+        dot.className = idx === 0 ? 'active' : '';
+    });
+}
