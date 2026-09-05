@@ -1,37 +1,74 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Détail facture — Entreprise</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
-<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#4F46E5"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Recouvra"><link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
-<link rel="stylesheet" href="assets/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail facture — Recouvra</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Recouvra">
+    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+    <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
+
 <div class="app">
-  <nav class="sidebar no-print">
-    <div class="brand"><img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo"> <span data-company-name>Entreprise</span></div>
-    <a class="nav-link" href="index.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> Tableau de bord</a>
-    <a class="nav-link" href="stock.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v18"/><path d="M4 7l4-4 4 4"/><path d="M16 21V3"/><path d="M20 17l-4 4-4-4"/></svg> Mouvements stock</a>
-    <a class="nav-link" href="rupture-stock.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 17h.01"/></svg> Ruptures de stock</a>
-    <a class="nav-link active" href="factures.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v19l-3-2-3 2-3-2-3 2V2z"/><path d="M9 8h6M9 12h6"/></svg> Factures</a>
-    <a class="nav-link" href="credits.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg> Emprunts</a>
-    <a class="nav-link" href="clients.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Clients</a>
-    <div class="sidebar-footer">
-      <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
-      <button class="btn-logout" onclick="logout()">Déconnexion</button>
-    </div>
-  </nav>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="brand">
+            <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
+            <span data-company-name>Recouvra</span>
+        </div>
 
-  <main class="main">
-    <div class="topbar no-print">
-      <div><a href="factures.html" class="btn-back"><span class="arrow">←</span> Retour aux factures</a></div>
-    </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Quotidien</div>
+            <a href="index.html" class="nav-link"><span class="nav-emoji">🏠</span> Accueil</a>
+            <a href="factures.html" class="nav-link"><span class="nav-emoji">🧾</span> Vendre</a>
+            <a href="clients.html" class="nav-link"><span class="nav-emoji">👥</span> Mes Clients</a>
+        </div>
 
-    <div id="content">Chargement...</div>
-  </main>
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Stock</div>
+            <a href="stock.html" class="nav-link"><span class="nav-emoji">📊</span> Stock & Produits</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Argent</div>
+            <a href="credits.html" class="nav-link"><span class="nav-emoji">💸</span> On me doit</a>
+            <a href="recouvra.html" class="nav-link premium"><span class="nav-emoji">📣</span> Relancer <span class="badge-premium">PRO</span></a>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;">
+                <span id="dark-mode-icon">🌙</span> <span id="dark-mode-label">Mode sombre</span>
+            </button>
+            <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
+            <button class="btn-logout" onclick="logout()">Déconnexion</button>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="main">
+        <div class="topbar no-print">
+            <div><a href="factures.html" class="btn-back"><span class="arrow">←</span> Retour aux factures</a></div>
+        </div>
+
+        <div id="content">Chargement...</div>
+    </main>
 </div>
+
+<!-- Barre de navigation mobile (générée par app.js) -->
+<nav class="global-nav no-print">
+    <a href="index.html" class="global-nav-link"><span class="global-nav-icon">🏠</span><span class="global-nav-text">Accueil</span></a>
+    <a href="factures.html" class="global-nav-link"><span class="global-nav-icon">🧾</span><span class="global-nav-text">Vendre</span></a>
+    <a href="clients.html" class="global-nav-link"><span class="global-nav-icon">👥</span><span class="global-nav-text">Clients</span></a>
+    <a href="stock.html" class="global-nav-link"><span class="global-nav-icon">📊</span><span class="global-nav-text">Stock</span></a>
+    <a href="credits.html" class="global-nav-link"><span class="global-nav-icon">💸</span><span class="global-nav-text">Crédits</span></a>
+</nav>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@4.2.1/dist/jspdf.umd.min.js"></script>
@@ -39,447 +76,564 @@
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
 <script>
+// ============================================================================
+// FACTURE DETAIL - Logique (utilise app.js)
+// ============================================================================
+
 const params = new URLSearchParams(window.location.search);
 const factureId = params.get("id");
 
-// Alimentées par loadFacture(), relues par la génération PDF (telechargerPDF/partagerPDF)
-// pour ne jamais refaire de requête réseau au moment du téléchargement.
 let currentFacture, currentLignes, currentSettings;
 
-function onModePaiementChange() {
-  const isCredit = document.getElementById("mode_paiement").value === "CREDIT";
-  document.getElementById("echeance-field").style.display = isCredit ? "block" : "none";
-}
+document.addEventListener('DOMContentLoaded', async () => {
+    const session = await requireAuth();
+    if (!session) return;
 
+    await loadFacture();
+
+    document.addEventListener('recouvra:connectivity-changed', loadFacture);
+    document.addEventListener('recouvra:pending-updates-updated', loadFacture);
+});
+
+// ---------- Chargement de la facture ----------
 async function loadFacture() {
-  const el = document.getElementById("content");
-  if (!factureId) { el.innerHTML = `<div class="error-msg">Facture introuvable.</div>`; return; }
-  const settings = await getCompanySettings() || {};
+    const el = document.getElementById("content");
+    if (!factureId) {
+        el.innerHTML = `<div class="error-msg">Facture introuvable.</div>`;
+        return;
+    }
 
-  let facture, lignes, offline = false, savedAt = null;
-  try {
-    const { data: f, error } = await supabaseClient
-      .from("factures").select("*, clients(nom, telephone, email, adresse)").eq("id", factureId).single();
-    if (error || !f) throw error || new Error("introuvable");
-    const { data: l } = await supabaseClient.from("factures_lignes").select("*").eq("facture_id", factureId);
-    facture = f; lignes = l || [];
-    cacheCollection(`facture_${factureId}`, { facture, lignes });
-  } catch {
-    const cached = getCachedCollection(`facture_${factureId}`);
-    if (!cached.savedAt) { el.innerHTML = `<div class="error-msg">Facture introuvable. ${appIsOnline ? "" : "Hors ligne et jamais consultée sur ce poste : reconnecte-toi une fois pour la mettre en cache."}</div>`; return; }
-    facture = cached.items.facture; lignes = cached.items.lignes;
-    offline = true; savedAt = cached.savedAt;
-  }
-  [facture] = applyPendingFieldUpdates("factures", [facture]);
-  if (offline && savedAt) showToast(`Facture hors ligne : données du ${fmtDateTime(savedAt)}.`, "info");
-  currentFacture = facture; currentLignes = lignes; currentSettings = settings;
+    const settings = await getCompanySettings() || {};
+    let facture, lignes, offline = false, savedAt = null;
 
-  const badgeClass = { BROUILLON: "badge-muted", VALIDEE: "badge-success", ANNULEE: "badge-danger" };
+    try {
+        const { data: f, error } = await supabaseClient
+            .from("factures")
+            .select("*, clients(nom, telephone, email, adresse)")
+            .eq("id", factureId)
+            .single();
+        if (error || !f) throw error || new Error("introuvable");
 
-  el.innerHTML = `
-    <div class="card">
-      <div class="invoice-header">
-        <div class="ih-logo">
-          <img src="${esc(settings.logo_url || settings.logo_path || "assets/img/icon.svg")}" alt="${esc(settings.nom_commercial || "Entreprise")}">
-          <div>
-            <div class="ih-name">${esc(settings.nom_commercial || "Entreprise")}</div>
-            <div class="ih-sub">${esc(settings.adresse || "")}</div>
-          </div>
-        </div>
-        <div class="ih-contact">
-          ${settings.telephone ? `<div><strong>Téléphone :</strong> ${esc(settings.telephone)}</div>` : ""}
-          ${settings.email ? `<div>${esc(settings.email)}</div>` : ""}
-          ${settings.identifiant_fiscal ? `<div>${esc(settings.identifiant_fiscal)}</div>` : ""}
-        </div>
-      </div>
-      <div class="card-head">
-        <div>
-          <h1>${esc(facture.numero_facture || "Brouillon #" + facture.id)}</h1>
-          <div class="subtitle">${fmtDate(facture.created_at)} <span class="badge ${badgeClass[facture.statut]}" style="margin-left:8px;">${facture.statut}</span></div>
-        </div>
-        <div class="no-print toolbar">
-          ${facture.statut === "VALIDEE" ? `<button class="btn btn-secondary" onclick="window.print()"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="1.5"/><path d="M6 17h12v4H6z"/></svg>Imprimer</button>` : ""}
-          ${facture.statut === "VALIDEE" ? `<button class="btn btn-secondary" id="pdf-btn" onclick="telechargerPDF()"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Télécharger PDF</button>` : ""}
-          ${facture.statut === "VALIDEE" ? `<button class="btn-icon" id="share-btn" title="Partager le PDF" onclick="partagerPDF()"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98"/><path d="M15.41 6.51l-6.82 3.98"/></svg></button>` : ""}
-          ${facture.statut === "VALIDEE" ? `<button class="btn btn-danger-solid" ${appIsOnline ? "" : "disabled"} title="${appIsOnline ? "" : "Connexion requise"}" onclick="annulerFacture()"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>Annuler la facture</button>` : ""}
-          ${facture.statut === "BROUILLON" ? `<button class="btn btn-danger-solid" ${appIsOnline ? "" : "disabled"} title="${appIsOnline ? "" : "Connexion requise"}" onclick="supprimerBrouillon()"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>Supprimer le brouillon</button>` : ""}
-        </div>
-      </div>
+        const { data: l } = await supabaseClient.from("factures_lignes").select("*").eq("facture_id", factureId);
+        facture = f;
+        lignes = l || [];
+        cacheCollection(`facture_${factureId}`, { facture, lignes });
+    } catch {
+        const cached = getCachedCollection(`facture_${factureId}`);
+        if (!cached.savedAt) {
+            el.innerHTML = `<div class="error-msg">Facture introuvable. ${appIsOnline ? "" : "Hors ligne et jamais consultée sur ce poste : reconnecte-toi une fois pour la mettre en cache."}</div>`;
+            return;
+        }
+        facture = cached.items.facture;
+        lignes = cached.items.lignes;
+        offline = true;
+        savedAt = cached.savedAt;
+    }
 
-      <div class="field-row" style="margin-bottom:6px;">
-        <div>
-          <label style="margin-top:0;">Client</label>
-          <div>${esc(facture.clients?.nom || "—")}</div>
-          <div class="hint">${esc(facture.clients?.telephone || "")} ${facture.clients?.email ? " · " + esc(facture.clients.email) : ""}</div>
-        </div>
-        <div>
-          <label style="margin-top:0;">Mode de paiement</label>
-          <div>${MODE_PAIEMENT_LABELS[facture.mode_paiement] || facture.mode_paiement || "—"}</div>
-        </div>
-      </div>
+    [facture] = applyPendingFieldUpdates("factures", [facture]);
+    if (offline && savedAt) showToast(`Facture hors ligne : données du ${fmtDateTime(savedAt)}.`, "info");
 
-      ${facture.mode_paiement === "CREDIT" ? `
-        <div class="field-row" style="margin-bottom:6px;">
-          <div>
-            <label style="margin-top:0;">Échéance</label>
-            <div>${facture.echeance_type === "SEMAINE" ? "Sous 1 semaine" : "Sous 1 mois"} — ${fmtDate(facture.date_echeance)}</div>
-          </div>
-          <div>
-            <label style="margin-top:0;">Statut du paiement</label>
-            <div>
-              <span class="badge ${facture.paye ? "badge-success" : "badge-warn"}">${facture.paye ? "Payé" : "Non payé"}</span>
-              ${facture._pendingSync ? `<span class="badge badge-info" style="margin-left:6px;">Sync en attente</span>` : ""}
-              ${!facture.paye ? `<button type="button" class="btn btn-secondary btn-sm no-print" style="margin-left:10px;" onclick="marquerPaye()">Marquer comme payé</button>` : ""}
+    currentFacture = facture;
+    currentLignes = lignes;
+    currentSettings = settings;
+
+    const badgeClass = { BROUILLON: "badge-muted", VALIDEE: "badge-success", ANNULEE: "badge-danger" };
+    // Correction (audit V3) : `facture.paye` n'est pas mis à jour par le
+    // circuit officiel de paiement (enregistrer_paiement, qui met à jour
+    // montant_restant). On privilégie donc montant_restant quand il est
+    // disponible, `paye` ne servant que de repli.
+    const estPayee = (facture.montant_restant !== undefined && facture.montant_restant !== null)
+        ? Number(facture.montant_restant) <= 0
+        : !!facture.paye;
+
+    el.innerHTML = `
+        <div class="card">
+            <div class="invoice-header">
+                <div class="ih-logo">
+                    <img src="${esc(settings.logo_url || settings.logo_path || "assets/img/icon.svg")}" alt="${esc(settings.nom_commercial || "Entreprise")}">
+                    <div>
+                        <div class="ih-name">${esc(settings.nom_commercial || "Entreprise")}</div>
+                        <div class="ih-sub">${esc(settings.adresse || "")}</div>
+                    </div>
+                </div>
+                <div class="ih-contact">
+                    ${settings.telephone ? `<div><strong>Téléphone :</strong> ${esc(settings.telephone)}</div>` : ""}
+                    ${settings.email ? `<div>${esc(settings.email)}</div>` : ""}
+                    ${settings.identifiant_fiscal ? `<div>${esc(settings.identifiant_fiscal)}</div>` : ""}
+                </div>
             </div>
-          </div>
-        </div>
-      ` : ""}
 
-      <table style="margin-top:18px;">
-        <thead><tr><th>Désignation</th><th class="num">Qté</th><th class="num">Prix unit.</th><th class="num">Montant</th></tr></thead>
-        <tbody>
-          ${(lignes || []).map(l => `
-            <tr>
-              <td>${esc(l.designation)}</td>
-              <td class="num">${l.quantite_affichee ?? l.quantite} ${esc(MEASURE_UNIT_LABELS[l.unite_gros] || MEASURE_UNIT_LABELS[l.unite_mesure] || l.unite_mesure || "pcs")}</td>
-              <td class="num">${fmtMoney(l.prix_unitaire)}</td>
-              <td class="num">${fmtMoney(l.montant)}</td>
-            </tr>`).join("")}
-        </tbody>
-      </table>
+            <div class="card-head">
+                <div>
+                    <h1>${esc(facture.numero_facture || "Brouillon #" + facture.id)}</h1>
+                    <div class="subtitle">${fmtDate(facture.created_at)} <span class="badge ${badgeClass[facture.statut]}" style="margin-left:8px;">${facture.statut}</span></div>
+                </div>
+                <div class="no-print toolbar">
+                    ${facture.statut === "VALIDEE" ? `<button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimer</button>` : ""}
+                    ${facture.statut === "VALIDEE" ? `<button class="btn btn-secondary" id="pdf-btn" onclick="telechargerPDF()">⬇️ PDF</button>` : ""}
+                    ${facture.statut === "VALIDEE" ? `<button class="btn btn-secondary" id="share-btn" onclick="partagerPDF()">📤 Partager</button>` : ""}
+                    ${facture.statut === "VALIDEE" ? `<button class="btn btn-danger-solid" ${appIsOnline ? "" : "disabled"} title="${appIsOnline ? "" : "Connexion requise"}" onclick="annulerFacture()">🚫 Annuler</button>` : ""}
+                    ${facture.statut === "BROUILLON" ? `<button class="btn btn-danger-solid" ${appIsOnline ? "" : "disabled"} title="${appIsOnline ? "" : "Connexion requise"}" onclick="supprimerBrouillon()">🗑️ Supprimer</button>` : ""}
+                </div>
+            </div>
 
-      <div style="text-align:right; margin-top:16px; font-family:var(--font-display); font-size:1.3rem;">
-        Total : <span class="mono">${fmtMoney(facture.montant_total)}</span>
-      </div>
+            <div class="field-row" style="margin-bottom:6px;">
+                <div>
+                    <label style="margin-top:0;">Client</label>
+                    <div class="value">${esc(facture.clients?.nom || "—")}</div>
+                    <div class="hint">${esc(facture.clients?.telephone || "")} ${facture.clients?.email ? " · " + esc(facture.clients.email) : ""}</div>
+                </div>
+                <div>
+                    <label style="margin-top:0;">Mode de paiement</label>
+                    <div class="value">${MODE_PAIEMENT_LABELS[facture.mode_paiement] || facture.mode_paiement || "—"}</div>
+                </div>
+            </div>
 
-      ${facture.statut === "BROUILLON" ? (appIsOnline ? `
-        <div class="no-print" style="border-top:1px solid var(--border); margin-top:22px; padding-top:20px;">
-          <h3>Valider la facture</h3>
-          <p class="hint">La validation déstocke automatiquement chaque pièce et attribue un numéro définitif. Cette action est irréversible.</p>
-          <label>Mode de paiement *</label>
-          <select id="mode_paiement" style="max-width:220px;" onchange="onModePaiementChange()">
-            <option value="ESPECES">Espèces</option>
-            <option value="CARTE">Carte</option>
-            <option value="VIREMENT">Virement</option>
-            <option value="WAVE">Wave</option>
-            <option value="OM">Orange Money</option>
-            <option value="CHEQUE">Chèque</option>
-            <option value="CREDIT">Crédit (bon — le client paie plus tard)</option>
-          </select>
-          <div id="echeance-field" style="display:none; margin-top:12px;">
-            <label>Le client paie sous *</label>
-            <select id="echeance_type" style="max-width:220px;">
-              <option value="SEMAINE">1 semaine</option>
-              <option value="MOIS">1 mois</option>
-            </select>
-          </div>
-          <div id="validate-msg"></div>
-          <button class="btn" style="margin-top:14px;" id="validate-btn" onclick="validerFacture()">Valider et déstocker</button>
+            ${facture.mode_paiement === "CREDIT" ? `
+                <div class="field-row" style="margin-bottom:6px;">
+                    <div>
+                        <label style="margin-top:0;">Échéance</label>
+                        <div class="value">${facture.echeance_type === "SEMAINE" ? "Sous 1 semaine" : "Sous 1 mois"} — ${fmtDate(facture.date_echeance)}</div>
+                    </div>
+                    <div>
+                        <label style="margin-top:0;">Statut du paiement</label>
+                        <div class="value">
+                            <span class="badge ${estPayee ? "badge-success" : "badge-warn"}">${estPayee ? "Payé" : "Non payé"}</span>
+                            ${facture._pendingSync ? `<span class="badge badge-info" style="margin-left:6px;">Sync en attente</span>` : ""}
+                            ${!estPayee ? `<button type="button" class="btn btn-secondary btn-sm no-print" style="margin-left:10px;" onclick="marquerPaye()">Marquer comme payé</button>` : ""}
+                        </div>
+                    </div>
+                </div>
+            ` : ""}
+
+            <table style="margin-top:18px;">
+                <thead><tr><th>Désignation</th><th class="num">Qté</th><th class="num">Prix unit.</th><th class="num">Montant</th></tr></thead>
+                <tbody>
+                    ${(lignes || []).map(l => `
+                        <tr>
+                            <td>${esc(l.designation)}</td>
+                            <td class="num">${l.quantite_affichee ?? l.quantite} ${esc(MEASURE_UNIT_LABELS[l.unite_gros] || MEASURE_UNIT_LABELS[l.unite_mesure] || l.unite_mesure || "pcs")}</td>
+                            <td class="num">${fmtMoney(l.prix_unitaire)}</td>
+                            <td class="num">${fmtMoney(l.montant)}</td>
+                        </tr>`).join("")}
+                </tbody>
+            </table>
+
+            <div style="text-align:right; margin-top:16px; font-family:var(--font-display); font-size:1.3rem;">
+                Total : <span class="mono">${fmtMoney(facture.montant_total)}</span>
+            </div>
+
+            ${facture.statut === "BROUILLON" ? (appIsOnline ? `
+                <div class="no-print" style="border-top:1px solid var(--border); margin-top:22px; padding-top:20px;">
+                    <h3>Valider la facture</h3>
+                    <p class="hint">La validation déstocke automatiquement chaque pièce et attribue un numéro définitif. Cette action est irréversible.</p>
+                    <label>Mode de paiement *</label>
+                    <select id="mode_paiement" style="max-width:220px;" onchange="onModePaiementChange()">
+                        <option value="ESPECES">Espèces</option>
+                        <option value="CARTE">Carte</option>
+                        <option value="VIREMENT">Virement</option>
+                        <option value="WAVE">Wave</option>
+                        <option value="OM">Orange Money</option>
+                        <option value="CHEQUE">Chèque</option>
+                        <option value="CREDIT">Crédit (bon — le client paie plus tard)</option>
+                    </select>
+                    <div id="echeance-field" style="display:none; margin-top:12px;">
+                        <label>Le client paie sous *</label>
+                        <select id="echeance_type" style="max-width:220px;">
+                            <option value="SEMAINE">1 semaine</option>
+                            <option value="MOIS">1 mois</option>
+                        </select>
+                    </div>
+                    <div id="validate-msg"></div>
+                    <button class="btn" style="margin-top:14px;" id="validate-btn" onclick="validerFacture()">Valider et déstocker</button>
+                </div>
+            ` : `
+                <div class="no-print" style="border-top:1px solid var(--border); margin-top:22px; padding-top:20px;">
+                    <p class="hint">Hors connexion : la validation (déstockage + numéro définitif) nécessite une connexion internet. Réessaie une fois reconnecté.</p>
+                </div>
+            `) : ""}
         </div>
-      ` : `
-        <div class="no-print" style="border-top:1px solid var(--border); margin-top:22px; padding-top:20px;">
-          <p class="hint">Hors connexion : la validation (déstockage + numéro définitif) nécessite une connexion internet. Réessaie une fois reconnecté.</p>
-        </div>
-      `) : ""}
-    </div>
-  `;
+    `;
+
+    if (!appIsOnline && facture.statut === "BROUILLON") {
+        // Aucune action en ligne possible
+    }
 }
 
+// ---------- Gestion du mode paiement (crédit) ----------
+function onModePaiementChange() {
+    const isCredit = document.getElementById("mode_paiement").value === "CREDIT";
+    document.getElementById("echeance-field").style.display = isCredit ? "block" : "none";
+}
+
+// ---------- Validation de la facture ----------
 async function validerFacture() {
-  const msgEl = document.getElementById("validate-msg");
-  clearMsg(msgEl);
-  const modePaiement = document.getElementById("mode_paiement").value;
-  const echeanceType = modePaiement === "CREDIT" ? document.getElementById("echeance_type").value : null;
+    const msgEl = document.getElementById("validate-msg");
+    clearMsg(msgEl);
 
-  const btn = document.getElementById("validate-btn");
-  btn.disabled = true; btn.textContent = "Validation...";
+    const modePaiement = document.getElementById("mode_paiement").value;
+    const echeanceType = modePaiement === "CREDIT" ? document.getElementById("echeance_type").value : null;
 
-  const { error } = await supabaseClient.rpc("valider_facture", {
-    p_facture_id: Number(factureId),
-    p_mode_paiement: modePaiement,
-    p_echeance_type: echeanceType,
-  });
+    const btn = document.getElementById("validate-btn");
+    btn.disabled = true;
+    btn.textContent = "Validation...";
 
-  btn.disabled = false; btn.textContent = "Valider et déstocker";
-
-  if (error) { showMsg(msgEl, friendlyError(error)); return; }
-  loadFacture();
+    try {
+        const { error } = await supabaseClient.rpc("valider_facture", {
+            p_facture_id: Number(factureId),
+            p_mode_paiement: modePaiement,
+            p_echeance_type: echeanceType,
+        });
+        if (error) throw error;
+        showToast("✅ Facture validée avec succès.", "success");
+        loadFacture();
+    } catch (error) {
+        showMsg(msgEl, friendlyError(error));
+    } finally {
+        btn.disabled = false;
+        btn.textContent = "Valider et déstocker";
+    }
 }
 
+// ---------- Annulation de la facture ----------
 async function annulerFacture() {
-  if (!appIsOnline) { showToast("Connexion requise pour annuler une facture.", "error"); return; }
-  const ok = await confirmDialog(
-    "Annuler cette facture ? Les pièces vendues seront remises en stock automatiquement. Cette action est irréversible.",
-    { title: "Annuler la facture", confirmLabel: "Annuler la facture", danger: true }
-  );
-  if (!ok) return;
+    if (!appIsOnline) {
+        showToast("Connexion requise pour annuler une facture.", "error");
+        return;
+    }
+    const ok = await confirmDialog(
+        "Annuler cette facture ? Les pièces vendues seront remises en stock automatiquement. Cette action est irréversible.",
+        { title: "Annuler la facture", confirmLabel: "Annuler la facture", danger: true }
+    );
+    if (!ok) return;
 
-  const { error } = await supabaseClient.rpc("annuler_facture", { p_facture_id: Number(factureId) });
-  if (error) { showToast(friendlyError(error), "error"); return; }
-  showToast("Facture annulée — le stock a été remis à jour.", "success");
-  loadFacture();
+    try {
+        const { error } = await supabaseClient.rpc("annuler_facture", { p_facture_id: Number(factureId) });
+        if (error) throw error;
+        showToast("Facture annulée — le stock a été remis à jour.", "success");
+        loadFacture();
+    } catch (error) {
+        showToast(friendlyError(error), "error");
+    }
 }
 
+// ---------- Suppression d'un brouillon ----------
 async function supprimerBrouillon() {
-  if (!appIsOnline) { showToast("Connexion requise pour supprimer un brouillon.", "error"); return; }
-  const ok = await confirmDialog("Supprimer ce brouillon de facture ? Cette action est irréversible.", {
-    title: "Supprimer le brouillon",
-    confirmLabel: "Supprimer",
-    danger: true,
-  });
-  if (!ok) return;
-
-  const { error } = await supabaseClient
-    .from("factures").delete().eq("id", factureId).eq("statut", "BROUILLON");
-
-  if (error) { showToast(friendlyError(error), "error"); return; }
-  window.location.href = "factures.html";
-}
-
-async function marquerPaye() {
-  const ok = await confirmDialog("Marquer ce bon comme payé ?", { confirmLabel: "Marquer payé", danger: false });
-  if (!ok) return;
-
-  if (!appIsOnline) {
-    queueFieldUpdate("factures", Number(factureId), { paye: true, paye_at: new Date().toISOString() }, `Bon #${factureId} marqué payé`);
-    showToast("Marqué payé hors ligne — synchronisé automatiquement au retour de la connexion.", "info");
-    loadFacture();
-    return;
-  }
-
-  const { error } = await supabaseClient
-    .from("factures").update({ paye: true, paye_at: new Date().toISOString() }).eq("id", factureId);
-
-  if (error) { showToast(friendlyError(error), "error"); return; }
-  showToast("Bon marqué comme payé.", "success");
-  loadFacture();
-}
-
-// ---------- Génération PDF (jsPDF + autoTable) ----------
-// Reproduit fidèlement la mise en page de la facture affichée à l'écran (en-tête avec
-// logo/coordonnées, infos client, tableau des lignes, total) sans dépendre du DOM :
-// jsPDF dessine directement, donc le rendu est identique en Web, PWA installée et TWA
-// Android (aucune API serveur, aucune dépendance à window.print()).
-
-function hexToRgb(hex) {
-  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || "");
-  return m ? [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)] : [79, 70, 229];
-}
-
-// Les polices de base de jsPDF (WinAnsi) ne connaissent pas l'espace fine insécable que
-// toLocaleString("fr-FR") utilise comme séparateur de milliers : sans ce remplacement, ce
-// caractère s'affiche comme un glyphe manquant dans le PDF généré.
-function pdfMoney(n) {
-  return fmtMoney(n).replace(/ /g, " ");
-}
-
-// Best-effort : un logo hors ligne, absent, ou bloqué par CORS ne doit jamais empêcher la
-// génération du PDF — juste omettre le logo.
-async function logoDataUrl(url) {
-  if (!url || !url.startsWith("http")) return null;
-  try {
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const blob = await res.blob();
-    return await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
+    if (!appIsOnline) {
+        showToast("Connexion requise pour supprimer un brouillon.", "error");
+        return;
+    }
+    const ok = await confirmDialog("Supprimer ce brouillon de facture ? Cette action est irréversible.", {
+        title: "Supprimer le brouillon",
+        confirmLabel: "Supprimer",
+        danger: true,
     });
-  } catch {
-    return null;
-  }
+    if (!ok) return;
+
+    try {
+        const { error } = await supabaseClient.from("factures").delete().eq("id", factureId).eq("statut", "BROUILLON");
+        if (error) throw error;
+        window.location.href = "factures.html";
+    } catch (error) {
+        showToast(friendlyError(error), "error");
+    }
 }
 
-// Libellés côté PDF pour statut_paiement (peuplé par valider_facture pour TOUTES les
-// factures validées, pas seulement celles suivies via Recouvra — cf. upgrade_units_mesure.sql).
+// ---------- Marquer comme payé (crédit) ----------
+async function marquerPaye() {
+    const ok = await confirmDialog("Marquer ce bon comme payé ?", { confirmLabel: "Marquer payé", danger: false });
+    if (!ok) return;
+
+    const montantRestant = Number(currentFacture?.montant_restant ?? currentFacture?.montant_total ?? 0);
+    const montantTotal = Number(currentFacture?.montant_total ?? 0);
+
+    if (!appIsOnline) {
+        // Correction (audit V3) : même bug que credits.html — on garde
+        // désormais montant_restant/montant_paye/statut_paiement cohérents
+        // avec `paye`, pour que le module Recouvra (qui se base sur
+        // montant_restant) reflète bien ce changement.
+        queueFieldUpdate("factures", Number(factureId), {
+            paye: true,
+            paye_at: new Date().toISOString(),
+            montant_restant: 0,
+            montant_paye: montantTotal,
+            statut_paiement: 'PAYEE',
+        }, `Bon #${factureId} marqué payé`);
+        showToast("Marqué payé hors ligne — synchronisé automatiquement au retour de la connexion.", "info");
+        loadFacture();
+        return;
+    }
+
+    try {
+        // Correction (audit V3) : l'ancien code se contentait de basculer le
+        // booléen `paye`, sans jamais recalculer montant_restant/montant_paye
+        // ni créer d'enregistrement de paiement — la facture restait donc
+        // visible comme impayée dans le module Recouvra (recouvra.html filtre
+        // sur montant_restant > 0). Pour une entreprise disposant du module
+        // Recouvra, on passe par le circuit officiel enregistrer_paiement()
+        // (paiement réel tracé + recalcul serveur des champs dérivés).
+        const profile = await currentProfile();
+
+        if (profile?.has_recouvra && montantRestant > 0) {
+            const { error } = await supabaseClient.rpc('enregistrer_paiement', {
+                p_facture_id: Number(factureId),
+                p_montant: montantRestant,
+                p_methode: 'AUTRE',
+                p_note: 'Marqué payé depuis le détail de la facture',
+            });
+            if (error) throw error;
+        } else {
+            const { error } = await supabaseClient
+                .from("factures")
+                .update({
+                    paye: true,
+                    paye_at: new Date().toISOString(),
+                    montant_restant: 0,
+                    montant_paye: montantTotal,
+                    statut_paiement: 'PAYEE',
+                })
+                .eq("id", factureId);
+            if (error) throw error;
+        }
+        showToast("Bon marqué comme payé.", "success");
+        loadFacture();
+    } catch (error) {
+        showToast(friendlyError(error), "error");
+    }
+}
+
+// ---------- Génération PDF (jsPDF + autotable) ----------
+function hexToRgb(hex) {
+    const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || "");
+    return m ? [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)] : [79, 70, 229];
+}
+
+function pdfMoney(n) {
+    return fmtMoney(n).replace(/ /g, " ");
+}
+
+async function logoDataUrl(url) {
+    if (!url || !url.startsWith("http")) return null;
+    try {
+        const res = await fetch(url);
+        if (!res.ok) return null;
+        const blob = await res.blob();
+        return await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    } catch {
+        return null;
+    }
+}
+
 const STATUT_PAIEMENT_LABELS_PDF = {
-  NON_PAYEE: "Non payé", PARTIELLEMENT_PAYEE: "Partiellement payé", PAYEE: "Payé", EN_RETARD: "En retard",
+    NON_PAYEE: "Non payé", PARTIELLEMENT_PAYEE: "Partiellement payé", PAYEE: "Payé", EN_RETARD: "En retard",
 };
 
-// NB : le schéma actuel (factures / factures_lignes) ne comporte ni champ "remise", ni
-// champ "notes/conditions" — ces deux rubriques demandées ne sont donc pas fabriquées ici,
-// conformément à "vérifie quelles données sont réellement disponibles". Le sous-total est
-// donc mathématiquement identique au total tant qu'aucune remise/taxe n'existe en base ;
-// il est affiché quand même (ligne demandée), prêt à diverger le jour où une remise existera.
 async function buildInvoicePdf() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: "mm", format: "a4" });
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  const marginX = 15;
-  const accent = hexToRgb(currentSettings?.primary_color || "#4F46E5");
-  const dark = [23, 23, 23];
-  const muted = [110, 110, 110];
-  let y = 20;
-  let textX = marginX;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: "mm", format: "a4" });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const marginX = 15;
+    const accent = hexToRgb(currentSettings?.primary_color || "#4F46E5");
+    const dark = [23, 23, 23];
+    const muted = [110, 110, 110];
+    let y = 20;
+    let textX = marginX;
 
-  const col2X = marginX + (pageWidth - 2 * marginX) * 0.36;
-  const col3X = marginX + (pageWidth - 2 * marginX) * 0.68;
+    const col2X = marginX + (pageWidth - 2 * marginX) * 0.36;
+    const col3X = marginX + (pageWidth - 2 * marginX) * 0.68;
 
-  function labelValueRow(cols, isBold) {
-    doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.setTextColor(...muted);
-    cols.forEach((c) => doc.text(c.label, c.x, y));
-    y += 5;
-    doc.setFont("helvetica", isBold ? "bold" : "normal"); doc.setFontSize(10.5); doc.setTextColor(...dark);
-    cols.forEach((c) => doc.text(String(c.value ?? "—"), c.x, y));
-    y += 7;
-  }
-
-  const logo = await logoDataUrl(currentSettings?.logo_url || currentSettings?.logo_path);
-  if (logo) {
-    try {
-      const format = logo.startsWith("data:image/png") ? "PNG" : "JPEG";
-      doc.addImage(logo, format, marginX, y - 5, 20, 20);
-      textX = marginX + 26;
-    } catch {
-      // Format d'image non supporté par jsPDF (ex: SVG) : on continue sans logo.
+    function labelValueRow(cols, isBold) {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8);
+        doc.setTextColor(...muted);
+        cols.forEach((c) => doc.text(c.label, c.x, y));
+        y += 5;
+        doc.setFont("helvetica", isBold ? "bold" : "normal");
+        doc.setFontSize(10.5);
+        doc.setTextColor(...dark);
+        cols.forEach((c) => doc.text(String(c.value ?? "—"), c.x, y));
+        y += 7;
     }
-  }
 
-  doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(...dark);
-  doc.text(currentSettings?.nom_commercial || "Entreprise", textX, y);
-  if (currentSettings?.adresse) {
-    y += 5.5;
-    doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...muted);
-    doc.text(currentSettings.adresse, textX, y);
-  }
+    const logo = await logoDataUrl(currentSettings?.logo_url || currentSettings?.logo_path);
+    if (logo) {
+        try {
+            const format = logo.startsWith("data:image/png") ? "PNG" : "JPEG";
+            doc.addImage(logo, format, marginX, y - 5, 20, 20);
+            textX = marginX + 26;
+        } catch {}
+    }
 
-  let yContact = 20;
-  doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...muted);
-  [currentSettings?.telephone ? `Tél : ${currentSettings.telephone}` : null, currentSettings?.email, currentSettings?.identifiant_fiscal]
-    .filter(Boolean)
-    .forEach((line) => { doc.text(line, pageWidth - marginX, yContact, { align: "right" }); yContact += 4.5; });
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.setTextColor(...dark);
+    doc.text(currentSettings?.nom_commercial || "Entreprise", textX, y);
+    if (currentSettings?.adresse) {
+        y += 5.5;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.setTextColor(...muted);
+        doc.text(currentSettings.adresse, textX, y);
+    }
 
-  y = Math.max(y, yContact, marginX + 15) + 5;
-  doc.setDrawColor(...accent); doc.setLineWidth(0.7);
-  doc.line(marginX, y, pageWidth - marginX, y);
-  y += 10;
+    let yContact = 20;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(...muted);
+    [currentSettings?.telephone ? `Tél : ${currentSettings.telephone}` : null, currentSettings?.email, currentSettings?.identifiant_fiscal]
+        .filter(Boolean)
+        .forEach((line) => {
+            doc.text(line, pageWidth - marginX, yContact, { align: "right" });
+            yContact += 4.5;
+        });
 
-  doc.setFont("helvetica", "bold"); doc.setFontSize(13); doc.setTextColor(...dark);
-  doc.text(currentFacture.numero_facture || `Brouillon #${currentFacture.id}`, marginX, y);
-  doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...muted);
-  doc.text(`${fmtDate(currentFacture.created_at)} — ${currentFacture.statut}`, marginX, y + 5);
-  y += 16;
+    y = Math.max(y, yContact, marginX + 15) + 5;
+    doc.setDrawColor(...accent);
+    doc.setLineWidth(0.7);
+    doc.line(marginX, y, pageWidth - marginX, y);
+    y += 10;
 
-  doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.setTextColor(...muted);
-  doc.text("CLIENT", marginX, y);
-  doc.text("MODE DE PAIEMENT", col2X, y);
-  y += 5;
-  doc.setFont("helvetica", "normal"); doc.setFontSize(10.5); doc.setTextColor(...dark);
-  doc.text(currentFacture.clients?.nom || "—", marginX, y);
-  doc.text(MODE_PAIEMENT_LABELS[currentFacture.mode_paiement] || currentFacture.mode_paiement || "—", col2X, y);
-  const contactLine = [currentFacture.clients?.telephone, currentFacture.clients?.email].filter(Boolean).join("  ·  ");
-  if (contactLine) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(...dark);
+    doc.text(currentFacture.numero_facture || `Brouillon #${currentFacture.id}`, marginX, y);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(...muted);
+    doc.text(`${fmtDate(currentFacture.created_at)} — ${currentFacture.statut}`, marginX, y + 5);
+    y += 16;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(...muted);
+    doc.text("CLIENT", marginX, y);
+    doc.text("MODE DE PAIEMENT", col2X, y);
     y += 5;
-    doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...muted);
-    doc.text(contactLine, marginX, y);
-  }
-  y += 7;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10.5);
+    doc.setTextColor(...dark);
+    doc.text(currentFacture.clients?.nom || "—", marginX, y);
+    doc.text(MODE_PAIEMENT_LABELS[currentFacture.mode_paiement] || currentFacture.mode_paiement || "—", col2X, y);
+    const contactLine = [currentFacture.clients?.telephone, currentFacture.clients?.email].filter(Boolean).join("  ·  ");
+    if (contactLine) {
+        y += 5;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.setTextColor(...muted);
+        doc.text(contactLine, marginX, y);
+    }
+    y += 7;
 
-  if (currentFacture.mode_paiement === "CREDIT") {
+    if (currentFacture.mode_paiement === "CREDIT") {
+        labelValueRow([
+            { x: marginX, label: "ÉCHÉANCE", value: `${currentFacture.echeance_type === "SEMAINE" ? "Sous 1 semaine" : "Sous 1 mois"} — ${fmtDate(currentFacture.date_echeance)}` },
+        ]);
+    }
+
     labelValueRow([
-      { x: marginX, label: "ÉCHÉANCE", value: `${currentFacture.echeance_type === "SEMAINE" ? "Sous 1 semaine" : "Sous 1 mois"} — ${fmtDate(currentFacture.date_echeance)}` },
-    ]);
-  }
+        { x: marginX, label: "MONTANT PAYÉ", value: pdfMoney(currentFacture.montant_paye ?? (currentFacture.paye ? currentFacture.montant_total : 0)) },
+        { x: col2X, label: "RESTE À PAYER", value: pdfMoney(currentFacture.montant_restant ?? (currentFacture.paye ? 0 : currentFacture.montant_total)) },
+        { x: col3X, label: "STATUT DE PAIEMENT", value: STATUT_PAIEMENT_LABELS_PDF[currentFacture.statut_paiement] || (currentFacture.paye ? "Payé" : "Non payé") },
+    ], true);
+    y += 3;
 
-  labelValueRow([
-    { x: marginX, label: "MONTANT PAYÉ", value: pdfMoney(currentFacture.montant_paye ?? (currentFacture.paye ? currentFacture.montant_total : 0)) },
-    { x: col2X, label: "RESTE À PAYER", value: pdfMoney(currentFacture.montant_restant ?? (currentFacture.paye ? 0 : currentFacture.montant_total)) },
-    { x: col3X, label: "STATUT DE PAIEMENT", value: STATUT_PAIEMENT_LABELS_PDF[currentFacture.statut_paiement] || (currentFacture.paye ? "Payé" : "Non payé") },
-  ], true);
-  y += 3;
+    doc.autoTable({
+        startY: y,
+        margin: { left: marginX, right: marginX, bottom: 22 },
+        head: [["Désignation", "Qté", "Prix unit.", "Montant"]],
+        body: (currentLignes || []).map((l) => [
+            l.designation,
+            `${l.quantite_affichee ?? l.quantite} ${MEASURE_UNIT_LABELS[l.unite_gros] || MEASURE_UNIT_LABELS[l.unite_mesure] || l.unite_mesure || "pcs"}`,
+            pdfMoney(l.prix_unitaire),
+            pdfMoney(l.montant),
+        ]),
+        theme: "grid",
+        headStyles: { fillColor: accent, textColor: [255, 255, 255], fontStyle: "bold", fontSize: 9 },
+        bodyStyles: { fontSize: 9.5, textColor: dark },
+        columnStyles: { 1: { halign: "right" }, 2: { halign: "right" }, 3: { halign: "right" } },
+    });
 
-  doc.autoTable({
-    startY: y,
-    margin: { left: marginX, right: marginX, bottom: 22 },
-    head: [["Désignation", "Qté", "Prix unit.", "Montant"]],
-    body: (currentLignes || []).map((l) => [
-      l.designation,
-      `${l.quantite_affichee ?? l.quantite} ${MEASURE_UNIT_LABELS[l.unite_gros] || MEASURE_UNIT_LABELS[l.unite_mesure] || l.unite_mesure || "pcs"}`,
-      pdfMoney(l.prix_unitaire),
-      pdfMoney(l.montant),
-    ]),
-    theme: "grid",
-    headStyles: { fillColor: accent, textColor: [255, 255, 255], fontStyle: "bold", fontSize: 9 },
-    bodyStyles: { fontSize: 9.5, textColor: dark },
-    columnStyles: { 1: { halign: "right" }, 2: { halign: "right" }, 3: { halign: "right" } },
-  });
+    const sousTotal = (currentLignes || []).reduce((s, l) => s + Number(l.montant), 0);
+    let finalY = doc.lastAutoTable.finalY + 9;
+    if (finalY + 22 > pageHeight - 15) {
+        doc.addPage();
+        finalY = 22;
+    }
 
-  const sousTotal = (currentLignes || []).reduce((s, l) => s + Number(l.montant), 0);
-  let finalY = doc.lastAutoTable.finalY + 9;
-  // Facture longue : si le total ne tient plus sur la page où s'est arrêté le tableau,
-  // on le reporte proprement en haut d'une nouvelle page plutôt que de le laisser déborder.
-  if (finalY + 22 > pageHeight - 15) { doc.addPage(); finalY = 22; }
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(...muted);
+    doc.text(`Sous-total : ${pdfMoney(sousTotal)}`, pageWidth - marginX, finalY, { align: "right" });
+    finalY += 7;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12.5);
+    doc.setTextColor(...dark);
+    doc.text(`Total : ${pdfMoney(currentFacture.montant_total)}`, pageWidth - marginX, finalY, { align: "right" });
 
-  doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(...muted);
-  doc.text(`Sous-total : ${pdfMoney(sousTotal)}`, pageWidth - marginX, finalY, { align: "right" });
-  finalY += 7;
-  doc.setFont("helvetica", "bold"); doc.setFontSize(12.5); doc.setTextColor(...dark);
-  doc.text(`Total : ${pdfMoney(currentFacture.montant_total)}`, pageWidth - marginX, finalY, { align: "right" });
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(...muted);
+        doc.text(`Page ${i} / ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: "center" });
+    }
 
-  // Pied de page (numéro de page) sur chaque page, une fois le contenu final connu —
-  // fait après coup pour ne pas avoir à deviner le nombre total de pages à l'avance.
-  const pageCount = doc.internal.getNumberOfPages();
-  for (let i = 1; i <= pageCount; i++) {
-    doc.setPage(i);
-    doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(...muted);
-    doc.text(`Page ${i} / ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: "center" });
-  }
-
-  return doc;
+    return doc;
 }
 
 function pdfFileName() {
-  const ref = (currentFacture.numero_facture || "facture-" + currentFacture.id).replace(/[^A-Za-z0-9-]/g, "_");
-  return `Facture-${ref}.pdf`;
+    const ref = (currentFacture.numero_facture || "facture-" + currentFacture.id).replace(/[^A-Za-z0-9-]/g, "_");
+    return `Facture-${ref}.pdf`;
 }
 
 async function telechargerPDF() {
-  if (!currentFacture) return;
-  const btn = document.getElementById("pdf-btn");
-  const original = btn?.innerHTML;
-  if (btn) { btn.disabled = true; btn.textContent = "Génération..."; }
-  try {
-    const doc = await buildInvoicePdf();
-    doc.save(pdfFileName());
-  } catch (err) {
-    showToast("Impossible de générer le PDF : " + (err?.message || err), "error");
-  } finally {
-    if (btn) { btn.disabled = false; btn.innerHTML = original; }
-  }
+    if (!currentFacture) return;
+    const btn = document.getElementById("pdf-btn");
+    const original = btn?.innerHTML;
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Génération...";
+    }
+    try {
+        const doc = await buildInvoicePdf();
+        doc.save(pdfFileName());
+    } catch (err) {
+        showToast("Impossible de générer le PDF : " + (err?.message || err), "error");
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = original;
+        }
+    }
 }
 
 async function partagerPDF() {
-  if (!currentFacture) return;
-  const btn = document.getElementById("share-btn");
-  if (btn) btn.disabled = true;
-  try {
-    const doc = await buildInvoicePdf();
-    const filename = pdfFileName();
-    const file = new File([doc.output("blob")], filename, { type: "application/pdf" });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: filename });
-    } else {
-      // API de partage indisponible (desktop, ou navigateur non compatible) : repli sur
-      // le téléchargement classique plutôt que de laisser le bouton sans effet.
-      doc.save(filename);
+    if (!currentFacture) return;
+    const btn = document.getElementById("share-btn");
+    if (btn) btn.disabled = true;
+    try {
+        const doc = await buildInvoicePdf();
+        const filename = pdfFileName();
+        const file = new File([doc.output("blob")], filename, { type: "application/pdf" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], title: filename });
+        } else {
+            doc.save(filename);
+        }
+    } catch (err) {
+        if (err?.name !== "AbortError") showToast("Impossible de partager le PDF : " + (err?.message || err), "error");
+    } finally {
+        if (btn) btn.disabled = false;
     }
-  } catch (err) {
-    if (err?.name !== "AbortError") showToast("Impossible de partager le PDF : " + (err?.message || err), "error");
-  } finally {
-    if (btn) btn.disabled = false;
-  }
 }
-
-(async () => {
-  const session = await requireAuth();
-  if (!session) return;
-  loadFacture();
-  document.addEventListener("sylla:connectivity-changed", loadFacture);
-  document.addEventListener("sylla:pending-updates-updated", loadFacture);
-})();
 </script>
+
 </body>
 </html>

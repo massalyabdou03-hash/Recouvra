@@ -1,19 +1,21 @@
 // ============================================================
-// ONBOARDING — Script complet avec animations
+// ONBOARDING - Logique améliorée
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Vérifier si l'utilisateur a déjà complété l'onboarding
+    // Vérifier si l'utilisateur a déjà complété l'onboarding.
+    // Correction (audit V2) : `profiles.onboarding_complete` n'existe pas
+    // dans le schéma — le vrai champ est `entreprises.onboarding_completed_at`.
+    // Voir supabase/PROPOSED_fix_onboarding_rls.sql.
     try {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
-            const { data: profile, error } = await supabaseClient
+            const { data: profile } = await supabaseClient
                 .from('profiles')
-                .select('onboarding_complete')
+                .select('entreprise_id, entreprises(onboarding_completed_at)')
                 .eq('id', session.user.id)
                 .single();
-            if (profile?.onboarding_complete === true) {
-                // Déjà fait → rediriger vers l'accueil
+            if (profile?.entreprises?.onboarding_completed_at) {
                 window.location.href = 'index.html';
                 return;
             }
@@ -22,12 +24,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.warn('Erreur vérification onboarding:', e);
     }
 
-    // Si on arrive ici, l'onboarding n'a pas été complété
     initOnboarding();
 });
 
 function initOnboarding() {
-    // Éléments DOM
     const steps = document.querySelectorAll('.onboarding-step');
     const progressDots = document.querySelectorAll('.onboarding-progress i');
     const finishBtn = document.getElementById('finish-btn');
@@ -38,7 +38,6 @@ function initOnboarding() {
     let selectedBesoins = [];
     let selectedPlan = null;
 
-    // ---------- Fonction pour changer d'étape avec animation ----------
     window.goToStep = function(step) {
         if (step < 1 || step > steps.length) return;
         if (step === 3 && !selectedCommerce) {
@@ -75,29 +74,21 @@ function initOnboarding() {
         }, 300);
     };
 
-    // ---------- Gestion des choix (type de commerce) ----------
     document.querySelectorAll('#commerce-choices .onboarding-choice').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('#commerce-choices .onboarding-choice').forEach(b => b.classList.remove('selected'));
             this.classList.add('selected');
             selectedCommerce = this.dataset.value;
             document.getElementById('step2-next').disabled = false;
-            this.style.transition = 'background 0.2s';
-            this.style.background = 'var(--accent-dim)';
-            setTimeout(() => this.style.background = '', 300);
         });
     });
 
-    // ---------- Gestion des choix multiples (besoins) ----------
     document.querySelectorAll('#besoins-choices .onboarding-choice').forEach(btn => {
         btn.addEventListener('click', function() {
             this.classList.toggle('selected');
             const val = this.dataset.value;
             if (this.classList.contains('selected')) {
                 if (!selectedBesoins.includes(val)) selectedBesoins.push(val);
-                this.style.transition = 'transform 0.15s';
-                this.style.transform = 'scale(0.95)';
-                setTimeout(() => this.style.transform = '', 150);
             } else {
                 selectedBesoins = selectedBesoins.filter(v => v !== val);
             }
@@ -105,23 +96,15 @@ function initOnboarding() {
         });
     });
 
-    // ---------- Sélection du plan ----------
     window.selectPlan = function(plan, element) {
         document.querySelectorAll('.pricing-option').forEach(el => el.classList.remove('selected'));
         element.classList.add('selected');
         selectedPlan = plan;
-        element.style.transition = 'transform 0.2s';
-        element.style.transform = 'scale(1.02)';
-        setTimeout(() => element.style.transform = '', 200);
     };
 
-    // ---------- Affichage des besoins sélectionnés (étape 3) ----------
     function updateValueBlocks() {
         const container = document.getElementById('value-blocks');
-        if (!container) {
-            console.error('❌ #value-blocks introuvable');
-            return;
-        }
+        if (!container) return;
         if (selectedBesoins.length === 0) {
             container.innerHTML = '';
             return;
@@ -139,31 +122,15 @@ function initOnboarding() {
                 ${selectedBesoins.map(b => `<span class="badge besoin-badge">${labels[b] || b}</span>`).join('')}
             </div>
         `;
-        // Animation d'apparition
-        container.style.transition = 'opacity 0.2s';
-        container.style.opacity = '0';
-        requestAnimationFrame(() => {
-            container.style.opacity = '1';
-        });
     }
 
-    // ---------- Gestion du message ----------
     function showMessage(text, type = 'info') {
         if (!msgEl) return;
         msgEl.textContent = text;
         msgEl.style.color = type === 'error' ? 'var(--danger)' : 'var(--info)';
-        msgEl.style.transition = 'opacity 0.2s';
-        msgEl.style.opacity = '0';
-        requestAnimationFrame(() => msgEl.style.opacity = '1');
     }
 
-    function clearMessage() {
-        if (msgEl) msgEl.textContent = '';
-    }
-
-    // ---------- Démarrer l'essai gratuit ----------
     window.startTrial = async function() {
-        clearMessage();
         if (!selectedCommerce) {
             showMessage('Veuillez sélectionner votre type de commerce.', 'error');
             return;
@@ -185,67 +152,21 @@ function initOnboarding() {
                 return;
             }
 
-            // Mise à jour du profil
-            const { error: profileError } = await supabaseClient
-                .from('profiles')
-                .update({
-                    type_commerce: selectedCommerce,
-                    besoins: selectedBesoins,
-                    plan_choisi: selectedPlan,
-                    onboarding_complete: true,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', session.user.id);
-            if (profileError) throw profileError;
-
-            // Récupérer l'entreprise_id
-            const { data: profile, error: fetchError } = await supabaseClient
-                .from('profiles')
-                .select('entreprise_id')
-                .eq('id', session.user.id)
-                .single();
-            if (fetchError) throw fetchError;
-
-            if (profile?.entreprise_id) {
-                const now = new Date();
-                const end = new Date(now);
-                end.setMonth(end.getMonth() + 1);
-
-                const { data: existingSub } = await supabaseClient
-                    .from('subscriptions')
-                    .select('id')
-                    .eq('entreprise_id', profile.entreprise_id)
-                    .maybeSingle();
-
-                if (existingSub) {
-                    await supabaseClient
-                        .from('subscriptions')
-                        .update({
-                            status: 'active',
-                            plan: selectedPlan === 'recouvrement' ? 'recouvra_pro' : 'simple',
-                            current_period_start: now.toISOString(),
-                            current_period_end: end.toISOString(),
-                            updated_at: now.toISOString()
-                        })
-                        .eq('entreprise_id', profile.entreprise_id);
-                } else {
-                    await supabaseClient
-                        .from('subscriptions')
-                        .insert({
-                            entreprise_id: profile.entreprise_id,
-                            plan: selectedPlan === 'recouvrement' ? 'recouvra_pro' : 'simple',
-                            status: 'active',
-                            current_period_start: now.toISOString(),
-                            current_period_end: end.toISOString(),
-                            updated_at: now.toISOString()
-                        });
-                }
-
-                await supabaseClient
-                    .from('profiles')
-                    .update({ has_recouvra: true, updated_at: now.toISOString() })
-                    .eq('entreprise_id', profile.entreprise_id);
-            }
+            // Correction (audit V2) : l'ancien code faisait un UPDATE direct
+            // sur `profiles` avec des colonnes inexistantes (plan_choisi,
+            // onboarding_complete) ou situées sur la mauvaise table
+            // (type_commerce/besoins appartiennent à `entreprises`), et de
+            // toute façon bloqué par la policy RLS (seul super_admin peut
+            // modifier `profiles`). Tout est désormais fait côté serveur par
+            // une fonction dédiée qui ne touche que les champs autorisés
+            // pour l'entreprise de l'utilisateur courant.
+            // -> Nécessite l'application de supabase/PROPOSED_fix_onboarding_rls.sql
+            const { error } = await supabaseClient.rpc('complete_onboarding', {
+                p_type_commerce: selectedCommerce,
+                p_besoins: selectedBesoins,
+                p_plan_choisi: selectedPlan,
+            });
+            if (error) throw error;
 
             btn.textContent = '✅ C\'est parti !';
             btn.style.background = 'var(--success)';
@@ -263,7 +184,6 @@ function initOnboarding() {
         }
     };
 
-    // ---------- Initialisation : première étape ----------
     steps.forEach((s, idx) => {
         if (idx === 0) {
             s.hidden = false;
