@@ -53,7 +53,7 @@ async function loadSettings() {
             if (document.getElementById('address')) document.getElementById('address').value = data.adresse || '';
             if (document.getElementById('tax')) document.getElementById('tax').value = data.identifiant_fiscal || '';
             if (document.getElementById('logo')) document.getElementById('logo').value = data.logo_path || '';
-            if (document.getElementById('primary')) document.getElementById('primary').value = data.primary_color || '#4F46E5';
+            if (document.getElementById('primary')) document.getElementById('primary').value = data.primary_color || '#1F6F5C';
             if (document.getElementById('secondary')) document.getElementById('secondary').value = data.secondary_color || '#20252b';
         }
     } catch (error) {

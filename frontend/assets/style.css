@@ -1,63 +1,65 @@
 /* ============================================================
-   RECOUVRA - DESIGN SYSTEM COMPLET
-   Version 2.0 - Moderne, Responsive, Dark Mode, Animations
+   RECOUVRA - DESIGN SYSTEM
+   Version 3.0 — Identité "marché moderne" : émeraude + or,
+   pensée pour des commerçants ouest-africains, l'usage WhatsApp
+   et le mobile money (Wave / Orange Money), lisible en plein
+   soleil sur un écran d'entrée de gamme.
    ============================================================ */
 
-/* Correction (audit V2 — refonte visuelle) : --font-display (Space Grotesk)
-   et --font-mono (IBM Plex Mono) étaient référencées partout dans ce fichier
-   mais n'étaient chargées nulle part (seul login.html chargeait des polices
-   Google Fonts, et ce n'étaient même pas les bonnes : Fraunces/Inter au lieu
-   de Space Grotesk/IBM Plex Mono). Résultat : sur 18 des 19 pages, tous les
-   titres et le texte "mono" retombaient silencieusement sur la police système.
-   En les importateurs ici, dans le fichier partagé par toutes les pages, la
-   police prévue s'applique désormais partout sans toucher au HTML. */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 /* ============================================================
    1. VARIABLES GLOBALES
    ============================================================ */
 :root {
-    /* Couleurs principales */
-    --bg: #F8FAFC;
-    --bg-2: #F1F5F9;
+    /* Couleurs principales — "marché moderne" : émeraude (confiance,
+       argent, croissance) + or (valeur, chaleur) sur un fond papier
+       neutre, plutôt que le bleu SaaS générique. */
+    --bg: #F6F4EF;
+    --bg-2: #EFEBE2;
     --surface: #FFFFFF;
-    --surface-2: #F1F5F9;
-    --surface-3: #E2E8F0;
-    --border: #E2E8F0;
-    --border-soft: #EAEFF4;
-    --text: #0F172A;
-    --text-muted: #64748B;
-    --text-faint: #94A3B8;
-    --accent: #4F46E5;
-    --accent-hi: #4338CA;
-    --accent-dim: #EEF2FF;
-    --accent-glow: rgba(79,70,229,0.16);
-    --danger: #DC2626;
-    --danger-hi: #B91C1C;
-    --danger-dim: #FEE2E2;
-    --success: #16A34A;
-    --success-hi: #15803D;
-    --success-dim: #DCFCE7;
-    --info: #0284C7;
-    --info-dim: #E0F2FE;
-    --warn: #D97706;
-    --warn-hi: #B45309;
-    --warn-dim: #FEF3C7;
+    --surface-2: #F6F4EF;
+    --surface-3: #E7E2D6;
+    --border: #E3DED2;
+    --border-soft: #ECE7DB;
+    --text: #16231D;
+    --text-muted: #5B6862;
+    --text-faint: #8B9791;
+    --accent: #1F6F5C;
+    --accent-hi: #17594A;
+    --accent-dim: #E7F2EE;
+    --accent-glow: rgba(31,111,92,0.16);
+    --gold: #E0942F;
+    --gold-hi: #C67A1B;
+    --gold-dim: #FBF0DD;
+    --danger: #C4472A;
+    --danger-hi: #A23A21;
+    --danger-dim: #FBE7E1;
+    --success: #2E7D4F;
+    --success-hi: #24623D;
+    --success-dim: #E3F3E8;
+    --info: #2B6E8F;
+    --info-dim: #E4F1F7;
+    --warn: #C67A1B;
+    --warn-hi: #A5650F;
+    --warn-dim: #FBF0DD;
 
-    /* Typographie */
-    --font-display: 'Space Grotesk', 'Segoe UI', sans-serif;
+    /* Typographie — Fraunces (personnalité, chaleur éditoriale) pour
+       les titres, Inter (lisibilité maximale sur petit écran) pour le
+       corps et les données. */
+    --font-display: 'Fraunces', 'Georgia', serif;
     --font-body: 'Inter', 'Segoe UI', sans-serif;
     --font-mono: 'IBM Plex Mono', 'Consolas', monospace;
 
     /* Ombres */
-    --shadow-sm: 0 1px 3px rgba(15,23,42,0.08);
-    --shadow-md: 0 10px 24px -10px rgba(15,23,42,0.14);
-    --shadow-lg: 0 20px 45px -18px rgba(15,23,42,0.18);
+    --shadow-sm: 0 1px 3px rgba(22,35,29,0.08);
+    --shadow-md: 0 10px 24px -10px rgba(22,35,29,0.16);
+    --shadow-lg: 0 20px 45px -18px rgba(22,35,29,0.22);
 
-    /* Rayons */
+    /* Rayons — différenciés par rôle plutôt qu'uniformes partout */
     --radius-sm: 8px;
     --radius: 12px;
-    --radius-lg: 16px;
+    --radius-lg: 20px;
 
     /* Transitions */
     --transition-fast: 0.15s ease;
@@ -77,27 +79,30 @@
    2. DARK MODE - VARIABLES
    ============================================================ */
 body.dark-mode {
-    --bg: #111827;
-    --bg-2: #111827;
-    --surface: #1F2937;
-    --surface-2: #374151;
-    --surface-3: #4B5563;
-    --border: #4B5563;
-    --border-soft: #374151;
-    --text: #F9FAFB;
-    --text-muted: #9CA3AF;
-    --text-faint: #6B7280;
-    --accent: #6366F1;
-    --accent-hi: #818CF8;
-    --accent-dim: rgba(99,102,241,0.15);
-    --accent-glow: rgba(99,102,241,0.25);
-    --danger: #F87171;
-    --danger-hi: #FCA5A5;
-    --danger-dim: rgba(248,113,113,0.15);
-    --success: #34D399;
-    --success-hi: #6EE7B0;
-    --success-dim: rgba(52,211,153,0.15);
-    --info: #38BDF8;
+    --bg: #101915;
+    --bg-2: #101915;
+    --surface: #17231D;
+    --surface-2: #1E2C24;
+    --surface-3: #2A3B32;
+    --border: #2A3B32;
+    --border-soft: #1E2C24;
+    --text: #F3F1EA;
+    --text-muted: #A9B3AC;
+    --text-faint: #6E7A73;
+    --accent: #3E9E82;
+    --accent-hi: #5AC0A2;
+    --accent-dim: rgba(62,158,130,0.16);
+    --accent-glow: rgba(62,158,130,0.28);
+    --gold: #F0AC4E;
+    --gold-hi: #F7C170;
+    --gold-dim: rgba(240,172,78,0.16);
+    --danger: #E27354;
+    --danger-hi: #EC947A;
+    --danger-dim: rgba(226,115,84,0.16);
+    --success: #4CAE7C;
+    --success-hi: #6EC79A;
+    --success-dim: rgba(76,174,124,0.16);
+    --info: #4FA6CC;
     --info-dim: rgba(56,189,248,0.15);
     --warn: #FBBF24;
     --warn-hi: #FCD34D;
@@ -138,7 +143,7 @@ a {
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     font-weight: 600;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.005em;
     margin: 0 0 8px;
     color: var(--text);
 }
@@ -183,10 +188,10 @@ p {
 }
 
 .sidebar {
-    width: 232px;
+    width: 240px;
     flex-shrink: 0;
-    background: linear-gradient(180deg, var(--surface) 0%, var(--bg-2) 130%);
-    border-right: 1px solid var(--border-soft);
+    background: linear-gradient(180deg, #163229 0%, #0F241D 100%);
+    border-right: 1px solid rgba(0,0,0,0.15);
     padding: 22px 14px;
     display: flex;
     flex-direction: column;
@@ -200,9 +205,9 @@ p {
 
 .brand {
     font-family: var(--font-display);
-    font-size: 1.05rem;
+    font-size: 1.15rem;
     font-weight: 700;
-    color: var(--text);
+    color: #F3F1EA;
     padding: 0 10px 22px;
     display: flex;
     align-items: center;
@@ -213,7 +218,7 @@ p {
     height: 28px;
     width: auto;
     flex-shrink: 0;
-    filter: drop-shadow(0 0 8px rgba(79,70,229,0.25));
+    filter: drop-shadow(0 0 8px rgba(224,148,47,0.35));
     border-radius: 6px;
 }
 
@@ -225,7 +230,7 @@ p {
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: var(--text-muted);
+    color: rgba(243,241,234,0.42);
     font-weight: 700;
     margin-bottom: 8px;
     padding-left: 12px;
@@ -237,7 +242,7 @@ p {
     gap: 12px;
     padding: 10px 12px;
     border-radius: var(--radius);
-    color: var(--text-muted);
+    color: rgba(243,241,234,0.78);
     text-decoration: none;
     font-size: 0.92rem;
     font-weight: 500;
@@ -246,15 +251,16 @@ p {
 }
 
 .nav-link:hover {
-    background: var(--surface-2);
-    color: var(--text);
+    background: rgba(255,255,255,0.08);
+    color: #F3F1EA;
     transform: translateX(2px);
 }
 
 .nav-link.active {
-    background: var(--accent);
-    color: #fff;
-    box-shadow: 0 4px 12px var(--accent-glow);
+    background: var(--gold);
+    color: #1A1206;
+    font-weight: 700;
+    box-shadow: 0 4px 14px rgba(224,148,47,0.35);
 }
 
 .nav-emoji {
@@ -264,8 +270,8 @@ p {
 }
 
 .badge-premium {
-    background: var(--warn);
-    color: white;
+    background: var(--gold);
+    color: #1A1206;
     font-size: 10px;
     padding: 2px 6px;
     border-radius: 20px;
@@ -276,7 +282,7 @@ p {
 .sidebar-footer {
     margin-top: auto;
     padding-top: 16px;
-    border-top: 1px solid var(--border-soft);
+    border-top: 1px solid rgba(255,255,255,0.1);
 }
 
 .support-link {
@@ -313,10 +319,10 @@ p {
     gap: 8px;
     padding: 10px;
     margin-bottom: 8px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
     border-radius: 8px;
-    color: var(--text);
+    color: #F3F1EA;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -325,14 +331,14 @@ p {
 }
 
 .dark-mode-toggle:hover {
-    background: var(--surface-3);
+    background: rgba(255,255,255,0.12);
 }
 
 .btn-logout {
     width: 100%;
     background: none;
-    border: 1px solid var(--border);
-    color: var(--text-muted);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: rgba(243,241,234,0.65);
     padding: 9px 12px;
     border-radius: var(--radius);
     cursor: pointer;
@@ -343,9 +349,13 @@ p {
 }
 
 .btn-logout:hover {
-    color: var(--danger-hi);
+    color: #fff;
     border-color: var(--danger);
-    background: var(--danger-dim);
+    background: rgba(196,71,42,0.35);
+}
+
+.hint.mono {
+    color: rgba(243,241,234,0.5) !important;
 }
 
 .main {
@@ -1588,14 +1598,14 @@ tbody tr:hover {
 }
 
 .big-card.primary {
-    background: linear-gradient(135deg, var(--accent), #6366F1);
+    background: var(--accent);
     color: #fff;
     border: none;
 }
 
 .big-card.warning {
-    background: linear-gradient(135deg, #f59e0b, #fbbf24);
-    color: #fff;
+    background: var(--gold);
+    color: #1A1206;
     border: none;
 }
 
@@ -3805,8 +3815,8 @@ body.dark-mode .spinner-small {
 
 /* --- Lien sidebar "Relancer PRO" mis en valeur --- */
 .nav-link.premium {
-    color: var(--accent);
-    font-weight: 600;
+    color: var(--gold);
+    font-weight: 700;
 }
 
 /* --- Stats génériques (stock.html : .stat-card existe déjà, mais pas
