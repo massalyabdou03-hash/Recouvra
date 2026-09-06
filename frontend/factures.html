@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vendre — Recouvra</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' [...]">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4F46E5">
     <meta name="mobile-web-app-capable" content="yes">
@@ -13,6 +13,13 @@
     <meta name="apple-mobile-web-app-title" content="Recouvra">
     <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
     <link rel="stylesheet" href="assets/style.css">
+    <!-- Component styles -->
+    <link rel="stylesheet" href="assets/components/buttons.css">
+    <link rel="stylesheet" href="assets/components/forms.css">
+    <link rel="stylesheet" href="assets/components/header.css">
+    <link rel="stylesheet" href="assets/components/nav.css">
+    <link rel="stylesheet" href="assets/components/toasts.css">
+    <link rel="stylesheet" href="assets/components/modals.css">
 </head>
 <body>
 
@@ -20,7 +27,7 @@
     <!-- Sidebar -->
     <nav class="sidebar">
         <div class="brand">
-            <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
+            <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 1[...]' alt="logo">
             <span data-company-name>Recouvra</span>
         </div>
 
@@ -51,6 +58,18 @@
         </div>
     </nav>
 
+    <!-- Header (mobile-first) -->
+    <header class="app-header" role="banner">
+      <div class="brand-compact">
+        <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F46E5'/%3E%3Cpath d='M7 1[...]' alt="logo">
+        <span data-company-name>Recouvra</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" title="Actualiser" onclick="location.reload()">🔄</button>
+        <button class="btn btn-secondary" title="Mode sombre" onclick="toggleDarkMode()">🌙</button>
+      </div>
+    </header>
+
     <!-- Contenu principal -->
     <main class="main">
         <div class="page-header-simple">
@@ -67,19 +86,19 @@
                     <span class="client-passing-icon">🏪</span><span>Client de passage</span>
                 </button>
                 <div class="client-select-wrap">
-                    <select id="client-select" onchange="onClientChange(this.value)">
+                    <select id="client-select" class="select--base" onchange="onClientChange(this.value)">
                         <option value="">Choisir un client...</option>
                     </select>
                 </div>
             </div>
-            <button class="btn-link" onclick="openQuickClient()">➕ Nouveau client</button>
+            <button class="btn-link btn--secondary" onclick="openQuickClient()">➕ Nouveau client</button>
         </div>
 
         <!-- Étape 2 : Produits -->
         <div class="sell-step-card">
             <div class="sell-step-header"><span class="step-number">2</span><h3>Qu'est-ce qu'il achète ?</h3></div>
             <div class="sell-search-bar">
-                <input type="text" id="product-search" placeholder="🔍 Rechercher un article..." oninput="filterProducts()">
+                <input type="text" id="product-search" class="input--base" placeholder="🔍 Rechercher un article..." oninput="filterProducts()">
             </div>
             <div class="sell-products-grid" id="products-grid">
                 <div class="empty-state">Chargement des articles...</div>
@@ -95,16 +114,16 @@
                 <strong id="cart-total">0 F</strong>
             </div>
             <div class="payment-buttons">
-                <button class="pay-button cash" onclick="completeSale('ESPECES')">
+                <button class="pay-button btn--primary btn--full cash" onclick="completeSale('ESPECES')">
                     <span class="pay-icon">💵</span><span class="pay-label">Espèces</span>
                 </button>
-                <button class="pay-button wave" onclick="completeSale('WAVE')">
+                <button class="pay-button btn--primary btn--full wave" onclick="completeSale('WAVE')">
                     <span class="pay-icon">📱</span><span class="pay-label">Wave</span>
                 </button>
-                <button class="pay-button om" onclick="completeSale('OM')">
+                <button class="pay-button btn--primary btn--full om" onclick="completeSale('OM')">
                     <span class="pay-icon">🟠</span><span class="pay-label">Orange Money</span>
                 </button>
-                <button class="pay-button credit" onclick="completeSale('CREDIT')">
+                <button class="pay-button btn--primary btn--full credit" onclick="completeSale('CREDIT')">
                     <span class="pay-icon">📝</span><span class="pay-label">À crédit</span>
                 </button>
             </div>
@@ -126,10 +145,10 @@
     <div class="modal modal-sm">
         <div class="modal-head"><h3>Nouveau client</h3><button class="close-x" onclick="closeQuickClient()">×</button></div>
         <form id="quick-client-form">
-            <label>Nom / Raison sociale *</label><input id="qc-nom" required>
+            <label>Nom / Raison sociale *</label><input id="qc-nom" class="input--base" required>
             <div class="field-row">
-                <div><label>Téléphone</label><input id="qc-telephone"></div>
-                <div><label>Email</label><input id="qc-email" type="email"></div>
+                <div><label>Téléphone</label><input id="qc-telephone" class="input--base"></div>
+                <div><label>Email</label><input id="qc-email" class="input--base" type="email"></div>
             </div>
             <div id="quick-client-msg"></div>
             <div class="modal-actions">
@@ -143,6 +162,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
+<script src="assets/components/ui.js"></script>
 <script>
 // ============================================================================
 // VENTE - LOGIQUE (utilise les fonctions de assets/app.js)
@@ -329,13 +349,6 @@ async function saveQuickClient(e) {
 let saleInProgress = false;
 
 async function completeSale(modePaiement) {
-    // Correction (audit V3) : chaque bouton de paiement (Espèces, Wave,
-    // Orange Money, Crédit) ne désactivait QUE lui-même pendant la vente.
-    // Rien n'empêchait de cliquer un AUTRE bouton pendant que le premier
-    // clic était encore en cours de traitement, ce qui pouvait vendre le
-    // même panier deux fois (deux factures, double déduction du stock).
-    // Le verrou global est posé seulement après les validations, et TOUJOURS
-    // levé dans le bloc finally, quel que soit le chemin de sortie.
     if (saleInProgress) return;
     if (cart.length === 0) { showToast('Ajoutez des articles au panier.', 'error'); return; }
     if (!isPassingClient && !selectedClientId) { showToast('Sélectionnez un client ou utilisez "Client de passage".', 'error'); return; }
@@ -353,11 +366,6 @@ async function completeSale(modePaiement) {
 
     const total = cart.reduce((s, item) => s + (item.prix * item.quantity), 0);
     const btn = document.querySelector(`.pay-button.${modePaiement.toLowerCase()}`);
-    // Correction (audit V3) : les boutons contiennent une icône + un libellé
-    // (innerHTML), mais le code écrasait ça avec `textContent = '...'` et
-    // tentait de restaurer un `dataset.originalText` qui n'était jamais
-    // défini nulle part — le bouton restait donc bloqué sur "..." après
-    // chaque vente. On sauvegarde et restaure désormais le vrai innerHTML.
     const btnOriginalHtml = btn ? btn.innerHTML : null;
     if (btn) { btn.innerHTML = '...'; }
     try {
@@ -435,7 +443,7 @@ async function loadTodaySales() {
             el.innerHTML = '<div class="empty-state">Aucune vente validée ce mois-ci.</div>';
             return;
         }
-        const modeLabels = { ESPECES: '💵 Espèces', WAVE: '📱 Wave', OM: '🟠 Orange Money', CREDIT: '📝 Crédit', CARTE: '💳 Carte', VIREMENT: '🏦 Virement', CHEQUE: '📄 Chèque' };
+        const modeLabels = { ESPECES: '💵 Espèces', WAVE: '📱 Wave', OM: '🟠 Orange Money', CREDIT: '📝 Crédit', CARTE: '💳 Carte', VIREMENT: '🏦 Virement', CHEQUE: '📄 Chèque' }[...]
         el.innerHTML = `
             <div class="table-wrapper">
                 <table>
@@ -468,5 +476,11 @@ async function loadTodaySales() {
 </script>
 
 <!-- Navigation mobile (générée par app.js) -->
+<nav class="mobile-nav" aria-hidden="false">
+  <a class="nav-item" href="index.html">🏠<span>Accueil</span></a>
+  <a class="nav-item active" href="factures.html">🧾<span>Vendre</span></a>
+  <a class="nav-item" href="stock.html">📦<span>Stock</span></a>
+  <a class="nav-item" href="clients.html">👥<span>Clients</span></a>
+</nav>
 </body>
 </html>
