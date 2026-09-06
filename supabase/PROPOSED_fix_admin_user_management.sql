@@ -1,4 +1,16 @@
 -- ============================================================================
+-- ÉTAPE 0 (recommandée) — DIAGNOSTIC EN LECTURE SEULE, SANS RISQUE
+-- À lancer d'abord pour vérifier la signature réellement déployée de
+-- admin_create_user (le DROP plus bas suppose "text, text, text, uuid,
+-- varchar, boolean" — à ajuster si le résultat ci-dessous est différent) :
+--
+-- select pg_get_function_identity_arguments(p.oid) as arguments
+-- from pg_proc p
+-- join pg_namespace n on n.oid = p.pronamespace
+-- where n.nspname = 'public' and p.proname = 'admin_create_user';
+-- ============================================================================
+
+-- ============================================================================
 -- PROPOSITION DE CORRECTION — NON APPLIQUÉE, À VALIDER AVANT EXÉCUTION
 -- ============================================================================
 -- Contexte (audit V2, passe 3) : super-admin.html appelle trois fonctions RPC
@@ -34,8 +46,93 @@
 -- avant toute mise en ligne, quel que soit le choix retenu.
 -- ============================================================================
 
-create extension if not exists pgcrypto;
+-- ============================================================================
+-- CORRECTION CRITIQUE : conflit avec le trigger d'auto-création d'entreprise
+-- ============================================================================
+-- Le trigger on_auth_user_created_create_company (upgrade_saas_onboarding_wave.sql,
+-- redéfini dans upgrade_wave_paiement_manuel.sql) se déclenche sur TOUT insert
+-- dans auth.users, y compris celui fait ci-dessous par admin_create_user().
+-- Sans garde-fou, il crée sa propre entreprise "Nouvelle entreprise" et son
+-- propre profil AVANT que admin_create_user() ne fasse le sien → conflit de
+-- clé primaire sur profiles.id, pour CHAQUE utilisateur créé depuis le
+-- super-admin (pas seulement le cas "nouvelle entreprise").
+--
+-- On neutralise le trigger uniquement pour les comptes créés par
+-- admin_create_user(), via un indicateur dans raw_app_meta_data (non
+-- modifiable par un utilisateur normal, contrairement à raw_user_meta_data
+-- que ce même trigger lit déjà pour l'inscription libre — donc aucun risque
+-- qu'un utilisateur se l'attribue lui-même).
+create or replace function create_company_for_new_user()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare
+    company_id uuid;
+    metadata jsonb := coalesce(new.raw_user_meta_data, '{}'::jsonb);
+begin
+    if coalesce(new.raw_app_meta_data->>'skip_auto_onboarding', 'false') = 'true' then
+        return new;
+    end if;
 
+    insert into entreprises (nom, gerant_nom, telephone, created_by)
+    values (
+        coalesce(nullif(metadata->>'entreprise_nom', ''), 'Nouvelle entreprise'),
+        nullif(metadata->>'gerant_nom', ''),
+        nullif(metadata->>'telephone', ''),
+        new.id
+    ) returning id into company_id;
+
+    insert into profiles (id, entreprise_id, role, has_recouvra)
+    values (new.id, company_id, 'admin', false);
+
+    insert into entreprise_settings (entreprise_id, nom_commercial, telephone)
+    values (company_id, coalesce(nullif(metadata->>'entreprise_nom', ''), 'Nouvelle entreprise'), nullif(metadata->>'telephone', ''));
+
+    insert into subscriptions (entreprise_id, status)
+    values (company_id, 'pending')
+    on conflict do nothing;
+
+    return new;
+end;
+$$;
+-- Le trigger lui-même n'a pas besoin d'être recréé : il pointe déjà vers
+-- cette fonction par son nom, "create or replace" suffit à le mettre à jour.
+
+-- ============================================================================
+-- CORRECTION #2 (découverte en testant en conditions réelles) : il existe
+-- un DEUXIÈME trigger sur auth.users, "on_auth_user_created" → handle_new_user(),
+-- qui n'apparaît dans AUCUN fichier .sql de ce dépôt — créé directement dans
+-- le dashboard Supabase à un moment donné, jamais versionné. Il exige que
+-- raw_user_meta_data contienne déjà un entreprise_id, sinon il lève
+-- exactement l'exception "entreprise_id is required to create a profile".
+-- Comme il se déclenche AVANT create_company_for_new_user() (ordre
+-- alphabétique des noms de trigger), il bloquait admin_create_user() avant
+-- même que le garde-fou ci-dessus n'entre en jeu. Aucun signUp() n'existe
+-- dans le code actuel du projet : ce trigger semble être un reliquat d'une
+-- architecture antérieure. On lui applique le même garde-fou plutôt que de
+-- le supprimer, par prudence (impossible de garantir qu'aucun processus
+-- externe n'en dépend).
+create or replace function handle_new_user()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare
+  v_entreprise_id uuid;
+begin
+  if coalesce(new.raw_app_meta_data->>'skip_auto_onboarding', 'false') = 'true' then
+    return new;
+  end if;
+
+  v_entreprise_id := nullif(new.raw_user_meta_data->>'entreprise_id', '')::uuid;
+
+  if v_entreprise_id is null then
+    raise exception 'entreprise_id is required to create a profile';
+  end if;
+
+  insert into public.profiles (id, entreprise_id)
+  values (new.id, v_entreprise_id);
+
+  return new;
+end;
+$$;
+
+create extension if not exists pgcrypto;
 -- Correction (suite au test réel) : Supabase installe pgcrypto par défaut
 -- dans le schéma "extensions", pas "public". Comme nos fonctions fixent
 -- explicitement leur search_path (bonne pratique de sécurité pour les
@@ -101,7 +198,7 @@ begin
 
     insert into auth.users (
         id, instance_id, aud, role, email, encrypted_password,
-        email_confirmed_at, raw_user_meta_data, created_at, updated_at
+        email_confirmed_at, raw_user_meta_data, raw_app_meta_data, created_at, updated_at
     )
     values (
         v_user_id,
@@ -110,6 +207,7 @@ begin
         crypt(p_password, gen_salt('bf')),
         now(),
         jsonb_build_object('nom', p_nom),
+        jsonb_build_object('skip_auto_onboarding', true),
         now(), now()
     );
 
