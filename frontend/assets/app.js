@@ -1101,6 +1101,20 @@ async function getCompanySettings() {
         data.logo_url = signed?.signedUrl || null;
       } else data.logo_url = data.logo_path;
       return data;
+    }).catch((error) => {
+      // Correction : cette promesse était mémorisée pour toute la durée de
+      // la page (variable globale companySettingsPromise). Si elle échouait
+      // ne serait-ce qu'une fois (aléa réseau, session pas encore prête au
+      // tout premier chargement), l'échec restait mis en cache pour de bon
+      // : tous les appels suivants à getCompanySettings() sur cette page
+      // re-levaient la même erreur, sans jamais réessayer. Sur des pages
+      // qui n'attrapaient pas cette erreur (ex: facture-detail.html), ça
+      // bloquait tout le script en silence, page coincée sur "Chargement...".
+      // On efface le cache pour permettre un nouvel essai au prochain appel,
+      // et on renvoie null plutôt que de propager l'erreur.
+      console.warn("Erreur récupération paramètres entreprise (non bloquant) :", error);
+      companySettingsPromise = null;
+      return null;
     });
   }
   return companySettingsPromise;

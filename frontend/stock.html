@@ -348,8 +348,8 @@ function renderProducts() {
             <div class="product-ref">${esc(p.reference_oem || '')} ${p.marque ? '· '+esc(p.marque) : ''}</div>
             <div class="product-price">${fmtMoney(p.prix_vente)}</div>
             <div class="card-actions">
-                <button class="edit-btn" onclick="event.stopPropagation(); editProduct('${p.id}')">✏️ Modifier</button>
-                <button class="delete-btn" onclick="event.stopPropagation(); deleteProduct('${p.id}')">🗑️ Supprimer</button>
+                <button class="edit-btn" onclick="event.stopPropagation(); editProduct(${p.id})">✏️ Modifier</button>
+                <button class="delete-btn" onclick="event.stopPropagation(); deleteProduct(${p.id})">🗑️ Supprimer</button>
             </div>
         </div>`;
     }).join('');

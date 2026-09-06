@@ -36,8 +36,21 @@
 
 create extension if not exists pgcrypto;
 
+-- Si vous avez déjà exécuté une version précédente de ce fichier, l'ancienne
+-- fonction à 6 paramètres doit être supprimée avant de recréer la nouvelle
+-- version à 7 paramètres (PostgreSQL les traiterait sinon comme deux
+-- fonctions différentes coexistantes, l'une d'elles restant obsolète).
+drop function if exists admin_create_user(text, text, text, uuid, varchar, boolean);
+
 -- ----------------------------------------------------------------------------
 -- admin_create_user : crée un compte auth + son profil, réservé au super_admin
+-- Correction (audit V4) : p_entreprise_id était obligatoire, mais le
+-- formulaire "Créer un utilisateur" de super-admin.html ne propose qu'une
+-- liste d'entreprises déjà existantes — impossible d'ajouter un utilisateur
+-- pour une entreprise qui n'existe pas encore. Résultat : en laissant le
+-- champ vide, l'insertion échouait avec une erreur de contrainte NOT NULL
+-- sur profiles.entreprise_id. p_entreprise_id devient donc optionnel : si
+-- absent, on crée la nouvelle entreprise à partir de p_nouvelle_entreprise_nom.
 -- ----------------------------------------------------------------------------
 create or replace function admin_create_user(
     p_email text,
@@ -45,7 +58,8 @@ create or replace function admin_create_user(
     p_nom text,
     p_entreprise_id uuid,
     p_role varchar,
-    p_has_recouvra boolean default false
+    p_has_recouvra boolean default false,
+    p_nouvelle_entreprise_nom text default null
 )
 returns uuid
 language plpgsql
@@ -54,6 +68,7 @@ set search_path = public, auth
 as $$
 declare
     v_user_id uuid := gen_random_uuid();
+    v_entreprise_id uuid := p_entreprise_id;
 begin
     if not current_user_is_super_admin() then
         raise exception 'Accès refusé : réservé au super administrateur';
@@ -65,6 +80,15 @@ begin
 
     if p_role not in ('vendeur', 'magasinier', 'admin', 'super_admin') then
         raise exception 'Rôle invalide : %', p_role;
+    end if;
+
+    if v_entreprise_id is null then
+        if p_nouvelle_entreprise_nom is null or trim(p_nouvelle_entreprise_nom) = '' then
+            raise exception 'Choisissez une entreprise existante ou indiquez le nom de la nouvelle entreprise';
+        end if;
+        insert into entreprises (nom, created_by)
+        values (trim(p_nouvelle_entreprise_nom), auth.uid())
+        returning id into v_entreprise_id;
     end if;
 
     insert into auth.users (
@@ -82,7 +106,7 @@ begin
     );
 
     insert into profiles (id, entreprise_id, role, has_recouvra)
-    values (v_user_id, p_entreprise_id, p_role, p_has_recouvra);
+    values (v_user_id, v_entreprise_id, p_role, p_has_recouvra);
 
     return v_user_id;
 end;
@@ -136,10 +160,10 @@ begin
 end;
 $$;
 
-revoke all on function admin_create_user(text, text, text, uuid, varchar, boolean) from public, anon;
+revoke all on function admin_create_user(text, text, text, uuid, varchar, boolean, text) from public, anon;
 revoke all on function admin_delete_user(uuid) from public, anon;
 revoke all on function admin_reset_password(uuid, text) from public, anon;
-grant execute on function admin_create_user(text, text, text, uuid, varchar, boolean) to authenticated;
+grant execute on function admin_create_user(text, text, text, uuid, varchar, boolean, text) to authenticated;
 grant execute on function admin_delete_user(uuid) to authenticated;
 grant execute on function admin_reset_password(uuid, text) to authenticated;
 

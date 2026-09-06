@@ -303,7 +303,14 @@
             <label>Nom complet</label>
             <input id="create-user-nom" type="text">
             <label>Entreprise</label>
-            <select id="create-user-entreprise"><option value="">— Choisir —</option></select>
+            <select id="create-user-entreprise" onchange="toggleNouvelleEntreprise()">
+                <option value="">— Choisir —</option>
+                <option value="__new__">+ Créer une nouvelle entreprise</option>
+            </select>
+            <div id="nouvelle-entreprise-row" style="display:none;">
+                <label>Nom de la nouvelle entreprise</label>
+                <input id="create-user-nouvelle-entreprise" type="text" placeholder="Ex: Boutique Fatou">
+            </div>
             <label>Rôle</label>
             <select id="create-user-role">
                 <option value="vendeur">Vendeur</option>
@@ -968,11 +975,20 @@ function openCreateUserModal() {
     document.getElementById('create-user-form').reset();
     document.getElementById('create-user-msg').textContent = '';
     const select = document.getElementById('create-user-entreprise');
-    select.innerHTML = '<option value="">— Choisir —</option>';
+    select.innerHTML = '<option value="">— Choisir —</option><option value="__new__">+ Créer une nouvelle entreprise</option>';
     allEntreprises.forEach(e => {
         select.innerHTML += `<option value="${e.id}">${esc(e.nom || 'Sans nom')}</option>`;
     });
+    document.getElementById('nouvelle-entreprise-row').style.display = 'none';
     document.getElementById('create-user-backdrop').classList.add('open');
+}
+
+// Correction (audit V4) : le formulaire ne proposait que des entreprises déjà
+// existantes — impossible d'ajouter un utilisateur pour une entreprise pas
+// encore créée. Ce bouton bascule l'affichage du champ "nouvelle entreprise".
+function toggleNouvelleEntreprise() {
+    const isNew = document.getElementById('create-user-entreprise').value === '__new__';
+    document.getElementById('nouvelle-entreprise-row').style.display = isNew ? 'block' : 'none';
 }
 
 async function createUser(e) {
@@ -982,11 +998,23 @@ async function createUser(e) {
     const email = document.getElementById('create-user-email').value.trim();
     const password = document.getElementById('create-user-password').value;
     const nom = document.getElementById('create-user-nom').value.trim();
-    const entrepriseId = document.getElementById('create-user-entreprise').value;
+    const entrepriseSelect = document.getElementById('create-user-entreprise').value;
+    const isNewEntreprise = entrepriseSelect === '__new__';
+    const nouvelleEntrepriseNom = document.getElementById('create-user-nouvelle-entreprise').value.trim();
     const role = document.getElementById('create-user-role').value;
     const hasRecouvra = document.getElementById('create-user-recouvra').checked;
     if (!email || !password) {
         msgEl.textContent = 'Email et mot de passe sont obligatoires.';
+        msgEl.style.color = 'var(--danger)';
+        return;
+    }
+    if (!entrepriseSelect) {
+        msgEl.textContent = 'Choisissez une entreprise ou créez-en une nouvelle.';
+        msgEl.style.color = 'var(--danger)';
+        return;
+    }
+    if (isNewEntreprise && !nouvelleEntrepriseNom) {
+        msgEl.textContent = 'Indiquez le nom de la nouvelle entreprise.';
         msgEl.style.color = 'var(--danger)';
         return;
     }
@@ -996,9 +1024,10 @@ async function createUser(e) {
                 p_email: email,
                 p_password: password,
                 p_nom: nom || null,
-                p_entreprise_id: entrepriseId || null,
+                p_entreprise_id: isNewEntreprise ? null : entrepriseSelect,
                 p_role: role,
-                p_has_recouvra: hasRecouvra
+                p_has_recouvra: hasRecouvra,
+                p_nouvelle_entreprise_nom: isNewEntreprise ? nouvelleEntrepriseNom : null
             });
         if (error) throw error;
         msgEl.textContent = '✅ Utilisateur créé avec succès.';
@@ -1006,6 +1035,7 @@ async function createUser(e) {
         setTimeout(() => {
             closeModal('create-user-backdrop');
             loadUsers();
+            loadEntreprises();
         }, 1500);
     } catch (error) {
         console.error('Erreur création utilisateur:', error);

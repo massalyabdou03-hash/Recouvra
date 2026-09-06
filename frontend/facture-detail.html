@@ -89,7 +89,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     const session = await requireAuth();
     if (!session) return;
 
-    await loadFacture();
+    // Correction : un échec de loadFacture() (ex: getCompanySettings() dont
+    // la promesse mémorisée globalement dans app.js peut rester "rejetée"
+    // en cache après un simple aléa réseau au premier chargement) n'était
+    // jamais rattrapé ici. La page restait bloquée pour toujours sur le
+    // "Chargement..." statique du HTML, sans aucun message d'erreur —
+    // c'est la cause du chargement qui échoue "parfois" sans raison visible.
+    try {
+        await loadFacture();
+    } catch (error) {
+        console.error('Erreur chargement facture:', error);
+        const el = document.getElementById('content');
+        if (el) {
+            el.innerHTML = `<div class="error-msg">Une erreur est survenue pendant le chargement. <button class="btn btn-secondary btn-sm" onclick="location.reload()">Réessayer</button></div>`;
+        }
+    }
 
     document.addEventListener('recouvra:connectivity-changed', loadFacture);
     document.addEventListener('recouvra:pending-updates-updated', loadFacture);
@@ -103,7 +117,16 @@ async function loadFacture() {
         return;
     }
 
-    const settings = await getCompanySettings() || {};
+    // Correction : getCompanySettings() peut rester en échec mis en cache
+    // (voir commentaire plus haut) — son résultat (logo/branding de
+    // l'entreprise) est purement cosmétique et ne doit jamais empêcher
+    // l'affichage de la facture elle-même en cas d'échec.
+    let settings = {};
+    try {
+        settings = await getCompanySettings() || {};
+    } catch (error) {
+        console.warn('Paramètres entreprise indisponibles (non bloquant):', error);
+    }
     let facture, lignes, offline = false, savedAt = null;
 
     try {
