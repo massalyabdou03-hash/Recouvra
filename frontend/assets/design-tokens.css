@@ -1,0 +1,131 @@
+/*
+Design tokens for Recouvra — Mobile First
+This file centralizes colors, typography, spacing and component tokens.
+Use these CSS variables across the app to ensure a consistent design system.
+*/
+:root{
+  /* Brand / functional colors */
+  --color-primary: #4F46E5;    /* primary blue - action */
+  --color-primary-hi: #6366F1; /* hover / emphasis */
+  --color-primary-dim: rgba(79,70,229,0.08);
+
+  --color-success: #16A34A;    /* green */
+  --color-success-hi: #059669;
+  --color-success-dim: rgba(22,163,74,0.08);
+
+  --color-danger: #DC2626;     /* red */
+  --color-danger-hi: #B91C1C;
+  --color-danger-dim: rgba(220,38,38,0.06);
+
+  --color-warn: #F97316;       /* orange */
+  --color-warn-hi: #EA580C;
+  --color-warn-dim: rgba(249,115,22,0.06);
+
+  --color-info: #0EA5E9;       /* info / alternative */
+  --color-neutral-900: #0f172a;
+  --color-neutral-800: #1f2937;
+  --color-neutral-700: #374151;
+  --color-neutral-600: #4b5563;
+  --color-neutral-500: #6b7280;
+  --color-neutral-400: #9ca3af;
+  --color-neutral-300: #d1d5db;
+  --color-neutral-200: #e5e7eb;
+  --color-neutral-100: #f3f4f6;
+  --color-white: #ffffff;
+
+  /* Surfaces & borders */
+  --surface: var(--color-white);
+  --surface-2: var(--color-neutral-100);
+  --surface-3: var(--color-neutral-200);
+  --border: var(--color-neutral-200);
+  --border-soft: var(--color-neutral-300);
+
+  /* Text */
+  --text: var(--color-neutral-900);
+  --text-muted: var(--color-neutral-600);
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Helvetica Neue', monospace;
+  --font-sans: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+
+  /* Typography scale (mobile-first) */
+  --font-size-xs: 0.75rem;   /* 12px */
+  --font-size-sm: 0.875rem;  /* 14px */
+  --font-size-md: 1rem;      /* 16px */
+  --font-size-lg: 1.125rem;  /* 18px */
+  --font-size-xl: 1.375rem;  /* 22px */
+  --font-size-2xl: 1.75rem;  /* 28px */
+
+  /* Spacing */
+  --space-xxs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(16,24,40,0.04);
+  --shadow-md: 0 6px 18px rgba(16,24,40,0.08);
+  --shadow-lg: 0 20px 40px rgba(16,24,40,0.12);
+
+  /* Buttons / touch targets */
+  --btn-height-md: 44px; /* accessible touch target */
+  --btn-radius: 10px;
+
+  /* Accessibility focus ring */
+  --focus-ring: 3px solid rgba(79,70,229,0.18);
+}
+
+/* Dark mode tokens (toggle by adding .dark-mode to body) */
+body.dark-mode{
+  --surface: #0b1220;
+  --surface-2: #0f1724;
+  --surface-3: #111827;
+  --border: rgba(255,255,255,0.04);
+  --border-soft: rgba(255,255,255,0.06);
+  --text: #e6eef8;
+  --text-muted: #9aa6b2;
+}
+
+/* Minimal helper classes to encourage use of tokens */
+.u-ring{ outline: none; box-shadow: none; }
+.u-focus:focus{ box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
+
+/* Buttons baseline */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:var(--btn-height-md); padding:0 var(--space-md); border-radius:var(--btn-radius); font-weight:700; font-family:var(--font-sans); font-size:var(--font-size-sm); cursor:pointer; border:1px solid transparent; }
+.btn-primary{ background:var(--color-primary); color:var(--color-white); }
+.btn-primary:hover{ background:var(--color-primary-hi); }
+.btn-secondary{ background:var(--surface-2); color:var(--text); border:1px solid var(--border-soft); }
+.btn-danger{ background:var(--color-danger); color:var(--color-white); }
+
+/* Cards */
+.card{ background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); border:1px solid var(--border-soft); padding:var(--space-md); }
+
+/* Small badge styles */
+.badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-weight:700; font-size:var(--font-size-xs); }
+.badge-success{ background:var(--color-success-dim); color:var(--color-success-hi); }
+.badge-danger{ background:var(--color-danger-dim); color:var(--color-danger-hi); }
+.badge-warn{ background:var(--color-warn-dim); color:var(--color-warn-hi); }
+.badge-info{ background:var(--color-primary-dim); color:var(--color-primary); }
+
+/* Inputs baseline */
+.input{ padding:10px 12px; border-radius:8px; border:1.5px solid var(--border); background:var(--surface-2); color:var(--text); font-size:var(--font-size-sm); }
+.input:focus{ outline:none; box-shadow:var(--focus-ring); }
+
+/* Utilities */
+.mt-md{ margin-top:var(--space-md); }
+.mb-md{ margin-bottom:var(--space-md); }
+.text-muted{ color:var(--text-muted); font-size:var(--font-size-sm); }
+.mono{ font-family:var(--mono); }
+
+/* Mobile-first responsive helpers */
+@media (min-width: 600px){
+  :root{ --font-size-md:1.05rem; }
+}
+@media (min-width: 1024px){
+  :root{ --font-size-md:1.12rem; }
+}
