@@ -1,0 +1,33 @@
+/* Forms component — inputs, selects, textareas baseline
+   These classes are intended as a progressive enhancement: pages that already
+   rely on global input styles will keep working. New form markup should use
+   these classes for consistent spacing and focus states.
+*/
+
+.input--base {
+  padding:10px 12px;
+  border-radius:8px;
+  border:1.5px solid var(--border, #E2E8F0);
+  background: var(--surface-2, #F1F5F9);
+  color: var(--text, #0F172A);
+  font-size: var(--font-size-sm, 0.875rem);
+  width:100%;
+  box-sizing:border-box;
+}
+
+.input--base:focus{
+  outline:none;
+  box-shadow: 0 0 0 4px rgba(79,70,229,0.08);
+  border-color: var(--color-primary, var(--accent));
+}
+
+.select--base{ appearance: none; padding:10px 12px; border-radius:8px; border:1.5px solid var(--border, #E2E8F0); background:var(--surface-2); width:100%; }
+
+.textarea--base{ padding:10px 12px; border-radius:8px; border:1.5px solid var(--border, #E2E8F0); background:var(--surface-2); width:100%; min-height:80px; resize:vertical; }
+
+.form-row--2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media (max-width:600px){ .form-row--2{ grid-template-columns:1fr; } }
+
+.form-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:16px; }
+
+.input-hint{ font-size:0.85rem; color:var(--text-muted); margin-top:6px; }

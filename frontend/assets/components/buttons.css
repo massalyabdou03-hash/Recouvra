@@ -1,0 +1,50 @@
+/* Buttons component (reusable)
+   Use these classes where possible instead of inline styles.
+   These classes rely on design tokens (frontend/assets/design-tokens.css) when available,
+   and fall back to existing vars defined in assets/style.css.
+*/
+
+.btn--primary {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:44px;
+  padding:0 16px;
+  border-radius:10px;
+  font-weight:700;
+  font-family:var(--font-sans, Inter, system-ui, sans-serif);
+  font-size:var(--font-size-sm, 0.875rem);
+  cursor:pointer;
+  border:1px solid transparent;
+  background: var(--color-primary, var(--accent));
+  color: var(--color-white, #fff);
+  box-shadow: 0 6px 18px rgba(16,24,40,0.08);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.btn--primary:hover:not(:disabled){
+  transform: translateY(-2px);
+  background: var(--color-primary-hi, var(--accent-hi));
+}
+
+.btn--secondary{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  min-height:44px; padding:0 14px; border-radius:10px; font-weight:700;
+  background: var(--surface-2, #F1F5F9); color: var(--text); border:1px solid var(--border-soft);
+}
+
+.btn--danger{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  min-height:44px; padding:0 14px; border-radius:10px; font-weight:700;
+  background: var(--color-danger-dim, #FEE2E2); color: var(--color-danger-hi, #B91C1C); border:1px solid var(--color-danger, #DC2626);
+}
+
+.btn--icon{
+  background:none; border:none; padding:8px; border-radius:8px; cursor:pointer; color:var(--text-muted);
+}
+
+.btn--full {
+  width:100%;
+  display:inline-flex;
+}
