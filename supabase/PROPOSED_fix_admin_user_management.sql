@@ -36,6 +36,14 @@
 
 create extension if not exists pgcrypto;
 
+-- Correction (suite au test réel) : Supabase installe pgcrypto par défaut
+-- dans le schéma "extensions", pas "public". Comme nos fonctions fixent
+-- explicitement leur search_path (bonne pratique de sécurité pour les
+-- fonctions security definer), elles ne trouvaient pas gen_salt()/crypt()
+-- tant que "extensions" n'y figurait pas — d'où l'erreur
+-- "function gen_salt(unknown) does not exist". Le search_path des 3
+-- fonctions ci-dessous inclut donc désormais extensions.
+
 -- Si vous avez déjà exécuté une version précédente de ce fichier, l'ancienne
 -- fonction à 6 paramètres doit être supprimée avant de recréer la nouvelle
 -- version à 7 paramètres (PostgreSQL les traiterait sinon comme deux
@@ -64,7 +72,7 @@ create or replace function admin_create_user(
 returns uuid
 language plpgsql
 security definer
-set search_path = public, auth
+set search_path = public, auth, extensions
 as $$
 declare
     v_user_id uuid := gen_random_uuid();
@@ -119,7 +127,7 @@ create or replace function admin_delete_user(p_user_id uuid)
 returns void
 language plpgsql
 security definer
-set search_path = public, auth
+set search_path = public, auth, extensions
 as $$
 begin
     if not current_user_is_super_admin() then
@@ -142,7 +150,7 @@ create or replace function admin_reset_password(p_user_id uuid, p_new_password t
 returns void
 language plpgsql
 security definer
-set search_path = public, auth
+set search_path = public, auth, extensions
 as $$
 begin
     if not current_user_is_super_admin() then
@@ -182,7 +190,7 @@ grant execute on function admin_reset_password(uuid, text) to authenticated;
 --
 -- create or replace function admin_list_users()
 -- returns table (id uuid, email text, entreprise_id uuid, role varchar, has_recouvra boolean, created_at timestamptz)
--- language plpgsql security definer set search_path = public, auth
+-- language plpgsql security definer set search_path = public, auth, extensions
 -- as $$
 -- begin
 --     if not current_user_is_super_admin() then
