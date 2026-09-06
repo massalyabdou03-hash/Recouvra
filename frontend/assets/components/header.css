@@ -1,0 +1,27 @@
+/* Header / topbar component styles */
+.app-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 16px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border-soft);
+}
+
+.app-header .brand-compact{
+  display:flex; align-items:center; gap:10px;
+}
+
+.app-header .brand-compact img{ height:28px; width:auto; border-radius:6px; }
+
+.app-header .header-actions{ display:flex; gap:8px; align-items:center; }
+
+.app-header .search-input{ min-width:180px; padding:8px 12px; border-radius:10px; border:1px solid var(--border); background:var(--surface-2); }
+
+/* Mobile: compact header */
+@media (max-width: 600px){
+  .sidebar{ display:none; }
+  .app{ flex-direction:column; }
+  .app-header{ position:sticky; top:0; z-index:30; width:100%; }
+}

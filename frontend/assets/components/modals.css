@@ -1,0 +1,7 @@
+/* Modals component (lightweight) */
+.modal-backdrop{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.45); z-index:80; padding:20px; }
+.modal-backdrop.open{ display:flex; }
+.modal-box{ background:var(--surface); border-radius:14px; width:100%; max-width:720px; padding:20px; box-shadow:var(--shadow-lg); border:1px solid var(--border-soft); }
+.modal-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px; }
+.modal-close{ background:none; border:none; font-size:20px; cursor:pointer; }
+@media(max-width:600px){ .modal-box{ max-width:100%; border-radius:12px; padding:16px; } }
