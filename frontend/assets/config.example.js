@@ -15,7 +15,7 @@ const SUPABASE_ANON_KEY = "<YOUR_SUPABASE_ANON_KEY_HERE>";
 const ADMIN_EMAIL = "admin@example.com";
 
 // Initialisation du client Supabase — ne modifiez pas si vous voulez garder
-// le comportement actuel (le fichier réel `config.js` doit définir ces valeurs).
+// le comportement actuel (le fichier réel `config.js` dans le repo définit ces valeurs).
 let supabaseClient = null;
 if (typeof window !== "undefined" && window.supabase) {
   if (SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL.indexOf('<') === -1) {
