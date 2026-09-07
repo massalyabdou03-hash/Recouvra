@@ -85,6 +85,16 @@ const factureId = params.get("id");
 
 let currentFacture, currentLignes, currentSettings;
 
+// Correction : utilisée deux fois dans ce fichier (affichage + export PDF)
+// mais jamais définie nulle part dans le projet — provoquait un
+// ReferenceError qui interrompait tout le chargement de la page.
+const MODE_PAIEMENT_LABELS = {
+    ESPECES: 'Espèces',
+    WAVE: 'Wave',
+    OM: 'Orange Money',
+    CREDIT: 'Crédit',
+};
+
 document.addEventListener('DOMContentLoaded', async () => {
     const session = await requireAuth();
     if (!session) return;

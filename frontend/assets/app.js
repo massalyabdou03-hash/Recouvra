@@ -155,9 +155,18 @@ async function requireAuth() {
     return null;
   }
 
+  // Correction : trial_ends_at n'existe pas sur `subscriptions` (colonnes
+  // réelles : status, current_period_end, etc. — voir schéma en base) et le
+  // statut 'trial' n'existe pas non plus dans la contrainte de `status`.
+  // Cette requête échouait donc systématiquement (erreur 400), et comme son
+  // erreur n'était pas vérifiée, `profile` finissait undefined à chaque
+  // appel : le contrôle d'abonnement plus bas était alors silencieusement
+  // court-circuité par le "if (!profile...) return session" — n'importe qui
+  // pouvait accéder à l'application sans abonnement actif, sans erreur
+  // visible nulle part.
   const { data: profile } = await supabaseClient
     .from("profiles")
-    .select("*, entreprises(subscriptions(status, trial_ends_at))")
+    .select("*, entreprises(subscriptions(status, current_period_end))")
     .eq("id", session.user.id)
     .single();
 
@@ -175,9 +184,8 @@ async function requireAuth() {
   }
 
   const subStatus = profile.entreprises.subscriptions?.status;
-  const trialEnd = profile.entreprises.subscriptions?.trial_ends_at;
 
-  if (subStatus === "active" || (subStatus === "trial" && trialEnd && new Date(trialEnd) > new Date())) {
+  if (subStatus === "active") {
     // OK
   } else {
     window.location.href = "abonnement.html";
