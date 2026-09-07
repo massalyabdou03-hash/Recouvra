@@ -217,11 +217,6 @@
                 <div><label>Catégorie</label>
                     <select id="categorie">
                         <option value="">— Choisir —</option>
-                        <option value="COSMETIQUES">Cosmétiques</option>
-                        <option value="PARFUMS">Parfums</option>
-                        <option value="SOINS">Soins</option>
-                        <option value="QUINCAILLERIE">Quincaillerie</option>
-                        <option value="AUTRE">Autre</option>
                     </select>
                 </div>
             </div>
@@ -233,7 +228,21 @@
                 <div><label>Quantité en stock</label><input id="quantite_stock" type="number" min="0" step="1" value="0"></div>
                 <div><label>Seuil d'alerte</label><input id="seuil_alerte" type="number" min="0" step="1" value="1"></div>
             </div>
-            <div><label>Emplacement</label><input id="emplacement" placeholder="Ex : Étagère A"></div>
+            <div class="form-row">
+                <div><label>Emplacement</label><input id="emplacement" placeholder="Ex : Étagère A"></div>
+                <div><label>Unité de mesure</label>
+                    <select id="unite_mesure">
+                        <option value="PCS" selected>Pièce</option>
+                        <option value="KG">Kilogramme (kg)</option>
+                        <option value="L">Litre (L)</option>
+                        <option value="M">Mètre (m)</option>
+                        <option value="M2">Mètre carré (m²)</option>
+                        <option value="ROULEAU">Rouleau</option>
+                        <option value="CARTON">Carton</option>
+                        <option value="PAQUET">Paquet</option>
+                    </select>
+                </div>
+            </div>
             <label>Description</label><textarea id="description" rows="2"></textarea>
             <div id="form-msg"></div>
             <div class="modal-actions">
@@ -259,9 +268,58 @@ let currentSearch = '';
 let currentTab = 'produits';
 let debounceTimer = null;
 
+// Catégories proposées selon le type de commerce choisi à l'inscription
+// (entreprises.type_commerce). Avant, la liste était figée sur un
+// vocabulaire de boutique de cosmétiques quel que soit le commerce.
+const CATEGORY_PRESETS = {
+    boutique: ['Vêtements', 'Chaussures', 'Accessoires', 'Cosmétiques & Beauté', 'Électronique', 'Maison', 'Autre'],
+    quincaillerie: ['Outillage', 'Plomberie', 'Électricité', 'Peinture', 'Visserie & Fixations', 'Matériaux de construction', 'Autre'],
+    garage: ['Moteur', 'Freinage', 'Suspension & Direction', 'Carrosserie', 'Électricité auto', 'Pneumatiques', 'Lubrifiants & Fluides', 'Autre'],
+    pieces_auto: ['Moteur', 'Freinage', 'Suspension & Direction', 'Carrosserie', 'Électricité auto', 'Pneumatiques', 'Lubrifiants & Fluides', 'Autre'],
+    alimentation: ['Épicerie', 'Boissons', 'Produits frais', 'Céréales & Féculents', 'Hygiène & Entretien', 'Autre'],
+};
+const DEFAULT_CATEGORIES = ['Général', 'Alimentation', 'Textile', 'Électronique', 'Autre'];
+let currentTypeCommerce = null;
+
+// Récupère le type de commerce de l'entreprise pour adapter la liste de
+// catégories. Non bloquant : en cas d'échec, on retombe sur une liste
+// générique plutôt que de casser le formulaire.
+async function loadTypeCommerce() {
+    try {
+        const profile = await currentProfile();
+        if (!profile?.entreprise_id) return;
+        const { data } = await supabaseClient.from('entreprises').select('type_commerce').eq('id', profile.entreprise_id).single();
+        currentTypeCommerce = data?.type_commerce || null;
+    } catch (e) {
+        console.warn('Impossible de charger le type de commerce (non bloquant) :', e);
+    } finally {
+        populateCategories();
+    }
+}
+
+// Remplit le <select> Catégorie avec la liste adaptée au commerce. Si une
+// catégorie déjà enregistrée (ex : ancienne donnée "COSMETIQUES") ne fait
+// plus partie de la liste, on l'ajoute quand même pour ne pas la perdre
+// silencieusement à l'édition.
+function populateCategories(selectedValue) {
+    const select = document.getElementById('categorie');
+    const current = selectedValue !== undefined ? selectedValue : select.value;
+    const list = CATEGORY_PRESETS[currentTypeCommerce] || DEFAULT_CATEGORIES;
+    select.innerHTML = '<option value="">— Choisir —</option>' + list.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+    if (current && ![...select.options].some(o => o.value === current)) {
+        const opt = document.createElement('option');
+        opt.value = current;
+        opt.textContent = current + ' (ancienne catégorie)';
+        select.appendChild(opt);
+    }
+    select.value = current || '';
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     const session = await requireAuth();
     if (!session) return;
+
+    loadTypeCommerce();
 
     // Pré-sélection du filtre via ?filter=rupture|faible|ok (utilisé par le
     // raccourci "Articles à commander" du dashboard, qui pointait auparavant
@@ -428,7 +486,8 @@ function editProduct(id) {
     document.getElementById('reference_oem').value = p.reference_oem || '';
     document.getElementById('reference_interne').value = p.reference_interne || '';
     document.getElementById('marque').value = p.marque || '';
-    document.getElementById('categorie').value = p.categorie || '';
+    populateCategories(p.categorie || '');
+    document.getElementById('unite_mesure').value = p.unite_mesure || 'PCS';
     document.getElementById('emplacement').value = p.emplacement || '';
     document.getElementById('prix_achat').value = p.prix_achat;
     document.getElementById('prix_vente').value = p.prix_vente;
@@ -453,6 +512,7 @@ async function saveProduct(e) {
         marque: document.getElementById('marque').value.trim() || null,
         categorie: document.getElementById('categorie').value || null,
         emplacement: document.getElementById('emplacement').value.trim() || null,
+        unite_mesure: document.getElementById('unite_mesure').value || 'PCS',
         prix_achat: Number(document.getElementById('prix_achat').value) || 0,
         prix_vente: Number(document.getElementById('prix_vente').value) || 0,
         quantite_stock: Number(document.getElementById('quantite_stock').value) || 0,
