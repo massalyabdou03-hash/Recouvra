@@ -1067,9 +1067,9 @@ async function addAdminToGlobalNav() {
 
 // ----------------------------------------------------------------------------
 // 14bis. UTILITAIRES SUPABASE PARTAGÉS (ajoutés lors de l'audit V2 : ces deux
-// fonctions étaient appelées par rupture-stock.js et super-admin.js mais
-// n'existaient nulle part dans le projet, ce qui cassait silencieusement
-// ces deux fonctionnalités).
+// fonctions étaient appelées par rupture-stock.js (page supprimée depuis,
+// fusionnée dans stock.html) et super-admin.js mais n'existaient nulle part
+// dans le projet, ce qui cassait silencieusement ces deux fonctionnalités).
 // ----------------------------------------------------------------------------
 
 // Récupère toutes les lignes d'une requête en paginant par lots de 1000

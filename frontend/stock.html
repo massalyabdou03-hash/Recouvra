@@ -124,13 +124,17 @@
         <div class="nav-section">
             <div class="nav-section-title">Mon Stock</div>
             <a href="stock.html" class="nav-link active"><span class="nav-emoji">📊</span> Stock & Produits</a>
-            <a href="rupture-stock.html" class="nav-link"><span class="nav-emoji">⚠️</span> Ruptures</a>
         </div>
 
         <div class="nav-section">
             <div class="nav-section-title">Mon Argent</div>
             <a href="credits.html" class="nav-link"><span class="nav-emoji">💸</span> On me doit</a>
             <a href="recouvra.html" class="nav-link premium"><span class="nav-emoji">📣</span> Relancer <span class="badge-premium">PRO</span></a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Entreprise</div>
+            <a href="parametres.html" class="nav-link"><span class="nav-emoji">⚙️</span> Paramètres</a>
         </div>
 
         <div class="sidebar-footer">
@@ -172,6 +176,7 @@
                     <button class="stock-tab" data-filter="rupture" onclick="filterByStatus('rupture', this)">❌ Ruptures</button>
                     <button class="stock-tab" data-filter="ok" onclick="filterByStatus('ok', this)">✅ En stock</button>
                 </div>
+                <button class="btn btn-secondary" id="export-btn" onclick="exportExcel()">⬇️ Exporter en Excel</button>
                 <button class="btn" onclick="openModal()">➕ Ajouter</button>
             </div>
 
@@ -240,6 +245,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
 <script>
@@ -256,6 +262,16 @@ let debounceTimer = null;
 document.addEventListener('DOMContentLoaded', async () => {
     const session = await requireAuth();
     if (!session) return;
+
+    // Pré-sélection du filtre via ?filter=rupture|faible|ok (utilisé par le
+    // raccourci "Articles à commander" du dashboard, qui pointait auparavant
+    // vers la page Ruptures désormais supprimée).
+    const urlFilter = new URLSearchParams(location.search).get('filter');
+    if (['faible', 'rupture', 'ok'].includes(urlFilter)) {
+        currentFilter = urlFilter;
+        document.querySelectorAll('.stock-tab').forEach(t => t.classList.remove('active'));
+        document.querySelector(`.stock-tab[data-filter="${urlFilter}"]`)?.classList.add('active');
+    }
 
     await loadProducts();
     await loadMovements();
@@ -321,9 +337,8 @@ function filterProducts() {
     renderProducts();
 }
 
-// ---------- Affichage des produits ----------
-function renderProducts() {
-    const grid = document.getElementById('products-grid');
+// ---------- Filtrage (partagé entre l'affichage et l'export Excel) ----------
+function getFilteredProducts() {
     let filtered = allProducts;
     if (currentFilter === 'faible') filtered = filtered.filter(p => p.quantite_stock > 0 && p.quantite_stock <= p.seuil_alerte);
     else if (currentFilter === 'rupture') filtered = filtered.filter(p => p.quantite_stock === 0);
@@ -333,6 +348,13 @@ function renderProducts() {
         (p.reference_oem || '').toLowerCase().includes(currentSearch) ||
         (p.marque || '').toLowerCase().includes(currentSearch)
     );
+    return filtered;
+}
+
+// ---------- Affichage des produits ----------
+function renderProducts() {
+    const grid = document.getElementById('products-grid');
+    const filtered = getFilteredProducts();
 
     if (filtered.length === 0) {
         grid.innerHTML = '<div class="empty-state">Aucun article trouvé</div>';
@@ -353,6 +375,35 @@ function renderProducts() {
             </div>
         </div>`;
     }).join('');
+}
+
+// ---------- Export Excel ----------
+// Repris de la page Ruptures (supprimée : sa fonction est désormais couverte
+// par les onglets Tous/Faible/Ruptures/En stock ci-dessus). Exporte la liste
+// actuellement affichée (filtre + recherche en cours).
+const FILTER_LABELS = { all: 'Tous les articles', faible: 'Stock faible', rupture: 'Ruptures de stock', ok: 'En stock' };
+
+function exportExcel() {
+    const filtered = getFilteredProducts();
+    if (filtered.length === 0) { showToast('Aucun article à exporter.', 'info'); return; }
+    const rows = filtered.map(p => ({
+        "Référence OEM": p.reference_oem,
+        "Référence interne": p.reference_interne,
+        "Désignation": p.designation,
+        "Marque": p.marque || "",
+        "Catégorie": p.categorie || "",
+        "Emplacement": p.emplacement || "",
+        "Quantité en stock": p.quantite_stock,
+        "Prix d'achat": Number(p.prix_achat || 0),
+        "Prix de vente": Number(p.prix_vente || 0),
+        "Seuil d'alerte": p.seuil_alerte,
+    }));
+    const sheet = XLSX.utils.json_to_sheet(rows);
+    sheet["!cols"] = [{ wch: 18 }, { wch: 18 }, { wch: 32 }, { wch: 16 }, { wch: 16 }, { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 12 }];
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, sheet, FILTER_LABELS[currentFilter] || "Stock");
+    const today = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(workbook, `stock_${currentFilter}_${today}.xlsx`);
 }
 
 // ---------- Modal Ajouter / Modifier ----------

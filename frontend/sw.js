@@ -15,7 +15,7 @@
 // postes déjà installés continueront de servir l'ancienne version en cache.
 // =============================================================================
 
-const CACHE_VERSION = "v27";
+const CACHE_VERSION = "v28";
 const SHELL_CACHE = `recouvra-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `recouvra-runtime-${CACHE_VERSION}`;
 
@@ -25,7 +25,6 @@ const SHELL_ASSETS = [
   "index.html",
   "catalogue.html",
   "stock.html",
-  "rupture-stock.html",
   "factures.html",
   "facture-detail.html",
   "credits.html",
