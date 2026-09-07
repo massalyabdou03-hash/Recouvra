@@ -64,13 +64,13 @@ function renderTable(search = '') {
                 <thead><tr><th>Référence</th><th>Désignation</th><th>Marque</th><th>Catégorie</th><th>Emplacement</th><th class="num">Prix achat</th><th class="num">Seuil d'alerte</th></tr></thead>
                 <tbody>
                     ${filtered.map(p => `<tr>
-                        <td><div class="ref">${esc(p.reference_oem)}</div><div class="hint">${esc(p.reference_interne)}</div></td>
-                        <td>${esc(p.designation)}</td>
-                        <td>${esc(p.marque || '—')}</td>
-                        <td>${esc(p.categorie || '—')}</td>
-                        <td>${esc(p.emplacement || '—')}</td>
-                        <td class="num">${fmtMoney(p.prix_achat)}</td>
-                        <td class="num">${p.seuil_alerte}</td>
+                        <td data-label="Référence"><div class="ref">${esc(p.reference_oem)}</div><div class="hint">${esc(p.reference_interne)}</div></td>
+                        <td data-label="Désignation">${esc(p.designation)}</td>
+                        <td data-label="Marque">${esc(p.marque || '—')}</td>
+                        <td data-label="Catégorie">${esc(p.categorie || '—')}</td>
+                        <td data-label="Emplacement">${esc(p.emplacement || '—')}</td>
+                        <td class="num" data-label="Prix achat">${fmtMoney(p.prix_achat)}</td>
+                        <td class="num" data-label="Seuil d'alerte">${p.seuil_alerte}</td>
                     </tr>`).join('')}
                 </tbody>
             </table>

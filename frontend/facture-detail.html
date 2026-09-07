@@ -244,18 +244,20 @@ async function loadFacture() {
                 </div>
             ` : ""}
 
-            <table style="margin-top:18px;">
-                <thead><tr><th>Désignation</th><th class="num">Qté</th><th class="num">Prix unit.</th><th class="num">Montant</th></tr></thead>
-                <tbody>
-                    ${(lignes || []).map(l => `
-                        <tr>
-                            <td>${esc(l.designation)}</td>
-                            <td class="num">${l.quantite_affichee ?? l.quantite} ${esc(MEASURE_UNIT_LABELS[l.unite_gros] || MEASURE_UNIT_LABELS[l.unite_mesure] || l.unite_mesure || "pcs")}</td>
-                            <td class="num">${fmtMoney(l.prix_unitaire)}</td>
-                            <td class="num">${fmtMoney(l.montant)}</td>
-                        </tr>`).join("")}
-                </tbody>
-            </table>
+            <div class="table-wrapper" style="margin-top:18px;">
+                <table>
+                    <thead><tr><th>Désignation</th><th class="num">Qté</th><th class="num">Prix unit.</th><th class="num">Montant</th></tr></thead>
+                    <tbody>
+                        ${(lignes || []).map(l => `
+                            <tr>
+                                <td data-label="Désignation">${esc(l.designation)}</td>
+                                <td class="num" data-label="Qté">${l.quantite_affichee ?? l.quantite} ${esc(MEASURE_UNIT_LABELS[l.unite_gros] || MEASURE_UNIT_LABELS[l.unite_mesure] || l.unite_mesure || "pcs")}</td>
+                                <td class="num" data-label="Prix unit.">${fmtMoney(l.prix_unitaire)}</td>
+                                <td class="num" data-label="Montant">${fmtMoney(l.montant)}</td>
+                            </tr>`).join("")}
+                    </tbody>
+                </table>
+            </div>
 
             <div style="text-align:right; margin-top:16px; font-family:var(--font-display); font-size:1.3rem;">
                 Total : <span class="mono">${fmtMoney(facture.montant_total)}</span>

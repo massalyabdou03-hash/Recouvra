@@ -151,11 +151,11 @@ async function loadPromises() {
                     <tbody>
                         ${data.map(p => `
                             <tr>
-                                <td>${esc(p.clients?.nom || '—')}</td>
-                                <td class="ref">${esc(p.factures?.numero_facture || '—')}</td>
-                                <td class="num"><strong>${fmtMoney(p.montant_promis)}</strong></td>
-                                <td class="hint">${fmtDate(p.date_promise)}</td>
-                                <td>${statusBadge[p.statut] || p.statut}</td>
+                                <td data-label="Client">${esc(p.clients?.nom || '—')}</td>
+                                <td class="ref" data-label="Facture">${esc(p.factures?.numero_facture || '—')}</td>
+                                <td class="num" data-label="Montant promis"><strong>${fmtMoney(p.montant_promis)}</strong></td>
+                                <td class="hint" data-label="Date promise">${fmtDate(p.date_promise)}</td>
+                                <td data-label="Statut">${statusBadge[p.statut] || p.statut}</td>
                                 <td class="actions-cell">
                                     ${p.statut === 'EN_ATTENTE' ? `
                                         <button class="btn btn-sm btn-secondary" onclick="markPromiseRespected('${p.id}')">✓ Respectée</button>

@@ -3665,6 +3665,12 @@ body.dark-mode .spinner-small {
     }
 }
 
+@media (max-width: 480px) {
+    .stock-stats {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
 /* ============================================================
    20. IMPRESSION
    ============================================================ */

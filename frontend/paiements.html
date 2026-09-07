@@ -242,12 +242,12 @@ async function loadPayments() {
                     <tbody>
                         ${data.map(p => `
                             <tr>
-                                <td class="hint">${fmtDateTime(p.created_at)}</td>
-                                <td class="ref">${esc(p.factures?.numero_facture || '—')}</td>
-                                <td class="num"><strong>${fmtMoney(p.montant)}</strong></td>
-                                <td><span class="badge badge-info">${esc(p.methode)}</span></td>
-                                <td class="hint">${esc(p.reference || '—')}</td>
-                                <td class="hint">${esc(p.profiles?.email || '—')}</td>
+                                <td class="hint" data-label="Date">${fmtDateTime(p.created_at)}</td>
+                                <td class="ref" data-label="Facture">${esc(p.factures?.numero_facture || '—')}</td>
+                                <td class="num" data-label="Montant"><strong>${fmtMoney(p.montant)}</strong></td>
+                                <td data-label="Méthode"><span class="badge badge-info">${esc(p.methode)}</span></td>
+                                <td class="hint" data-label="Référence">${esc(p.reference || '—')}</td>
+                                <td class="hint" data-label="Par">${esc(p.profiles?.email || '—')}</td>
                             </tr>
                         `).join('')}
                     </tbody>

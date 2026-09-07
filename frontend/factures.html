@@ -524,11 +524,11 @@ async function loadTodaySales() {
                     <tbody>
                         ${data.map(f => `
                             <tr onclick="window.location.href='facture-detail.html?id=${f.id}'" style="cursor:pointer;">
-                                <td class="ref">${esc(f.numero_facture || '—')}</td>
-                                <td class="hint">${fmtDate(f.validated_at || f.created_at)}</td>
-                                <td>${esc(f.clients?.nom || '—')}</td>
-                                <td class="num"><strong>${fmtMoney(f.montant_total)}</strong></td>
-                                <td>${modeLabels[f.mode_paiement] || f.mode_paiement}</td>
+                                <td class="ref" data-label="N° Facture">${esc(f.numero_facture || '—')}</td>
+                                <td class="hint" data-label="Date">${fmtDate(f.validated_at || f.created_at)}</td>
+                                <td data-label="Client">${esc(f.clients?.nom || '—')}</td>
+                                <td class="num" data-label="Montant"><strong>${fmtMoney(f.montant_total)}</strong></td>
+                                <td data-label="Paiement">${modeLabels[f.mode_paiement] || f.mode_paiement}</td>
                                 <td class="actions-cell">
                                     <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); window.location.href='facture-detail.html?id=${f.id}'">Voir</button>
                                 </td>

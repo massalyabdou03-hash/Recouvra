@@ -53,14 +53,14 @@ async function loadRelances() {
                     <tbody>
                         ${data.map(r => `
                             <tr>
-                                <td class="hint">${fmtDateTime(r.created_at)}</td>
-                                <td>
+                                <td class="hint" data-label="Date">${fmtDateTime(r.created_at)}</td>
+                                <td data-label="Client">
                                     <strong>${esc(r.clients?.nom || '—')}</strong>
                                     <div class="hint">${esc(r.clients?.telephone || '')}</div>
                                 </td>
-                                <td class="ref">${esc(r.factures?.numero_facture || '—')}</td>
-                                <td>${canalBadge[r.canal] || r.canal}</td>
-                                <td class="hint" style="max-width:400px; word-break:break-word;">
+                                <td class="ref" data-label="Facture">${esc(r.factures?.numero_facture || '—')}</td>
+                                <td data-label="Canal">${canalBadge[r.canal] || r.canal}</td>
+                                <td class="hint" data-label="Message" style="max-width:400px; word-break:break-word;">
                                     ${esc(r.message || '—')}
                                 </td>
                             </tr>
