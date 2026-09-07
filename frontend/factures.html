@@ -61,11 +61,11 @@
         <div class="page-header-simple">
             <a href="index.html" class="btn-back"><span class="arrow">←</span> Accueil</a>
             <h1>🧾 Faire une vente</h1>
-            <p>Vendez en 3 étapes simples.</p>
+            <p>Vendez en 3 étapes simples. <button type="button" class="btn-link" id="replay-tour-btn">🧭 Revoir le guide</button></p>
         </div>
 
         <!-- Étape 1 : Client -->
-        <div class="sell-step-card">
+        <div class="sell-step-card" id="sell-step-client">
             <div class="sell-step-header"><span class="step-number">1</span><h3>Qui achète ?</h3></div>
             <div class="client-quick-select">
                 <button class="client-passing active" onclick="selectClient('passing', this)">
@@ -81,7 +81,7 @@
         </div>
 
         <!-- Étape 2 : Produits -->
-        <div class="sell-step-card">
+        <div class="sell-step-card" id="sell-step-products">
             <div class="sell-step-header"><span class="step-number">2</span><h3>Qu'est-ce qu'il achète ?</h3></div>
             <div class="sell-search-bar">
                 <input type="text" id="product-search" placeholder="🔍 Rechercher un article..." oninput="filterProducts()">
@@ -148,6 +148,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
+<script src="assets/tour.js"></script>
 <script>
 // ============================================================================
 // VENTE - LOGIQUE (utilise les fonctions de assets/app.js)
@@ -169,7 +170,64 @@ document.addEventListener('DOMContentLoaded', async () => {
     ]);
 
     document.getElementById('quick-client-form').addEventListener('submit', saveQuickClient);
+    document.getElementById('replay-tour-btn').addEventListener('click', () => runVenteTour({ force: true }));
+    initVenteTourAutoStart();
 });
+
+// ---------- Guide de vente (visite guidée) ----------
+// Se déclenche tout seul au premier jour d'un vendeur sur cette page (une
+// fois par compte, mémorisé via profiles.tour_vente_vu_at), et reste
+// disponible à tout moment via le bouton "Revoir le guide" ou en ouvrant
+// factures.html?guide=1.
+function venteTourSteps() {
+    return [
+        {
+            title: "Bienvenue 👋",
+            text: "On vous montre en 4 étapes comment encaisser une vente. Ça prend 30 secondes, et vous pourrez toujours revoir ce guide plus tard.",
+        },
+        {
+            selector: "#sell-step-client",
+            title: "1. Qui achète ?",
+            text: "Par défaut, c'est un « Client de passage ». Pour une vente à un client enregistré (utile pour le crédit ou le suivi), choisissez-le dans la liste, ou créez-le avec « ➕ Nouveau client ».",
+        },
+        {
+            selector: "#sell-step-products",
+            title: "2. Qu'est-ce qu'il achète ?",
+            text: "Recherchez un article, puis touchez sa carte pour l'ajouter au panier. Vous pouvez ajouter autant d'articles que nécessaire.",
+        },
+        {
+            title: "3. Encaisser 💰",
+            text: "Dès qu'un article est ajouté, le récapitulatif et le total apparaissent en bas de page, avec les moyens de paiement : Espèces, Wave, Orange Money ou À crédit. Touchez celui utilisé par le client pour finaliser la vente.",
+        },
+    ];
+}
+
+function runVenteTour({ force = false } = {}) {
+    if (!force && document.querySelector(".tour-overlay")) return;
+    startGuidedTour(venteTourSteps(), {
+        onFinish: () => markVenteTourSeen(),
+    });
+}
+
+async function markVenteTourSeen() {
+    try {
+        const { error } = await supabaseClient.rpc('marquer_tour_vente_vu');
+        if (error) throw error;
+    } catch (error) {
+        console.warn('Erreur enregistrement guide de vente vu :', error);
+    }
+}
+
+async function initVenteTourAutoStart() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('guide') === '1') { runVenteTour({ force: true }); return; }
+    try {
+        const profile = await currentProfile();
+        if (profile && !profile.tour_vente_vu_at) runVenteTour();
+    } catch (error) {
+        console.warn('Erreur vérification guide de vente :', error);
+    }
+}
 
 // ---------- Chargement des produits ----------
 async function loadProducts() {

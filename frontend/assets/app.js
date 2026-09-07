@@ -984,6 +984,26 @@ function addSupportLinkToSidebar() {
   footer.insertBefore(supportLink, footer.firstChild);
 }
 
+// Ajoute le lien "Aide" (mode d'emploi + guide de vente rejouable) dans la
+// section "Mon Entreprise" de la sidebar, sur toutes les pages, sans avoir à
+// dupliquer le lien dans chaque fichier HTML (même logique que le lien
+// Support ci-dessus).
+function addAideLinkToSidebar() {
+  const sidebar = document.querySelector(".sidebar");
+  if (!sidebar) return;
+  if (sidebar.querySelector(".aide-nav-link")) return;
+
+  const settingsLink = sidebar.querySelector('a.nav-link[href="parametres.html"]');
+  if (!settingsLink) return;
+
+  const currentPage = window.location.pathname.split("/").pop() || "index.html";
+  const aideLink = document.createElement("a");
+  aideLink.href = "aide.html";
+  aideLink.className = "nav-link aide-nav-link" + (currentPage === "aide.html" ? " active" : "");
+  aideLink.innerHTML = '<span class="nav-emoji">❓</span> Aide';
+  settingsLink.after(aideLink);
+}
+
 async function addAdminLinkIfSuperAdmin() {
   try {
     const { data: { session } } = await supabaseClient.auth.getSession();
@@ -1036,6 +1056,7 @@ function createGlobalNav() {
     { key: "stock", label: "Stock", href: "stock.html", icon: "📊" },
     { key: "credits", label: "Crédits", href: "credits.html", icon: "💸" },
     { key: "recouvra", label: "Recouvra", href: "recouvra.html", icon: "📣" },
+    { key: "aide", label: "Aide", href: "aide.html", icon: "❓" },
   ];
   nav.innerHTML = `<div class="global-nav-links">${links
     .map(
@@ -1142,6 +1163,21 @@ async function getCompanySettings() {
   return companySettingsPromise;
 }
 
+// Génère un avatar de repli (initiale de l'entreprise sur fond coloré) à
+// utiliser quand le vrai logo ne charge pas (fichier supprimé du storage,
+// URL collée par l'utilisateur invalide/morte, URL signée expirée...).
+// Avant cette correction, un logo cassé laissait le navigateur afficher son
+// icône "image cassée" + le texte alternatif juste à côté du nom de
+// l'entreprise, qui débordait par-dessus le reste de l'en-tête (visible
+// aussi bien dans la sidebar que sur l'en-tête d'une facture).
+function companyLogoFallback(settings) {
+  const letter = (settings?.nom_commercial || "?").trim().charAt(0).toUpperCase() || "?";
+  const color = settings?.primary_color || "#1F6F5C";
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="${color}"/><text x="32" y="33" text-anchor="middle" dominant-baseline="central" font-family="Georgia, serif" font-size="30" font-weight="700" fill="#fff">${letter}</text></svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+window.companyLogoFallback = companyLogoFallback;
+
 async function applyCompanySettings() {
   const settings = await getCompanySettings();
   if (!settings) return;
@@ -1153,7 +1189,16 @@ async function applyCompanySettings() {
   document.querySelectorAll(".global-nav-mark").forEach((mark) => {
     mark.textContent = (settings.nom_commercial || "Entreprise").trim().charAt(0).toUpperCase();
   });
-  if (settings.logo_url) document.querySelectorAll("[data-company-logo]").forEach((img) => (img.src = settings.logo_url));
+  if (settings.logo_url) {
+    const fallback = companyLogoFallback(settings);
+    document.querySelectorAll("[data-company-logo]").forEach((img) => {
+      // Si le chargement échoue (à l'instant ou plus tard, ex: lien externe
+      // qui tombe), on bascule sur l'avatar généré au lieu de laisser
+      // l'icône cassée du navigateur s'afficher.
+      img.onerror = () => { img.onerror = null; img.src = fallback; };
+      img.src = settings.logo_url;
+    });
+  }
   if (settings.nom_commercial && document.title.includes(" — ")) {
     document.title = document.title.split(" — ")[0] + " — " + settings.nom_commercial;
   }
@@ -1175,6 +1220,7 @@ function date(value) {
 document.addEventListener("DOMContentLoaded", () => {
   initDarkMode();
   addSupportLinkToSidebar();
+  addAideLinkToSidebar();
   addAdminLinkIfSuperAdmin();
   createGlobalNav();
   addAdminToGlobalNav();

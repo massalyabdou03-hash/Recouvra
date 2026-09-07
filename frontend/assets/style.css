@@ -220,6 +220,7 @@ p {
     flex-shrink: 0;
     filter: drop-shadow(0 0 8px rgba(224,148,47,0.35));
     border-radius: 6px;
+    overflow: hidden;
 }
 
 .nav-section {
@@ -4046,6 +4047,7 @@ body.dark-mode .spinner-small {
     background: var(--surface-2);
     border: 1px solid var(--border-soft);
     flex-shrink: 0;
+    overflow: hidden;
 }
 
 .ih-name {
@@ -4081,5 +4083,112 @@ body.dark-mode .spinner-small {
     }
     .ih-contact {
         text-align: left;
+    }
+}
+
+/* ============================================================
+   GUIDE INTERACTIF (visite guidée) — voir assets/tour.js.
+   Le voile sombre est simulé par une immense box-shadow sur la
+   "découpe" (.tour-spotlight), ce qui donne l'effet de projecteur
+   sans avoir à découper un vrai calque plein écran.
+   ============================================================ */
+.tour-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 6000;
+}
+
+.tour-spotlight {
+    position: fixed;
+    border-radius: var(--radius);
+    box-shadow: 0 0 0 9999px rgba(10, 16, 13, 0.62);
+    transition: top 0.3s ease, left 0.3s ease, width 0.3s ease, height 0.3s ease;
+    pointer-events: none;
+}
+
+.tour-tooltip {
+    position: fixed;
+    z-index: 6001;
+    width: 320px;
+    max-width: calc(100vw - 24px);
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    padding: 18px;
+    transition: top 0.3s ease, left 0.3s ease;
+}
+
+.tour-tooltip.tour-tooltip-center {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.tour-tooltip-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+.tour-tooltip-text {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+    margin-bottom: 14px;
+}
+
+.tour-dots {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.tour-tooltip-center .tour-dots {
+    justify-content: center;
+}
+
+.tour-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: var(--transition-fast);
+}
+
+.tour-dot.active {
+    width: 18px;
+    border-radius: 4px;
+    background: var(--accent);
+}
+
+.tour-tooltip-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.tour-skip {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 4px;
+}
+
+.tour-skip:hover {
+    color: var(--text);
+    text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+    .tour-tooltip {
+        width: calc(100vw - 24px);
     }
 }

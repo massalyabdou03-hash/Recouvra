@@ -15,7 +15,7 @@
 // postes déjà installés continueront de servir l'ancienne version en cache.
 // =============================================================================
 
-const CACHE_VERSION = "v29";
+const CACHE_VERSION = "v30";
 const SHELL_CACHE = `recouvra-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `recouvra-runtime-${CACHE_VERSION}`;
 
@@ -30,6 +30,7 @@ const SHELL_ASSETS = [
   "credits.html",
   "clients.html",
   "parametres.html",
+  "aide.html",
   "recouvra.html",
   "recouvra-detail.html",
   "paiements.html",
@@ -46,6 +47,7 @@ const SHELL_ASSETS = [
   "assets/relances.js",
   "assets/abonnement.js",
   "assets/onboarding.js",
+  "assets/tour.js",
   "assets/img/icon.svg",
   "assets/img/apple-touch-icon.png",
   "assets/img/icon-192.png",

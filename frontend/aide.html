@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aide — Recouvra</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%231F6F5C'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1F6F5C">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Recouvra">
+    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="app">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="brand">
+            <img data-company-logo src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%231F6F5C'/%3E%3Cpath d='M7 12h10M12 7v10' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" class="brand-logo" alt="Logo">
+            <span data-company-name>Recouvra</span>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Quotidien</div>
+            <a href="index.html" class="nav-link"><span class="nav-emoji">🏠</span> Accueil</a>
+            <a href="factures.html" class="nav-link"><span class="nav-emoji">🧾</span> Vendre</a>
+            <a href="clients.html" class="nav-link"><span class="nav-emoji">👥</span> Mes Clients</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Stock</div>
+            <a href="stock.html" class="nav-link"><span class="nav-emoji">📊</span> Stock & Produits</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Argent</div>
+            <a href="credits.html" class="nav-link"><span class="nav-emoji">💸</span> On me doit</a>
+            <a href="recouvra.html" class="nav-link premium"><span class="nav-emoji">📣</span> Relancer <span class="badge-premium">PRO</span></a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Mon Entreprise</div>
+            <a href="parametres.html" class="nav-link"><span class="nav-emoji">⚙️</span> Paramètres</a>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="width:100%; margin-bottom:8px;">
+                <span id="dark-mode-icon">🌙</span> <span id="dark-mode-label">Mode sombre</span>
+            </button>
+            <div class="hint mono" id="current-user-email" style="margin-bottom:8px;"></div>
+            <button class="btn-logout" onclick="logout()">Déconnexion</button>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="main">
+        <div class="page-header-simple">
+            <a href="index.html" class="btn-back"><span class="arrow">←</span> Accueil</a>
+            <h1>❓ Aide & mode d'emploi</h1>
+            <p>Le fonctionnement de Recouvra, étape par étape.</p>
+        </div>
+
+        <div class="card" style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+            <div>
+                <h3 style="margin:0 0 4px;">🧭 Guide interactif de vente</h3>
+                <p class="hint" style="margin:0;">Revoyez la visite guidée animée directement sur la page Vendre.</p>
+            </div>
+            <a href="factures.html?guide=1" class="btn">Lancer le guide</a>
+        </div>
+
+        <div class="card">
+            <div class="card-head"><h3>🧾 Vendre</h3></div>
+            <p>Une vente se fait en 3 étapes, sur la page <strong>Vendre</strong> :</p>
+            <ol>
+                <li><strong>Qui achète ?</strong> — « Client de passage » est sélectionné par défaut. Choisissez un client enregistré dans la liste si vous voulez suivre ses achats ou lui faire crédit, ou créez-le avec <em>➕ Nouveau client</em>.</li>
+                <li><strong>Qu'est-ce qu'il achète ?</strong> — Recherchez un article puis touchez sa carte pour l'ajouter au panier. Répétez pour chaque article.</li>
+                <li><strong>Récapitulatif</strong> — Une fois un article ajouté, le total et les moyens de paiement (Espèces, Wave, Orange Money, À crédit) apparaissent en bas. Touchez celui utilisé par le client pour enregistrer la vente.</li>
+            </ol>
+            <p class="hint">Les ventes du mois s'affichent en bas de la page Vendre ; touchez une ligne pour revoir le détail d'une facture.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-head"><h3>👥 Mes Clients</h3></div>
+            <p>La liste de tous vos clients enregistrés, avec leurs coordonnées et leur historique d'achats et de crédits. Vous pouvez y ajouter un client sans passer par une vente.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-head"><h3>📊 Stock & Produits</h3></div>
+            <p>Gérez votre catalogue d'articles : prix, quantité en stock, seuil d'alerte. Chaque vente déduit automatiquement le stock ; chaque annulation de facture le recrédite.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-head"><h3>💸 On me doit</h3></div>
+            <p>Le suivi des ventes à crédit : qui vous doit de l'argent, combien, et depuis quand. C'est ici que vous enregistrez les paiements reçus sur une créance.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-head"><h3>📣 Relancer <span class="badge-premium">PRO</span></h3></div>
+            <p>Module payant qui automatise les relances (WhatsApp/SMS) auprès des clients qui ont une créance en retard, pour vous éviter d'avoir à les recontacter un par un.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-head"><h3>⚙️ Paramètres</h3></div>
+            <p>Les informations de votre entreprise (nom, coordonnées), l'apparence (couleurs, logo affiché sur vos factures) et votre abonnement.</p>
+            <p class="hint">Si votre logo ne s'affiche pas correctement sur une facture, retournez dans Paramètres : la page vous indique maintenant si le fichier ou le lien du logo est invalide.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-head"><h3>🤝 Besoin d'un coup de main ?</h3></div>
+            <p>Le bouton <strong>Support WhatsApp</strong>, en bas du menu, vous met directement en contact avec l'équipe Recouvra.</p>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    const session = await requireAuth();
+    if (!session) return;
+});
+</script>
+
+<!-- Navigation mobile (générée par app.js) -->
+</body>
+</html>
