@@ -312,6 +312,20 @@ function confirmDialog(message, opts = {}) {
 }
 
 // ----------------------------------------------------------------------------
+// 7bis. LIBELLES DES UNITES DE MESURE (pieces.unite_mesure / unite_gros)
+// ----------------------------------------------------------------------------
+const MEASURE_UNIT_LABELS = {
+  PCS: "pcs",
+  M: "m",
+  M2: "m²",
+  KG: "kg",
+  L: "L",
+  ROULEAU: "rouleau(x)",
+  CARTON: "carton(s)",
+  PAQUET: "paquet(s)",
+};
+
+// ----------------------------------------------------------------------------
 // 8. GESTION DES ERREURS FRIENDLY
 // ----------------------------------------------------------------------------
 const DUPLICATE_FIELD_LABELS = {
