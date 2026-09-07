@@ -99,7 +99,7 @@
           </div>
           <div class="settings-fields">
             <label>Logo de l'entreprise <input id="logo-file" type="file" accept="image/png,image/jpeg,image/webp"></label>
-            <label>Ou URL du logo <input id="logo" type="url" placeholder="https://..."></label>
+            <label>Ou URL du logo <input id="logo" type="text" placeholder="https://..."></label>
           </div>
 
           <div class="settings-actions">
@@ -205,13 +205,21 @@ async function handleLogoUpload(e) {
     if (file.size > 2 * 1024 * 1024) { showToast('Le logo ne doit pas dépasser 2 Mo.', 'error'); return; }
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session) return;
+    const { data: profile } = await supabaseClient.from('profiles').select('entreprise_id').eq('id', session.user.id).single();
+    if (!profile?.entreprise_id) { showToast('Entreprise non trouvée.', 'error'); return; }
     const fileExt = file.name.split('.').pop();
-    const filePath = `${session.user.id}/logo-${Date.now()}.${fileExt}`;
+    // Le chemin doit commencer par l'entreprise_id : c'est ce que verifient
+    // les policies RLS du bucket "company-logos" (name like entreprise_id || '/%'),
+    // pas l'id de l'utilisateur qui fait l'upload.
+    const filePath = `${profile.entreprise_id}/logo-${Date.now()}.${fileExt}`;
     try {
         const { error } = await supabaseClient.storage.from('company-logos').upload(filePath, file, { cacheControl: '3600', upsert: true });
         if (error) throw error;
-        const { data: urlData } = supabaseClient.storage.from('company-logos').getPublicUrl(filePath);
-        document.getElementById('logo').value = urlData.publicUrl;
+        // Bucket privé : getPublicUrl() renvoyait une URL qui semblait valide
+        // mais répondait 403 à l'affichage. getCompanySettings() (app.js) sait
+        // générer une URL signée à la lecture — à condition de recevoir ici le
+        // chemin brut, pas une URL publique inutilisable.
+        document.getElementById('logo').value = filePath;
         showToast('Logo téléchargé avec succès.', 'success');
     } catch (error) { showToast(friendlyError(error), 'error'); }
 }
