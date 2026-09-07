@@ -4016,3 +4016,70 @@ body.dark-mode .spinner-small {
     gap: 16px;
     max-width: 520px;
 }
+
+/* --- En-tête de facture (facture-detail.html) : img sans dimension
+   ni layout -> le logo (parfois un SVG sans width/height intrinsèque)
+   s'affichait à sa taille native, soit géant et non cadré. --- */
+.invoice-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.ih-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.ih-logo img {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    border: 1px solid var(--border-soft);
+    flex-shrink: 0;
+}
+
+.ih-name {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.25;
+}
+
+.ih-sub {
+    font-size: 12.5px;
+    color: var(--text-muted);
+}
+
+.ih-contact {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    text-align: right;
+    line-height: 1.6;
+}
+
+@media print {
+    .ih-logo img {
+        background: transparent;
+        border: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .invoice-header {
+        justify-content: flex-start;
+    }
+    .ih-contact {
+        text-align: left;
+    }
+}
