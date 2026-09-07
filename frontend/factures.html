@@ -202,6 +202,8 @@ function venteTourSteps() {
     ];
 }
 
+const VENTE_TOUR_LOCAL_KEY = 'rc_tour_vente_vu';
+
 function runVenteTour({ force = false } = {}) {
     if (!force && document.querySelector(".tour-overlay")) return;
     startGuidedTour(venteTourSteps(), {
@@ -209,21 +211,35 @@ function runVenteTour({ force = false } = {}) {
     });
 }
 
-async function markVenteTourSeen() {
-    try {
-        const { error } = await supabaseClient.rpc('marquer_tour_vente_vu');
-        if (error) throw error;
-    } catch (error) {
-        console.warn('Erreur enregistrement guide de vente vu :', error);
-    }
+function markVenteTourSeen() {
+    // Mémorisé en local en priorité : synchrone, marche même hors-ligne
+    // (l'app fonctionne sans réseau — voir sw.js). C'est ce qui garantit
+    // que le guide ne se réaffiche pas à la prochaine ouverture, même si
+    // l'appel réseau ci-dessous échoue ou est en attente de connexion.
+    try { localStorage.setItem(VENTE_TOUR_LOCAL_KEY, '1'); } catch (error) { /* stockage indisponible (navigation privée...) */ }
+    // Et en base, en best-effort, pour que ce soit aussi mémorisé si le
+    // vendeur se connecte plus tard depuis un autre appareil/navigateur.
+    supabaseClient.rpc('marquer_tour_vente_vu').then(({ error }) => {
+        if (error) console.warn('Erreur enregistrement guide de vente vu (base) — a-t-on bien exécuté supabase/upgrade_tour_vente.sql ?', error);
+    });
 }
 
 async function initVenteTourAutoStart() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('guide') === '1') { runVenteTour({ force: true }); return; }
+
+    let seenLocally = false;
+    try { seenLocally = localStorage.getItem(VENTE_TOUR_LOCAL_KEY) === '1'; } catch (error) { /* ignore */ }
+    if (seenLocally) return;
+
     try {
         const profile = await currentProfile();
-        if (profile && !profile.tour_vente_vu_at) runVenteTour();
+        if (!profile) return;
+        if (profile.tour_vente_vu_at) {
+            try { localStorage.setItem(VENTE_TOUR_LOCAL_KEY, '1'); } catch (error) { /* ignore */ }
+            return;
+        }
+        runVenteTour();
     } catch (error) {
         console.warn('Erreur vérification guide de vente :', error);
     }

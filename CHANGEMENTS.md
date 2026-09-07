@@ -50,9 +50,19 @@ Il ajoute la colonne `profiles.tour_vente_vu_at` et une fonction
 sur sa propre ligne — `profiles` n'ayant pas de policy d'auto-modification,
 un simple `update` direct depuis le frontend aurait échoué silencieusement).
 
-Sans cette migration, le guide fonctionne quand même (bouton "Revoir le
-guide", `?guide=1`) mais se réaffichera à chaque visite au lieu de ne se
-déclencher qu'une fois.
+**Mise à jour (v2) :** le guide se mémorise maintenant aussi en local
+(`localStorage`) dès qu'il est terminé/passé, avant même l'appel réseau.
+C'est ce qui évite qu'il ne se réaffiche à chaque ouverture de la page
+Vendre — y compris si la migration SQL n'a pas encore été exécutée, ou si
+le vendeur est hors-ligne (l'app fonctionne sans réseau). L'appel à
+`marquer_tour_vente_vu()` reste fait en best-effort, pour que ce soit aussi
+mémorisé côté serveur (utile si le vendeur change d'appareil/navigateur).
+
+Si le guide continue de réapparaître après cette mise à jour, ouvrez la
+console du navigateur (F12) sur la page Vendre : un avertissement
+"Erreur enregistrement guide de vente vu (base)" confirmera que la
+migration SQL n'a pas encore été exécutée (sans bloquer le fonctionnement
+local).
 
 ## Service worker
 
