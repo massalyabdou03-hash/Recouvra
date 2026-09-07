@@ -348,6 +348,9 @@ function friendlyError(err) {
   if (msg.includes("violates foreign key")) return "Cet élément est utilisé ailleurs et ne peut pas être supprimé.";
   if (msg.includes("Stock insuffisant")) return msg.split("CONTEXT")[0].trim();
   if (msg.includes("Invalid login credentials")) return "Code d'accès incorrect.";
+  if (msg.toLowerCase().includes("already registered") || msg.toLowerCase().includes("already exists")) return "Un compte existe déjà avec cet email. Connectez-vous plutôt.";
+  if (msg.includes("Password") && msg.includes("6 characters")) return "Le mot de passe doit contenir au moins 6 caractères.";
+  if (msg.includes("Unable to validate email address")) return "Adresse email invalide.";
   if (msg.includes("facture n'est plus en brouillon") || msg.includes("déjà")) return msg.split("CONTEXT")[0].trim();
   return msg;
 }

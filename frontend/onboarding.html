@@ -21,14 +21,47 @@
       <i data-step="1"></i><i data-step="2"></i><i data-step="3"></i>
     </div>
 
-    <!-- Étape 1 : Bienvenue -->
+    <!-- Étape 1 : Créer un compte -->
     <section class="onboarding-step" data-step="1">
       <span class="onboarding-eyebrow">Étape 1 sur 3</span>
       <h1>Bienvenue sur Recouvra 👋</h1>
-      <p class="lead">Votre espace de gestion est prêt. Quelques questions rapides pour adapter l'application à votre commerce.</p>
-      <div class="onboarding-nav" style="justify-content:flex-end;">
-        <button type="button" class="btn" onclick="goToStep(2)">Continuer</button>
+      <p class="lead">Créez votre compte pour démarrer votre essai gratuit de 14 jours.</p>
+
+      <label for="su-entreprise">Nom de l'entreprise *</label>
+      <input type="text" id="su-entreprise" placeholder="Ex. Boutique Awa" autocomplete="organization">
+
+      <div class="field-row">
+        <div>
+          <label for="su-gerant">Votre nom *</label>
+          <input type="text" id="su-gerant" placeholder="Ex. Awa Diop" autocomplete="name">
+        </div>
+        <div>
+          <label for="su-telephone">Téléphone *</label>
+          <input type="tel" id="su-telephone" placeholder="Ex. 77 123 45 67" autocomplete="tel">
+        </div>
       </div>
+
+      <label for="su-email">Email *</label>
+      <input type="email" id="su-email" placeholder="vous@exemple.com" autocomplete="email">
+
+      <div class="field-row">
+        <div>
+          <label for="su-password">Mot de passe *</label>
+          <input type="password" id="su-password" placeholder="6 caractères minimum" autocomplete="new-password">
+        </div>
+        <div>
+          <label for="su-password2">Confirmer *</label>
+          <input type="password" id="su-password2" placeholder="Répétez le mot de passe" autocomplete="new-password">
+        </div>
+      </div>
+
+      <div id="signup-msg" style="margin-top:12px; font-size:0.9rem; min-height:1.4em;"></div>
+
+      <div class="onboarding-nav" style="justify-content:flex-end;">
+        <button type="button" class="btn" id="signup-btn" onclick="createAccount()">Créer mon compte</button>
+      </div>
+
+      <p class="hint" style="margin-top:16px; text-align:center;">Déjà un compte ? <a href="login.html" style="color:var(--accent); font-weight:600;">Se connecter</a></p>
     </section>
 
     <!-- Étape 2 : Type de commerce -->

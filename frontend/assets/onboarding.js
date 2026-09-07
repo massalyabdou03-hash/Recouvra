@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Correction (audit V2) : `profiles.onboarding_complete` n'existe pas
     // dans le schéma — le vrai champ est `entreprises.onboarding_completed_at`.
     // Voir supabase/PROPOSED_fix_onboarding_rls.sql.
+    let startStep = 1;
     try {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
@@ -19,21 +20,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                 window.location.href = 'index.html';
                 return;
             }
+            // Un compte existe déjà et une session est active (compte créé
+            // par un super-admin, ou étape 1 déjà complétée précédemment) :
+            // on saute directement la création de compte.
+            startStep = 2;
         }
     } catch (e) {
         console.warn('Erreur vérification onboarding:', e);
     }
 
-    initOnboarding();
+    initOnboarding(startStep);
 });
 
-function initOnboarding() {
+function initOnboarding(startStep = 1) {
     const steps = document.querySelectorAll('.onboarding-step');
     const progressDots = document.querySelectorAll('.onboarding-progress i');
     const finishBtn = document.getElementById('finish-btn');
     const msgEl = document.getElementById('onboarding-msg');
 
-    let currentStep = 1;
+    let currentStep = startStep;
     let selectedCommerce = null;
     let selectedBesoins = [];
     let selectedPlan = null;
@@ -100,6 +105,78 @@ function initOnboarding() {
         document.querySelectorAll('.pricing-option').forEach(el => el.classList.remove('selected'));
         element.classList.add('selected');
         selectedPlan = plan;
+    };
+
+    function showSignupMessage(text, type = 'info') {
+        const el = document.getElementById('signup-msg');
+        if (!el) return;
+        el.textContent = text;
+        el.style.color = type === 'error' ? 'var(--danger)' : (type === 'success' ? 'var(--success)' : 'var(--info)');
+    }
+
+    // Crée le compte (auth.users) avec les métadonnées attendues par le
+    // trigger `create_company_for_new_user` (voir upgrade_saas_onboarding_wave.sql),
+    // qui crée automatiquement entreprises/profiles/entreprise_settings.
+    window.createAccount = async function() {
+        const entrepriseNom = document.getElementById('su-entreprise').value.trim();
+        const gerantNom = document.getElementById('su-gerant').value.trim();
+        const telephone = document.getElementById('su-telephone').value.trim();
+        const email = document.getElementById('su-email').value.trim();
+        const password = document.getElementById('su-password').value;
+        const password2 = document.getElementById('su-password2').value;
+
+        if (!entrepriseNom || !gerantNom || !telephone || !email || !password) {
+            showSignupMessage('Veuillez remplir tous les champs.', 'error');
+            return;
+        }
+        if (password.length < 6) {
+            showSignupMessage('Le mot de passe doit contenir au moins 6 caractères.', 'error');
+            return;
+        }
+        if (password !== password2) {
+            showSignupMessage('Les mots de passe ne correspondent pas.', 'error');
+            return;
+        }
+
+        const btn = document.getElementById('signup-btn');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = '⏳ Création...';
+        showSignupMessage('', 'info');
+
+        try {
+            const { data, error } = await supabaseClient.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        entreprise_nom: entrepriseNom,
+                        gerant_nom: gerantNom,
+                        telephone: telephone,
+                    },
+                },
+            });
+            if (error) throw error;
+
+            if (data.session) {
+                // Confirmation email désactivée sur le projet : session active
+                // immédiatement, on peut continuer l'assistant.
+                goToStep(2);
+            } else {
+                // Confirmation email requise : le compte (et son entreprise, via
+                // le trigger) existe déjà, mais il faut confirmer avant de
+                // pouvoir continuer. En revenant plus tard connecté, la
+                // vérification de session en haut de ce fichier renverra
+                // directement à l'étape 2.
+                showSignupMessage('Compte créé ! Vérifiez votre boîte mail pour confirmer votre adresse, puis connectez-vous pour continuer.', 'success');
+                btn.textContent = '✅ Vérifiez votre email';
+            }
+        } catch (error) {
+            console.error('Erreur création de compte :', error);
+            showSignupMessage(friendlyError(error), 'error');
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
     };
 
     function updateValueBlocks() {
@@ -185,7 +262,7 @@ function initOnboarding() {
     };
 
     steps.forEach((s, idx) => {
-        if (idx === 0) {
+        if (idx + 1 === startStep) {
             s.hidden = false;
             s.style.opacity = '1';
             s.style.transform = 'translateX(0)';
@@ -194,6 +271,8 @@ function initOnboarding() {
         }
     });
     progressDots.forEach((dot, idx) => {
-        dot.className = idx === 0 ? 'active' : '';
+        dot.className = '';
+        if (idx + 1 === startStep) dot.classList.add('active');
+        else if (idx + 1 < startStep) dot.classList.add('done');
     });
 }
