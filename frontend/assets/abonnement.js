@@ -112,13 +112,30 @@ async function submitPayment() {
             if (uploadError) throw uploadError;
         }
 
+        // Le paiement se rattache à l'abonnement de l'entreprise (subscription_id
+        // obligatoire en base, et vérifié par la policy RLS d'insertion). Chaque
+        // entreprise en a déjà un depuis sa création (create_company_for_new_user).
+        const { data: sub, error: subError } = await supabaseClient
+            .from('subscriptions')
+            .select('id')
+            .eq('entreprise_id', profile.entreprise_id)
+            .single();
+        if (subError || !sub) throw new Error('Abonnement introuvable pour cette entreprise.');
+
+        // Correction : `payment_tier` et `monthly_plan` n'existent pas dans le
+        // schéma de `subscription_payments` (colonnes réelles : entreprise_id,
+        // subscription_id, submitted_by, payment_type, amount, currency,
+        // provider, payment_method, payment_reference, proof_path, status...) —
+        // l'insert échouait donc systématiquement avec une erreur de schema
+        // cache PostgREST. Le plan choisi (selectedPlan) est déjà appliqué à
+        // l'abonnement lui-même via complete_onboarding()/l'admin ; il n'a pas
+        // besoin d'être redondant sur chaque paiement.
         const total = (alreadyHasSubscription ? 0 : setupFee) + monthlyFee;
         const { error } = await supabaseClient.from('subscription_payments').insert({
             entreprise_id: profile.entreprise_id,
+            subscription_id: sub.id,
             submitted_by: session.user.id,
             payment_type: alreadyHasSubscription ? 'subscription' : 'setup',
-            payment_tier: selectedPlan,
-            monthly_plan: selectedPlan,
             amount: total,
             payment_reference: reference || null,
             proof_path: proofPath,

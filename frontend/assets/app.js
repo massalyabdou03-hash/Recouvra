@@ -183,10 +183,17 @@ async function requireAuth() {
     return session;
   }
 
+  // Nouveau compte : subscriptions.status vaut "active" dès la création
+  // (essai gratuit de 14 jours posé par create_company_for_new_user), avec
+  // current_period_end = date de fin d'essai. Une fois ce délai dépassé (et
+  // tant qu'aucun paiement n'a été confirmé pour le renouveler), on renvoie
+  // vers la page d'abonnement comme pour un abonnement payant expiré.
   const subStatus = profile.entreprises.subscriptions?.status;
+  const periodEnd = profile.entreprises.subscriptions?.current_period_end;
+  const stillWithinPeriod = !periodEnd || new Date(periodEnd) > new Date();
 
-  if (subStatus === "active") {
-    // OK
+  if (subStatus === "active" && stillWithinPeriod) {
+    // OK (abonnement actif, ou essai gratuit en cours)
   } else {
     window.location.href = "abonnement.html";
     return null;
